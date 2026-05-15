@@ -5073,6 +5073,78 @@ function spawnAnonBotPostAbout(user) {
   });
 }
 
+// ===== RANDOM @-MENTION BOT =====
+// Every 35-90 min, the disclosed anon bot picks a random active member and
+// posts a short public message @-mentioning them. The mentioned member
+// gets a "you were mentioned" notification (and optional SMS). The bot
+// account is the same anonymous one disclosed in TOS page 5(a)/(b).
+const ATAT_TEMPLATES = [
+  'wassup @{handle}',
+  '@{handle} how u been',
+  '@{handle} wyd rn',
+  'yo @{handle} 👋',
+  '@{handle} we don\'t talk enough',
+  '@{handle} ✨',
+  'thinking about @{handle} for some reason',
+  '@{handle} you up',
+  'shoutout @{handle}',
+  '@{handle} miss u',
+  '@{handle} where you been',
+  '@{handle} drop a sign of life'
+];
+function spawnRandomAtMentionPost() {
+  try {
+    if (SITE_PAUSED) return;
+    const candidates = users.filter(u => u && u.status === 'active' && !u.isBot && !u.isSystem && u.handle);
+    if (!candidates.length) return;
+    // Skip users who got @-mentioned by the bot in the last 12h to avoid spam.
+    const recentCutoff = Date.now() - 12 * 60 * 60 * 1000;
+    const recentlyMentioned = new Set();
+    for (const p of posts) {
+      if (p.authorEmail !== 'anon-bot@paths.local') continue;
+      if ((p.createdAt || 0) < recentCutoff) continue;
+      const m = String(p.content || '').match(/@([a-z0-9_]+)/i);
+      if (m) recentlyMentioned.add(m[1].toLowerCase());
+    }
+    const eligible = candidates.filter(u => !recentlyMentioned.has((u.handle || '').toLowerCase()));
+    if (!eligible.length) return;
+    const target = eligible[Math.floor(Math.random() * eligible.length)];
+    const tpl = ATAT_TEMPLATES[Math.floor(Math.random() * ATAT_TEMPLATES.length)];
+    const content = tpl.replace(/\{handle\}/g, target.handle);
+    const now = Date.now();
+    const post = {
+      id: newId(),
+      authorEmail: 'anon-bot@paths.local',
+      authorName: 'anonymous',
+      isAnonymous: true,
+      isBot: true,
+      content,
+      createdAt: now,
+      reactions: {},
+      comments: [],
+      views: {},
+      mentions: [target.email]
+    };
+    posts.push(post);
+    savePosts();
+    try { io.emit('post-added', publicPost(post)); } catch {}
+    pushNotif(target.email || ('id:' + target.id), {
+      type: 'mention',
+      fromName: 'someone',
+      text: `mentioned you: "${content}"`,
+      postId: post.id,
+      ts: now
+    });
+    console.log('[atat-bot] mentioned @' + target.handle + ': ' + content);
+  } catch (e) { console.warn('[atat-bot] failed', e.message); }
+}
+// First fire 5 min after boot, then every 35-90 min (randomized each call).
+function scheduleNextAtat() {
+  const delay = (35 + Math.random() * 55) * 60 * 1000;
+  setTimeout(() => { spawnRandomAtMentionPost(); scheduleNextAtat(); }, delay);
+}
+setTimeout(scheduleNextAtat, 5 * 60 * 1000);
+
 app.post('/api/admin/waitlist/approve', (req, res) => {
   if (!requireAdmin(req, res)) return;
   const id = String((req.body && req.body.userId) || '');
