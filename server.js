@@ -1782,18 +1782,8 @@ setTimeout(() => {
 
   // Grandfather every existing active user into the current TOS so the
   // gate doesn't block actions like accepting friend requests for people
-  // who agreed to a previous TOS version. New signups still see the modal.
-  try {
-    let granted = 0;
-    for (const u of users) {
-      if (u.status !== 'active') continue;
-      if (u.tosAgreedVersion === CURRENT_TOS_VERSION) continue;
-      u.tosAgreedVersion = CURRENT_TOS_VERSION;
-      u.tosAgreedAt = u.tosAgreedAt || Date.now();
-      granted++;
-    }
-    if (granted > 0) { saveUsers(); console.log(`[cleanup] grandfathered ${granted} users into current TOS`); }
-  } catch (e) { console.warn('[cleanup] tos-grandfather failed', e.message); }
+  // TOS grandfather removed — users must agree on next login.
+  // Version bump forces re-prompt for everyone on this deploy.
 
   // QOTD bell notifications are disabled entirely now (widget on home is
   // enough). Wipe ALL qotd notifs from storage on every boot.
@@ -2375,7 +2365,7 @@ function findUserById(id) {
 }
 // Bump this string any time the TOS changes — every user is re-prompted
 // to agree on next login. Format: YYYY-MM-DD-vN.
-const CURRENT_TOS_VERSION = '2026-05-14-v2-18plus-camera';
+const CURRENT_TOS_VERSION = '2026-05-14-v3-required';
 
 // Hard blocklist of staff / role-based inbox names and email locals. These
 // aren't real students and must never get on the platform. Match on either
