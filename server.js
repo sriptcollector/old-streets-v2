@@ -4105,7 +4105,16 @@ function normalizeHandle(h) {
 function findUserByHandle(h) {
   const n = normalizeHandle(h);
   if (!n) return null;
-  return users.find(u => (u.handle || '').toLowerCase() === n) || null;
+  // 1) Exact handle match
+  const byHandle = users.find(u => (u.handle || '').toLowerCase() === n);
+  if (byHandle) return byHandle;
+  // 2) Fallback: match by email-prefix (so /u/<email-prefix> works for users
+  //    who haven't set a handle yet — fixes "user not found" on legacy refs)
+  const byPrefix = users.find(u => ((u.email || '').split('@')[0] || '').toLowerCase() === n);
+  if (byPrefix) return byPrefix;
+  // 3) Fallback: match by normalized name (first+last lower no-spaces)
+  const byName = users.find(u => (u.name || '').toLowerCase().replace(/[^a-z0-9_]/g, '') === n);
+  return byName || null;
 }
 function handleAvailable(h) {
   const n = normalizeHandle(h);
