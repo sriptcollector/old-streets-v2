@@ -2065,12 +2065,12 @@ footer a { color: var(--msp-ink-link); }
       show('signin-phone');
     });
 
-    // landing legal
-    ['link-tos-landing','footer-tos'].forEach(id => {
+    // landing legal — wire every Terms / Privacy link variant to the modal.
+    ['link-tos-landing','link-tos-landing-2','footer-tos','link-tos-modal'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('click', (e) => { e.preventDefault(); openLegal('terms'); });
     });
-    ['link-privacy-landing','footer-privacy'].forEach(id => {
+    ['link-privacy-landing','link-privacy-landing-2','footer-privacy','link-privacy-modal'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('click', (e) => { e.preventDefault(); openLegal('privacy'); });
     });
@@ -2244,13 +2244,11 @@ footer a { color: var(--msp-ink-link); }
     const btnSuSubmit = document.getElementById('btn-su-submit');
     if (btnSuSubmit) btnSuSubmit.addEventListener('click', submitSignup);
 
-    /* ----- Legal modal ----- */
-    const linkTosModal = document.getElementById('link-tos-modal');
-    if (linkTosModal) linkTosModal.addEventListener('click', (e) => { e.preventDefault(); openLegal('terms'); });
-    const linkPrivacyModal = document.getElementById('link-privacy-modal');
-    if (linkPrivacyModal) linkPrivacyModal.addEventListener('click', (e) => { e.preventDefault(); openLegal('privacy'); });
-    document.getElementById('legal-close').addEventListener('click', closeLegal);
-    document.getElementById('legal-modal').addEventListener('click', (e) => {
+    /* ----- Legal modal (close + backdrop-click) ----- */
+    const legalClose = document.getElementById('legal-close');
+    if (legalClose) legalClose.addEventListener('click', closeLegal);
+    const legalModal = document.getElementById('legal-modal');
+    if (legalModal) legalModal.addEventListener('click', (e) => {
       if (e.target.id === 'legal-modal') closeLegal();
     });
 
