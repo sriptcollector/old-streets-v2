@@ -1,6 +1,8 @@
-# Paths
+# Old Streets — v2
 
 Invite-only social platform. Live at `https://old-streets.fly.dev/`.
+
+This repo is the **v2 rebuild** as of 2026-05-15. For the pre-rebuild Monday baseline (referrals, school gates, etc.), see [`sriptcollector/old-streets-monday`](https://github.com/sriptcollector/old-streets-monday).
 
 ## Stack
 - Node 20 + Express monolith (`server.js`)
