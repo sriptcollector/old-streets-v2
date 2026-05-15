@@ -7194,9 +7194,8 @@ function requireSession(req, res) {
 app.post('/api/me/selfie', (req, res) => {
   const user = requireSession(req, res);
   if (!user) return;
-  // One-shot: once a selfie is taken, it's locked. Admin can reset
-  // by manually editing users.json on the volume.
-  if (user.selfieTaken && !user.isAdmin) {
+  // One-shot: once a selfie is taken, it's locked for everyone.
+  if (user.selfieTaken) {
     return res.status(409).json({ error: 'locked', message: 'profile photo is set for life — cannot change.' });
   }
   const dataUrl = String((req.body && req.body.dataUrl) || '');
@@ -7221,8 +7220,8 @@ app.put('/api/users/me', (req, res) => {
     user.bio = bio.slice(0, 200);
   }
   if (typeof avatar === 'string') {
-    // Once a selfie is taken it's locked — profile edit cannot override it
-    if (user.selfieTaken && !user.isAdmin) {
+    // Once a selfie is taken it's locked for everyone — no overrides
+    if (user.selfieTaken) {
       // silently ignore avatar changes for locked users
     } else if (avatar === '' || avatar.startsWith('data:image/')) {
       if (avatar.length > 2 * 1024 * 1024) {

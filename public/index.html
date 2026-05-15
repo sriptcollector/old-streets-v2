@@ -3110,7 +3110,6 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
       if (!needsTos && !needsSelfie) return;
       if (state._tosGateShown) return;
       state._tosGateShown = true;
-      if (state.user.isAdmin) return;
       buildTosOverlay(needsTos, needsSelfie);
     } catch (e) { console.warn('[tos-gate]', e.message); }
   }
