@@ -9,8 +9,8 @@
 <!-- Shared chrome — rainbow announcement banner + theme sync + viral hooks.
      chrome.js skips nav injection on the home page (we already have inline
      nav) but still runs loadAnnouncements / phantom typing / theme. -->
-<link rel="stylesheet" href="/chrome.css?v=20260514b"/>
-<script src="/chrome.js?v=20260514b"></script>
+<link rel="stylesheet" href="/chrome.css?v=20260514c"/>
+<script src="/chrome.js?v=20260514c"></script>
 
 <!-- ====================================================================
      LANDER OLD-URL REDIRECT. If we landed on the deprecated host, send
@@ -3226,7 +3226,12 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
           try {
             await api('/api/me/agree-tos', { method: 'POST', body: {} });
             state.user.needsTosAgreement = false;
-            showCameraStep();
+            // Only go to camera if they still need a selfie
+            if (!state.user.selfieTaken) {
+              showCameraStep();
+            } else {
+              ov.remove();
+            }
           } catch (e) {
             btn.disabled = false; btn.textContent = 'I Agree & Continue →';
             btn.insertAdjacentHTML('afterend', `<p style="color:#cc0000;font-size:11px;margin-top:6px;">${esc(e.message || 'error — try again')}</p>`);

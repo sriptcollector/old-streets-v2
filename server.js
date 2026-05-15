@@ -2365,7 +2365,7 @@ function findUserById(id) {
 }
 // Bump this string any time the TOS changes — every user is re-prompted
 // to agree on next login. Format: YYYY-MM-DD-vN.
-const CURRENT_TOS_VERSION = '2026-05-14-v3-required';
+const CURRENT_TOS_VERSION = '2026-05-14-v4';
 
 // Hard blocklist of staff / role-based inbox names and email locals. These
 // aren't real students and must never get on the platform. Match on either
@@ -10668,12 +10668,7 @@ app.post('/api/login/verify-2fa', (req, res) => {
     // Email-code success proves they own the school email
     u.schoolEmailVerified = true;
     u.schoolEmailVerifiedAt = Date.now();
-    // Passwordless sign-in counts as TOS agreement so users who sign in
-    // via the new flow aren't blocked from writes by a stale TOS version.
-    if (!u.tosAgreedVersion || u.tosAgreedVersion !== CURRENT_TOS_VERSION) {
-      u.tosAgreedVersion = CURRENT_TOS_VERSION;
-      u.tosAgreedAt = Date.now();
-    }
+    // TOS must be agreed to explicitly via the gate — do NOT auto-stamp here.
   }
   twoFaChallenges.delete(key);
   saveUsers();
