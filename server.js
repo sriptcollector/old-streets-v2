@@ -7221,8 +7221,10 @@ app.put('/api/users/me', (req, res) => {
     user.bio = bio.slice(0, 200);
   }
   if (typeof avatar === 'string') {
-    if (avatar === '' || avatar.startsWith('data:image/')) {
-      // client compresses before sending; this is a generous cap.
+    // Once a selfie is taken it's locked — profile edit cannot override it
+    if (user.selfieTaken && !user.isAdmin) {
+      // silently ignore avatar changes for locked users
+    } else if (avatar === '' || avatar.startsWith('data:image/')) {
       if (avatar.length > 2 * 1024 * 1024) {
         return res.status(413).json({ error: 'avatar too big — try a smaller image' });
       }

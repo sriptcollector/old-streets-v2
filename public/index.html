@@ -9,8 +9,8 @@
 <!-- Shared chrome — rainbow announcement banner + theme sync + viral hooks.
      chrome.js skips nav injection on the home page (we already have inline
      nav) but still runs loadAnnouncements / phantom typing / theme. -->
-<link rel="stylesheet" href="/chrome.css?v=20260514a"/>
-<script src="/chrome.js?v=20260515c"></script>
+<link rel="stylesheet" href="/chrome.css?v=20260514b"/>
+<script src="/chrome.js?v=20260514b"></script>
 
 <!-- ====================================================================
      LANDER OLD-URL REDIRECT. If we landed on the deprecated host, send
@@ -3098,50 +3098,270 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
   // ==========================================================
   // FORCED 3-school lock — appears the moment a user signs in and is
   // dismissable ONLY by completing the double-confirm flow. Locked-in
-  // ToS gate — shown once per unaccepted version. Blocks all other modals.
+  // ================================================================
+  // TOS + SELFIE GATE — full-screen paged flow. Cannot be dismissed.
+  // Page 1-4: terms. Page 4 warns about selfie. After agree → camera.
+  // Camera permission is REQUIRED to enter the site.
+  // ================================================================
   async function maybeShowTosGate() {
     try {
-      if (!state.user || !state.user.needsTosAgreement) return;
+      const needsTos = state.user && state.user.needsTosAgreement;
+      const needsSelfie = state.user && !state.user.selfieTaken;
+      if (!needsTos && !needsSelfie) return;
       if (state._tosGateShown) return;
       state._tosGateShown = true;
-      openModal('📋 Terms of Service', `
-        <div style="background:#cc0000; color:#fff; padding:8px 10px; font-size:11px; font-weight:700; margin:-12px -12px 12px;">
-          REQUIRED · agree to continue using old streets
+      if (state.user.isAdmin) return;
+      buildTosOverlay(needsTos, needsSelfie);
+    } catch (e) { console.warn('[tos-gate]', e.message); }
+  }
+
+  function buildTosOverlay(needsTos, needsSelfie) {
+    // Remove any existing overlay
+    const old = document.getElementById('tos-gate-overlay');
+    if (old) old.remove();
+
+    const ov = document.createElement('div');
+    ov.id = 'tos-gate-overlay';
+    ov.style.cssText = `
+      position:fixed; inset:0; z-index:99999; background:#f2f0e8;
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:flex-start; overflow-y:auto;
+      font-family: 'Trebuchet MS', Arial, sans-serif;
+    `;
+
+    const TOS_PAGES = [
+      {
+        title: 'old streets — terms of service',
+        body: `
+          <p><strong>1. Who can use old streets.</strong> You must be at least 13 years old to create an account. By proceeding, you confirm that you meet this age requirement. old streets is invite-only and school-isolated — your account is tied permanently to your school community. Access is a privilege, not a right, and can be revoked at any time for conduct violations.</p>
+          <p><strong>2. Your identity here is real.</strong> old streets does not allow fake accounts, impersonation, or the creation of accounts on behalf of another person. Your name must be your legal first and last name as it appears in your school's records. Your handle is permanent. Your phone number is tied to your account and used for authentication only.</p>
+          <p><strong>3. Content you post.</strong> You retain ownership of everything you post. By submitting content to old streets, you grant us a non-exclusive, royalty-free license to display it to members of your school community for as long as your account exists. You are solely responsible for what you post. Do not post anything illegal, defamatory, sexually explicit involving real people without consent, or designed to harm, harass, or intimidate another person.</p>
+        `
+      },
+      {
+        title: 'privacy & data',
+        body: `
+          <p><strong>4. What we collect.</strong> old streets collects your phone number, legal name, chosen handle, profile photo, the content you post, and basic device and IP metadata for security and fraud prevention. We do not sell your data. We do not run third-party advertising trackers. We do not index your content to public search engines. Your school community is the only audience for your posts.</p>
+          <p><strong>5. Anonymous posts.</strong> When you post anonymously, your identity is hidden from other members of your school. However, platform administrators retain the ability to identify the real author of any post for safety, legal, and moderation purposes. Anonymity is not an invitation to harm others.</p>
+          <p><strong>6. Data retention.</strong> If you delete your account, we remove your posts, reactions, and profile data from active storage within 30 days. Backup copies may persist for up to 90 days. Illegal content flagged to law enforcement may be retained as required by applicable law. You may request a copy of your data at any time by contacting support.</p>
+        `
+      },
+      {
+        title: 'conduct & community',
+        body: `
+          <p><strong>7. Things that will get you removed immediately.</strong> Posting sexual content involving minors. Doxxing or sharing private information of others without consent. Impersonating another person, school official, or administrator. Using the platform to coordinate real-world harm, threats, or harassment. Creating multiple accounts to circumvent a ban. Attempting to scrape, reverse-engineer, or exploit the platform's systems.</p>
+          <p><strong>8. Things that will get you warned or timed out.</strong> Repeated targeted harassment of a specific member. Spamming the feed or DMs. Posting content designed to bully or demean a classmate. Abusing the anonymous posting feature to avoid accountability for harmful speech.</p>
+          <p><strong>9. Enforcement.</strong> We reserve the right to suspend, time-out, or permanently ban any account at our discretion. Bans based on phone number are permanent. If your conduct violates applicable law, we will cooperate fully with law enforcement, including sharing identifying information and content.</p>
+        `
+      },
+      {
+        title: 'one last thing before you continue.',
+        body: `
+          <p style="font-size:15px; font-weight:700; color:#cc0000; margin-bottom:18px;">We're going to take a photo of you right now.</p>
+          <p>old streets requires a live selfie to activate your account. This photo will be permanently locked as your profile picture. You cannot change it after it is taken.</p>
+          <p>The selfie is stored securely and displayed only to members of your school community. It is never used for facial recognition, sold to third parties, or shared outside the platform.</p>
+          <p>By clicking <strong>I Agree & Continue</strong> on the next screen, you consent to your camera being activated and a photo being captured and saved as your permanent profile picture for as long as your account exists.</p>
+          <p style="font-size:11px; color:#555; margin-top:16px; border-top:1px solid #ccc; padding-top:12px;">If you do not consent to this, you cannot create an account on old streets. Camera permission is required and non-negotiable.</p>
+        `
+      }
+    ];
+
+    let currentPage = needsTos ? 0 : -1; // -1 = skip straight to camera
+
+    function renderPage() {
+      ov.innerHTML = '';
+
+      if (currentPage === -1) {
+        // Straight to camera — no TOS needed
+        showCameraStep();
+        return;
+      }
+
+      const pg = TOS_PAGES[currentPage];
+      const isLast = currentPage === TOS_PAGES.length - 1;
+
+      ov.innerHTML = `
+        <div style="width:100%; max-width:540px; padding:24px 20px 40px; box-sizing:border-box;">
+          <div style="text-align:center; margin-bottom:20px;">
+            <div style="font-size:11px; color:#888; letter-spacing:2px; text-transform:uppercase;">
+              ${currentPage + 1} of ${TOS_PAGES.length}
+            </div>
+            <div style="display:flex; justify-content:center; gap:6px; margin-top:8px;">
+              ${TOS_PAGES.map((_, i) => `
+                <div style="width:28px; height:4px; background:${i <= currentPage ? '#003399' : '#ccc'};"></div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div style="background:#fff; border:2px solid #003399; padding:20px 22px; margin-bottom:20px;">
+            <div style="font-size:13px; font-weight:700; color:#003399; border-bottom:1px solid #d0d8f0; padding-bottom:8px; margin-bottom:14px; text-transform:uppercase; letter-spacing:1px;">
+              ${esc(pg.title)}
+            </div>
+            <div style="font-size:12.5px; line-height:1.75; color:#1a1a2e;">
+              ${pg.body}
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:${currentPage > 0 ? 'space-between' : 'flex-end'}; align-items:center; gap:12px;">
+            ${currentPage > 0 ? `
+              <button id="tos-back-btn" style="background:#eee; color:#333; border:1px solid #bbb; padding:10px 22px; font-size:12px; font-weight:700; cursor:pointer; letter-spacing:1px;">
+                ← Back
+              </button>
+            ` : ''}
+            <button id="tos-next-btn" style="background:#003399; color:#fff; border:2px solid #001a80; padding:11px 28px; font-size:13px; font-weight:700; cursor:pointer; letter-spacing:1px;">
+              ${isLast ? 'I Agree &amp; Continue →' : 'Next →'}
+            </button>
+          </div>
+
+          <p style="text-align:center; font-size:10px; color:#999; margin-top:16px;">
+            old streets · terms of service · you must agree to continue
+          </p>
         </div>
-        <div style="max-height:280px; overflow-y:auto; font-size:11.5px; line-height:1.6; margin-bottom:14px; padding-right:4px;">
-          <p><strong>1. Age.</strong> You must be 13 or older. By agreeing you confirm you meet this requirement.</p>
-          <p><strong>2. Profile photo.</strong> A live selfie is required at account setup. You grant old streets a non-exclusive license to host it as your profile picture while your account exists. Photos are not used for facial recognition or advertising.</p>
-          <p><strong>3. Content.</strong> You own what you post. You grant old streets permission to display it to members of your school community. Don't post anything illegal, harassing, or violating someone else's privacy.</p>
-          <p><strong>4. Anonymity.</strong> Anonymous posts are visible to your school community. Admins can see the real author for safety purposes.</p>
-          <p><strong>5. Rooms & video.</strong> Calls route through Jitsi Meet. We don't record server-side, but other participants may screenshot. Exit any call at any time.</p>
-          <p><strong>6. Privacy.</strong> We collect: phone number, name, handle, selfie, posts, and basic device/IP for security. We don't sell data or run ads.</p>
-          <p><strong>7. Conduct.</strong> Don't spam, harass, or post explicit content of real people without consent. Violations result in removal.</p>
-          <p><strong>8. Termination.</strong> We can remove accounts that violate these terms. You can delete your account at any time.</p>
-        </div>
-        <div style="text-align:center;">
-          <button type="button" id="tos-agree-btn"
-            style="background:#003399; color:#fff; border:0; padding:10px 32px; font-size:13px; font-weight:700; cursor:pointer; width:100%;">
-            I Agree to the Terms of Service
-          </button>
-          <p style="font-size:10px; color:var(--msp-mute); margin-top:8px;">you must agree to use old streets.</p>
-        </div>
-      `, { dismissable: false });
-      setTimeout(() => {
-        const btn = document.getElementById('tos-agree-btn');
-        if (!btn) return;
-        btn.addEventListener('click', async () => {
+      `;
+
+      document.getElementById('tos-next-btn').addEventListener('click', async () => {
+        if (isLast) {
+          // Save TOS agreement then go to camera
+          const btn = document.getElementById('tos-next-btn');
           btn.disabled = true; btn.textContent = 'saving…';
           try {
             await api('/api/me/agree-tos', { method: 'POST', body: {} });
             state.user.needsTosAgreement = false;
-            closeModal();
+            showCameraStep();
           } catch (e) {
-            btn.disabled = false; btn.textContent = 'I Agree to the Terms of Service';
-            showToast(e.message || 'failed, try again');
+            btn.disabled = false; btn.textContent = 'I Agree & Continue →';
+            btn.insertAdjacentHTML('afterend', `<p style="color:#cc0000;font-size:11px;margin-top:6px;">${esc(e.message || 'error — try again')}</p>`);
           }
-        });
-      }, 200);
-    } catch (e) { console.warn('[tos-gate]', e.message); }
+        } else {
+          currentPage++;
+          renderPage();
+        }
+      });
+
+      const backBtn = document.getElementById('tos-back-btn');
+      if (backBtn) backBtn.addEventListener('click', () => { currentPage--; renderPage(); });
+    }
+
+    function showCameraStep() {
+      ov.innerHTML = `
+        <div style="width:100%; max-width:480px; padding:32px 20px; box-sizing:border-box; text-align:center;">
+          <div style="font-size:18px; font-weight:700; color:#cc0000; margin-bottom:6px; letter-spacing:1px;">
+            📷 CAMERA REQUIRED
+          </div>
+          <div style="font-size:13px; color:#333; margin-bottom:24px; line-height:1.6;">
+            We need camera permission to get in the site.<br>
+            <span style="font-size:11px; color:#888;">Your photo will be permanently locked as your profile picture.</span>
+          </div>
+
+          <div id="cam-permission-msg" style="background:#fff3cd; border:2px solid #ffc107; padding:14px 16px; font-size:12px; color:#333; margin-bottom:20px; display:none;"></div>
+
+          <div id="cam-preview-wrap" style="display:none; margin-bottom:20px; position:relative;">
+            <video id="tos-cam-video" autoplay playsinline muted
+              style="width:100%; max-width:360px; height:270px; object-fit:cover; border:3px solid #003399; display:block; margin:0 auto; transform:scaleX(-1);"></video>
+            <canvas id="tos-cam-canvas" style="display:none;"></canvas>
+            <div id="cam-countdown" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:72px; font-weight:900; color:#fff; text-shadow:0 0 12px #000; display:none; pointer-events:none;"></div>
+          </div>
+
+          <div id="cam-snap-preview" style="display:none; margin-bottom:20px;">
+            <img id="cam-snap-img" style="width:100%; max-width:360px; height:270px; object-fit:cover; border:3px solid #003399; display:block; margin:0 auto;"/>
+            <p style="font-size:12px; color:#555; margin-top:8px;">saving your photo…</p>
+          </div>
+
+          <button id="cam-allow-btn"
+            style="background:#cc0000; color:#fff; border:2px solid #990000; padding:13px 36px; font-size:14px; font-weight:700; cursor:pointer; letter-spacing:1px; width:100%; max-width:360px;">
+            ALLOW CAMERA ACCESS
+          </button>
+
+          <p id="cam-denied-msg" style="display:none; color:#cc0000; font-size:12px; margin-top:14px; line-height:1.6;">
+            Camera access was denied.<br>
+            <strong>You must allow camera access to use old streets.</strong><br>
+            Open your browser settings, allow camera for this site, then tap the button above.
+          </p>
+
+          <p style="font-size:10px; color:#aaa; margin-top:20px;">
+            old streets · selfie required · one-time · permanent
+          </p>
+        </div>
+      `;
+
+      let stream = null;
+
+      async function requestCamera() {
+        const allowBtn = document.getElementById('cam-allow-btn');
+        const deniedMsg = document.getElementById('cam-denied-msg');
+        const previewWrap = document.getElementById('cam-preview-wrap');
+        const permMsg = document.getElementById('cam-permission-msg');
+        if (allowBtn) { allowBtn.disabled = true; allowBtn.textContent = 'requesting…'; }
+        if (deniedMsg) deniedMsg.style.display = 'none';
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+          const vid = document.getElementById('tos-cam-video');
+          if (vid) { vid.srcObject = stream; }
+          if (previewWrap) previewWrap.style.display = '';
+          if (allowBtn) allowBtn.style.display = 'none';
+          if (permMsg) permMsg.style.display = 'none';
+          // Auto-snap countdown: 3…2…1…snap
+          startCountdown();
+        } catch (err) {
+          if (allowBtn) { allowBtn.disabled = false; allowBtn.textContent = 'ALLOW CAMERA ACCESS'; }
+          if (deniedMsg) deniedMsg.style.display = '';
+          if (permMsg) {
+            permMsg.style.display = '';
+            permMsg.textContent = 'Camera blocked. Allow camera access in your browser settings and tap the button above.';
+          }
+        }
+      }
+
+      function startCountdown() {
+        const countEl = document.getElementById('cam-countdown');
+        if (countEl) countEl.style.display = '';
+        let n = 3;
+        function tick() {
+          if (!countEl) return;
+          if (n > 0) { countEl.textContent = n; n--; setTimeout(tick, 1000); }
+          else { countEl.style.display = 'none'; snapPhoto(); }
+        }
+        tick();
+      }
+
+      async function snapPhoto() {
+        const vid = document.getElementById('tos-cam-video');
+        const canvas = document.getElementById('tos-cam-canvas');
+        const previewWrap = document.getElementById('cam-preview-wrap');
+        const snapPreview = document.getElementById('cam-snap-preview');
+        const snapImg = document.getElementById('cam-snap-img');
+        if (!vid || !canvas) return;
+        canvas.width = vid.videoWidth || 640;
+        canvas.height = vid.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+        // Mirror the capture to match the preview (front camera flip)
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        // Stop the stream
+        if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+        if (previewWrap) previewWrap.style.display = 'none';
+        if (snapImg) snapImg.src = dataUrl;
+        if (snapPreview) snapPreview.style.display = '';
+        // Upload
+        try {
+          const r = await api('/api/me/selfie', { method: 'POST', body: { dataUrl } });
+          if (r.user) state.user = r.user;
+          // Done — tear down overlay
+          ov.remove();
+        } catch (e) {
+          if (snapPreview) snapPreview.querySelector('p').textContent = 'Upload failed — reloading…';
+          setTimeout(() => location.reload(), 1800);
+        }
+      }
+
+      const allowBtn = document.getElementById('cam-allow-btn');
+      if (allowBtn) allowBtn.addEventListener('click', requestCamera);
+    }
+
+    document.body.appendChild(ov);
+    renderPage();
   }
 
   // forever after that. Three schools only: Ancient Old Streets, Beverly Hills,
