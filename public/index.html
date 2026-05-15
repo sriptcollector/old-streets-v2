@@ -1203,8 +1203,11 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
               style="background:#eef2f8;color:#003399;border:1px solid var(--msp-rule);padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">🖼 Image</button>
             <button type="button" id="wc-btn-video" title="add video"
               style="background:#eef2f8;color:#003399;border:1px solid var(--msp-rule);padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">🎥 Video</button>
+            <button type="button" id="wc-btn-camera" title="take photo"
+              style="background:#eef2f8;color:#003399;border:1px solid var(--msp-rule);padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">📷 Camera</button>
             <input type="file" id="wc-file-image" accept="image/*" style="display:none;"/>
             <input type="file" id="wc-file-video" accept="video/*" style="display:none;"/>
+            <input type="file" id="wc-file-camera" accept="image/*" capture="environment" style="display:none;"/>
             <label style="display:flex; align-items:center; gap:4px; font-size:11px; cursor:pointer;">
               <input type="checkbox" id="wc-anon"/>
               <span>anon</span>
@@ -1472,6 +1475,8 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     setInterval(refreshFounders, 90000);
     // Force school re-confirm on first login of the session
     maybePromptSchoolConfirm();
+    // ToS gate — must agree before accessing the feed
+    maybeShowTosGate();
     refreshBirthdays();
     refreshThrowback();
 
@@ -2641,8 +2646,10 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     const btnGif = $('wc-btn-gif');
     const btnImg = $('wc-btn-image');
     const btnVid = $('wc-btn-video');
+    const btnCam = $('wc-btn-camera');
     const fileImg = $('wc-file-image');
     const fileVid = $('wc-file-video');
+    const fileCam = $('wc-file-camera');
     const btnPost = $('wc-btn-post');
     if (!ta || !btnPost) return;
     state._wcGif = '';
@@ -2666,6 +2673,15 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     });
     if (btnImg) btnImg.addEventListener('click', () => fileImg.click());
     if (btnVid) btnVid.addEventListener('click', () => fileVid.click());
+    if (btnCam) btnCam.addEventListener('click', () => fileCam.click());
+    if (fileCam) fileCam.addEventListener('change', async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      if (f.size > 8 * 1024 * 1024) { showToast('photo too big (max 8MB)'); return; }
+      const dataUrl = await fileToDataUrl(f);
+      state._wcMedia = { type: 'image', content: dataUrl };
+      setMediaPreview(`<img src="${dataUrl}" style="max-width:100%; max-height:200px; display:block;"/>`);
+      fileCam.value = '';
+    });
     if (fileImg) fileImg.addEventListener('change', async (e) => {
       const f = e.target.files[0]; if (!f) return;
       if (f.size > 8 * 1024 * 1024) { showToast('image too big (max 8MB)'); return; }
@@ -3082,6 +3098,52 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
   // ==========================================================
   // FORCED 3-school lock — appears the moment a user signs in and is
   // dismissable ONLY by completing the double-confirm flow. Locked-in
+  // ToS gate — shown once per unaccepted version. Blocks all other modals.
+  async function maybeShowTosGate() {
+    try {
+      if (!state.user || !state.user.needsTosAgreement) return;
+      if (state._tosGateShown) return;
+      state._tosGateShown = true;
+      openModal('📋 Terms of Service', `
+        <div style="background:#cc0000; color:#fff; padding:8px 10px; font-size:11px; font-weight:700; margin:-12px -12px 12px;">
+          REQUIRED · agree to continue using old streets
+        </div>
+        <div style="max-height:280px; overflow-y:auto; font-size:11.5px; line-height:1.6; margin-bottom:14px; padding-right:4px;">
+          <p><strong>1. Age.</strong> You must be 13 or older. By agreeing you confirm you meet this requirement.</p>
+          <p><strong>2. Profile photo.</strong> A live selfie is required at account setup. You grant old streets a non-exclusive license to host it as your profile picture while your account exists. Photos are not used for facial recognition or advertising.</p>
+          <p><strong>3. Content.</strong> You own what you post. You grant old streets permission to display it to members of your school community. Don't post anything illegal, harassing, or violating someone else's privacy.</p>
+          <p><strong>4. Anonymity.</strong> Anonymous posts are visible to your school community. Admins can see the real author for safety purposes.</p>
+          <p><strong>5. Rooms & video.</strong> Calls route through Jitsi Meet. We don't record server-side, but other participants may screenshot. Exit any call at any time.</p>
+          <p><strong>6. Privacy.</strong> We collect: phone number, name, handle, selfie, posts, and basic device/IP for security. We don't sell data or run ads.</p>
+          <p><strong>7. Conduct.</strong> Don't spam, harass, or post explicit content of real people without consent. Violations result in removal.</p>
+          <p><strong>8. Termination.</strong> We can remove accounts that violate these terms. You can delete your account at any time.</p>
+        </div>
+        <div style="text-align:center;">
+          <button type="button" id="tos-agree-btn"
+            style="background:#003399; color:#fff; border:0; padding:10px 32px; font-size:13px; font-weight:700; cursor:pointer; width:100%;">
+            I Agree to the Terms of Service
+          </button>
+          <p style="font-size:10px; color:var(--msp-mute); margin-top:8px;">you must agree to use old streets.</p>
+        </div>
+      `, { dismissable: false });
+      setTimeout(() => {
+        const btn = document.getElementById('tos-agree-btn');
+        if (!btn) return;
+        btn.addEventListener('click', async () => {
+          btn.disabled = true; btn.textContent = 'saving…';
+          try {
+            await api('/api/me/agree-tos', { method: 'POST', body: {} });
+            state.user.needsTosAgreement = false;
+            closeModal();
+          } catch (e) {
+            btn.disabled = false; btn.textContent = 'I Agree to the Terms of Service';
+            showToast(e.message || 'failed, try again');
+          }
+        });
+      }, 200);
+    } catch (e) { console.warn('[tos-gate]', e.message); }
+  }
+
   // forever after that. Three schools only: Ancient Paths, Beverly Hills,
   // Crossroads.
   function maybePromptSchoolConfirm() {

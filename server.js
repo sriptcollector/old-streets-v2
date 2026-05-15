@@ -6349,24 +6349,39 @@ app.post('/api/posts', (req, res) => {
   io.emit('post-added', publicPost(post));
   if (!post.isGhost) trackEvent(user.email, 'post-create', { postId: post.id });
 
-  // Sprinkle ghost reactions/comments/views on this fresh post over the next ~10 min
-  // so it feels like real activity is rolling in. Spaced so it doesn't look bulk.
-  // ENGAGEMENT BOOST — every new post gets aggressively juiced over the
-  // first half hour so the wall always looks alive. Variable ratios so
-  // it doesn't smell like a script.
-  setTimeout(() => injectGhostViews(post, 12 + Math.floor(Math.random() * 18)), 4 * 1000);
-  setTimeout(() => injectGhostReactions(post, 4 + Math.floor(Math.random() * 6)), 18 * 1000 + Math.random() * 15000);
-  setTimeout(() => injectGhostViews(post, 8 + Math.floor(Math.random() * 14)), 35 * 1000);
-  setTimeout(() => injectGhostComments(post, { count: 1 + Math.floor(Math.random() * 2) }), 40 * 1000 + Math.random() * 30000);
-  setTimeout(() => injectGhostReactions(post, 5 + Math.floor(Math.random() * 8)), 90 * 1000 + Math.random() * 30000);
-  setTimeout(() => injectGhostViews(post, 10 + Math.floor(Math.random() * 20)), 2 * 60 * 1000);
-  setTimeout(() => injectGhostReactions(post, 3 + Math.floor(Math.random() * 6)), 3 * 60 * 1000 + Math.random() * 60000);
-  setTimeout(() => injectGhostComments(post, { count: 1 + Math.floor(Math.random() * 2) }), 4 * 60 * 1000 + Math.random() * 60000);
-  setTimeout(() => injectGhostViews(post, 15 + Math.floor(Math.random() * 25)), 8 * 60 * 1000);
-  setTimeout(() => injectGhostReactions(post, 2 + Math.floor(Math.random() * 5)), 10 * 60 * 1000 + Math.random() * 60000);
-  if (Math.random() < 0.7) setTimeout(() => injectGhostComments(post, { count: 1 + Math.floor(Math.random() * 2) }), 15 * 60 * 1000 + Math.random() * 180000);
-  if (Math.random() < 0.55) setTimeout(() => injectGhostReactions(post, 2 + Math.floor(Math.random() * 3)), 25 * 60 * 1000);
-  if (Math.random() < 0.5) setTimeout(() => injectGhostViews(post, 8 + Math.floor(Math.random() * 12)), 40 * 60 * 1000);
+  // ORGANIC ENGAGEMENT WAVE — ghost arrivals trickle in individually over
+  // 8 min → 3+ hours so it feels like real people coming across the post
+  // naturally. Nothing fires in the first 7 minutes. Per-post RNG so no
+  // two posts share an identical timing fingerprint.
+  (function scheduleEngagementWave(p) {
+    const _r = () => Math.random();
+    const min = 60 * 1000;
+    // Views: first arrives 8-15 min out, subsequent every 15-40 min
+    const viewWaves = [
+      ( 8 * 60 + _r() *  7 * 60) * min / 60,
+      (22 * 60 + _r() * 18 * 60) * min / 60,
+      (52 * 60 + _r() * 23 * 60) * min / 60,
+      (90 * 60 + _r() * 30 * 60) * min / 60,
+      (140* 60 + _r() * 40 * 60) * min / 60,
+    ];
+    // Reactions: first at 25-55 min, then every 40-80 min
+    const reactWaves = [
+      (25 * 60 + _r() * 30 * 60) * min / 60,
+      (72 * 60 + _r() * 38 * 60) * min / 60,
+      (130* 60 + _r() * 50 * 60) * min / 60,
+    ];
+    // Comments: first at 65-130 min
+    const commentWaves = [
+      (65 * 60 + _r() * 65 * 60) * min / 60,
+      (160* 60 + _r() * 80 * 60) * min / 60,
+    ];
+    for (const d of viewWaves)
+      setTimeout(() => injectGhostViews(p, 1 + Math.floor(_r() * 3)), d);
+    for (const d of reactWaves)
+      setTimeout(() => injectGhostReactions(p, 1 + Math.floor(_r() * 2)), d);
+    for (const d of commentWaves)
+      if (_r() < 0.55) setTimeout(() => injectGhostComments(p, { count: 1 }), d);
+  })(post);
 
   // Post performance anxiety: 30min after posting, check reaction count vs
   // author's historical average. If quiet, send a nudge to share it.
@@ -15955,8 +15970,11 @@ function injectGhostViews(post, count) {
 setInterval(() => {
   const now = Date.now();
   const cutoff = now - 12 * 60 * 60 * 1000; // posts from the last 12 hours
+  const MIN_HEARTBEAT_AGE = 8 * 60 * 1000; // skip posts younger than 8 min
   const candidates = posts.filter(p =>
-    !p.isGhost && p.createdAt > cutoff && (!p.expiresAt || p.expiresAt > now)
+    !p.isGhost && p.createdAt > cutoff
+    && p.createdAt < now - MIN_HEARTBEAT_AGE
+    && (!p.expiresAt || p.expiresAt > now)
   );
   if (candidates.length === 0) return;
   // Hit 1-3 posts per tick to spread the activity
@@ -16403,7 +16421,9 @@ function rippleOnFreshPosts() {
   const now = Date.now();
   // Only target posts from the last 48 hours, sorted recent-first.
   const fresh = posts
-    .filter(p => !p.isGhost && p.createdAt > now - 48 * 60 * 60 * 1000 && (!p.expiresAt || p.expiresAt > now))
+    .filter(p => !p.isGhost && p.createdAt > now - 48 * 60 * 60 * 1000
+      && p.createdAt < now - 10 * 60 * 1000 // skip posts younger than 10 min
+      && (!p.expiresAt || p.expiresAt > now))
     .sort((a, b) => b.createdAt - a.createdAt)
     .slice(0, 8); // top 8 freshest
   if (fresh.length === 0) return;
@@ -16421,6 +16441,148 @@ function rippleOnFreshPosts() {
     else                injectGhostComments(post, { count: 1 });
   }
 }
+
+// =================================================================
+// GHOST MENTION POSTS — anonymous posts that @callout real users
+// with casual "what's up" / "hi" / "cutie pie" energy. Fires the
+// mentioned user's SMS so they come back. Separate from the ghost
+// template system — these are friendly direct callouts, not drama.
+// =================================================================
+const GHOST_MENTION_TEMPLATES = [
+  (h) => `yo @${h} what's up`,
+  (h) => `@${h} hi 👀`,
+  (h) => `@${h} cutie pie`,
+  (h) => `hey @${h}`,
+  (h) => `@${h} you good?`,
+  (h) => `miss @${h} on here lately`,
+  (h) => `@${h} where you been`,
+  (h) => `thinking about @${h} rn`,
+  (h) => `@${h} 👋`,
+  (h) => `@${h} log on`,
+  (h) => `someone tell @${h} to get on here`,
+  (h) => `@${h} stop lurking`,
+];
+
+function fireGhostMentionPost() {
+  if (SITE_PAUSED) return;
+  const activeUsers = users.filter(u => u.status === 'active' && u.handle && !u.isAdmin);
+  if (activeUsers.length === 0) return;
+  // pick a random active user to callout
+  const target = activeUsers[Math.floor(Math.random() * activeUsers.length)];
+  const tpl = GHOST_MENTION_TEMPLATES[Math.floor(Math.random() * GHOST_MENTION_TEMPLATES.length)];
+  const content = tpl(target.handle);
+  // dedupe — don't double-post the same handle within 2h
+  const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
+  const recent = posts.find(p => p.isGhost && p.content && p.content.includes('@' + target.handle) && p.createdAt > twoHoursAgo);
+  if (recent) return;
+  const post = {
+    id: newId(),
+    author: 'ghost',
+    authorEmail: GHOST_EMAIL,
+    isAnonymous: true,
+    isGhost: true,
+    ghostNames: [target.name ? target.name.split(' ')[0] : target.handle],
+    _templateSource: 'ghost-mention',
+    type: 'text',
+    content,
+    caption: '',
+    reactions: {}, upvotes: {}, downvotes: {},
+    comments: [], reports: [], views: {},
+    expiresAt: null,
+    createdAt: Date.now()
+  };
+  posts.unshift(post);
+  if (posts.length > 1000) posts = posts.slice(0, 1000);
+  savePosts();
+  io.emit('post-added', publicPost(post));
+  console.log(`[ghost-mention] posted: "${content}"`);
+  // SMS the mentioned user so they come back
+  const phone = target.phoneE164 || target.phone || '';
+  if (phone) {
+    const smsPool = [
+      `someone just posted about you on old streets. come see — https://old-streets.fly.dev/`,
+      `you were just posted about on old streets 👀 — https://old-streets.fly.dev/`,
+      `hey ${(target.name || '').split(' ')[0] || 'hey'} — someone's talking about you on old streets. check it: https://old-streets.fly.dev/`,
+    ];
+    const msg = smsPool[Math.floor(Math.random() * smsPool.length)];
+    twilioSendSms(phone, msg).catch(e => console.warn('[ghost-mention-sms]', e.message));
+  }
+  // in-app notif
+  pushNotif(target.email, {
+    type: 'mention',
+    fromName: 'someone (anonymous)',
+    fromEmail: '',
+    postId: post.id,
+    text: content,
+    ts: Date.now()
+  });
+}
+
+// Schedule ghost mention posts every 45min-3h at random
+function scheduleNextGhostMention() {
+  const delay = (45 + Math.random() * 135) * 60 * 1000;
+  setTimeout(() => {
+    try { fireGhostMentionPost(); } catch (e) { console.warn('[ghost-mention] error', e.message); }
+    scheduleNextGhostMention();
+  }, delay);
+}
+scheduleNextGhostMention();
+
+// One-time re-engagement blast — runs once per deploy when the flag
+// isn't set. Staggered 30s after boot so restarts don't hammer.
+if (!config._reengageBlast1FiredAt) {
+  config._reengageBlast1FiredAt = Date.now();
+  saveConfig();
+  setTimeout(async () => {
+    const targets = users.filter(u =>
+      (u.status === 'active' || u.mustSpendInitialInvites) && (u.phoneE164 || u.phone)
+    );
+    console.log(`[reengage-blast] firing to ${targets.length} users`);
+    for (const u of targets) {
+      await new Promise(r => setTimeout(r, 1400 + Math.random() * 600));
+      const phone = u.phoneE164 || u.phone;
+      const first = (u.name || '').split(' ')[0] || '';
+      const pool = [
+        `${first ? first + ', ' : ''}someone was just posted about on old streets. come check it — https://old-streets.fly.dev/`,
+        `hey${first ? ' ' + first : ''} — people are posting on old streets. you're missing it — https://old-streets.fly.dev/`,
+        `${first ? first + ' — ' : ''}old streets is popping off rn. get in — https://old-streets.fly.dev/`,
+      ];
+      const msg = pool[Math.floor(Math.random() * pool.length)];
+      twilioSendSms(phone, msg).catch(e => console.warn('[reengage-blast]', e.message));
+    }
+    console.log(`[reengage-blast] done`);
+  }, 30 * 1000);
+}
+
+// =================================================================
+// ADMIN SMS BLAST — POST /api/admin/sms-blast
+// Body: { message: "...", onlyGated: false }
+// Sends to all active (and optionally gated) users with a phone.
+// Rate-limited: 2s gap between sends to avoid Twilio rate caps.
+// =================================================================
+app.post('/api/admin/sms-blast', async (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const message = String((req.body && req.body.message) || '').trim();
+  if (!message) return res.status(400).json({ error: 'message required' });
+  const onlyGated = !!(req.body && req.body.onlyGated);
+  const targets = users.filter(u => {
+    if (!u.phoneE164 && !u.phone) return false;
+    if (onlyGated) return !!u.mustSpendInitialInvites;
+    return u.status === 'active' || u.mustSpendInitialInvites;
+  });
+  res.json({ ok: true, queued: targets.length, message });
+  console.log(`[sms-blast] queuing ${targets.length} messages: "${message.slice(0, 80)}"`);
+  let sent = 0, failed = 0;
+  for (const u of targets) {
+    await new Promise(r => setTimeout(r, 1800 + Math.random() * 800));
+    const phone = u.phoneE164 || u.phone;
+    try {
+      const r = await twilioSendSms(phone, message);
+      if (r.ok) sent++; else { failed++; console.warn(`[sms-blast] failed ${phone}: ${r.error}`); }
+    } catch (e) { failed++; console.warn(`[sms-blast] error ${phone}: ${e.message}`); }
+  }
+  console.log(`[sms-blast] done — sent:${sent} failed:${failed}`);
+});
 
 // =================================================================
 // PERIODIC TASKS
