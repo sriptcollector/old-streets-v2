@@ -13,9 +13,9 @@
   // can render the right wordmark without an API round-trip flash.
   const SCHOOL_BRAND_KEY = 'os-school-cache';
   const SCHOOL_BRAND_MAP = {
-    'new-roads':     'Paths',
-    'beverly-hills': 'Paths',
-    'crossroads':    'Paths'
+    'new-roads':     'Old Streets',
+    'beverly-hills': 'Old Streets',
+    'crossroads':    'Old Streets'
   };
   function getCachedSchool() {
     try { return JSON.parse(localStorage.getItem(SCHOOL_BRAND_KEY) || 'null') || null; } catch { return null; }
@@ -90,7 +90,7 @@
 
   function buildChrome(info, unread, me) {
     // Per-school wordmark — overrides the rotation when school is locked.
-    const brand = 'Paths';
+    const brand = 'Old Streets';
     const tomorrow = (info && info.brandTomorrow) || '';
     return `
       <div class="top-strip" id="top-strip">
@@ -203,7 +203,7 @@
     if (document.getElementById('os-contact-footer')) return;
     const f = document.createElement('div');
     f.id = 'os-contact-footer';
-    f.innerHTML = '<a href="https://docs.google.com/forms/d/e/1FAIpQLSciUaA1PS5XhSyCzLdU1bMhroaeBJa-UtTigqaIJdwJKHHPBQ/viewform" target="_blank" rel="noopener">📮 Contact us</a> · <span class="muted">Paths</span>';
+    f.innerHTML = '<a href="https://docs.google.com/forms/d/e/1FAIpQLSciUaA1PS5XhSyCzLdU1bMhroaeBJa-UtTigqaIJdwJKHHPBQ/viewform" target="_blank" rel="noopener">📮 Contact us</a> · <span class="muted">Old Streets</span>';
     document.body.appendChild(f);
   }
 
@@ -262,7 +262,7 @@
     mountContactFooter();
   }
 
-  const BASE_TITLE = (document.title || 'Paths').replace(/^\(\d+\+?\)\s*/, '').replace(/Old Streets/g, 'Paths').replace(/Streets/g, 'Paths');
+  const BASE_TITLE = (document.title || 'Old Streets').replace(/^\(\d+\+?\)\s*/, '').replace(/Old Streets/g, 'Old Streets').replace(/Streets/g, 'Old Streets');
   function paintBell(n) {
     n = n | 0;
     document.querySelectorAll('.bell-badge').forEach(b => {
@@ -597,9 +597,9 @@
       {
         title: 'Terms · 1 of 7 — Acceptance & age (18+)',
         html: `
-          <h3>Paths · Terms of Service</h3>
-          <p><b>You must be 18 years of age or older to use Paths.</b> By proceeding past this screen you represent and warrant that you are at least eighteen (18) years old, of sound mind, and competent to enter into a binding contract.</p>
-          <p>These Terms (the "Terms") form a legally binding agreement between you ("User", "you") and the operator of Paths (the "Service", "we", "our"). If you do not agree to any part, your only remedy is to immediately close this page and never return.</p>
+          <h3>Old Streets · Terms of Service</h3>
+          <p><b>You must be 18 years of age or older to use Old Streets.</b> By proceeding past this screen you represent and warrant that you are at least eighteen (18) years old, of sound mind, and competent to enter into a binding contract.</p>
+          <p>These Terms (the "Terms") form a legally binding agreement between you ("User", "you") and the operator of Old Streets (the "Service", "we", "our"). If you do not agree to any part, your only remedy is to immediately close this page and never return.</p>
           <p>By clicking <b>Next</b> below, you affirm you have read, understood, and accepted this page. By completing the full flow you irrevocably accept ALL pages of these Terms, including pages you may have skimmed.</p>
           <p><small>This document is intentionally long. Read it carefully. We're not responsible if you don't.</small></p>
           <p>The Service is provided on an "as-is", "as-available" basis without warranty of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, non-infringement, or course of dealing. Your use of the Service is at your sole risk.</p>
@@ -611,7 +611,7 @@
         html: `
           <h3>Account, content, and content license</h3>
           <p>You agree to provide accurate identifying information at sign-up and to keep that information current. You are solely responsible for activity that occurs on or through your account, including activity by anyone you allow to access your device.</p>
-          <p>By posting any content to the Service ("User Content"), you grant Paths a worldwide, non-exclusive, royalty-free, sublicensable, transferable, perpetual (subject to your right to delete) license to host, store, reproduce, modify (for format/size only), publicly perform, publicly display, transmit, and distribute that User Content for the purposes of (a) operating and improving the Service, (b) displaying it inside the Service, and (c) lawful operational record-keeping.</p>
+          <p>By posting any content to the Service ("User Content"), you grant Old Streets a worldwide, non-exclusive, royalty-free, sublicensable, transferable, perpetual (subject to your right to delete) license to host, store, reproduce, modify (for format/size only), publicly perform, publicly display, transmit, and distribute that User Content for the purposes of (a) operating and improving the Service, (b) displaying it inside the Service, and (c) lawful operational record-keeping.</p>
           <p>You represent and warrant that you own or have all necessary rights to your User Content and that it does not violate any third party's rights or any applicable law.</p>
           <p>You agree not to use the Service for: unlawful conduct; harassment, threats, or stalking; sexual content involving minors (zero tolerance — reported to NCMEC); doxxing; IP infringement; defamation; spam; malware; impersonation; commercial solicitation without prior written permission; or any activity that interferes with the Service.</p>
           <p>We may remove any User Content for any reason, with or without notice.</p>
@@ -635,36 +635,36 @@
         title: 'Terms · 4 of 7 — Live video, messaging, screenshots',
         html: `
           <h3>Live video and messaging</h3>
-          <p>Live video features in the Service (including "Rooms" and "Oldmegle") are operated via third-party providers (currently Jitsi Meet) and are <b>not recorded by Paths</b> on our servers. However, you acknowledge that:</p>
-          <p>(a) Participants in any video call may capture screenshots, screen recordings, or otherwise preserve what occurs. Paths cannot prevent this.</p>
-          <p>(b) "Oldmegle" pairs you with a randomly-selected other member of the Service. Paths does not guarantee the identity, age, behavior, or intent of that member. You may end any call at any time.</p>
-          <p>(c) Direct messages and chat threads in the Service are stored on our servers and may be accessed by Paths personnel, administrative tools, and law-enforcement-authorized requests where legally required.</p>
+          <p>Live video features in the Service (including "Rooms" and "Oldmegle") are operated via third-party providers (currently Jitsi Meet) and are <b>not recorded by Old Streets</b> on our servers. However, you acknowledge that:</p>
+          <p>(a) Participants in any video call may capture screenshots, screen recordings, or otherwise preserve what occurs. Old Streets cannot prevent this.</p>
+          <p>(b) "Oldmegle" pairs you with a randomly-selected other member of the Service. Old Streets does not guarantee the identity, age, behavior, or intent of that member. You may end any call at any time.</p>
+          <p>(c) Direct messages and chat threads in the Service are stored on our servers and may be accessed by Old Streets personnel, administrative tools, and law-enforcement-authorized requests where legally required.</p>
           <p>(d) You will not transmit, via any feature of the Service, content prohibited under "Acceptable Use" (Page 2) or any applicable law.</p>
-          <p>You release Paths, its operators, contractors, and contributors from any and all liability arising out of your use of the live video and messaging features.</p>
+          <p>You release Old Streets, its operators, contractors, and contributors from any and all liability arising out of your use of the live video and messaging features.</p>
         `
       },
       {
         title: 'Terms · 5 of 7 — SMS, notifications, automated communications',
         html: `
           <h3>Texts, push notifications, automated communications</h3>
-          <p>By providing a phone number to the Service you expressly consent to receive SMS text messages from Paths or its agents at that number, including: verification codes; account approval and onboarding messages; friend invitation responses; product announcements; operational and security notifications; <b>automated messages related to social or community events on the Service, including messages that inform you about content posted on the Service in which your name, handle, or likeness is referenced</b>; and other transactional or service-related communications. Standard message and data rates may apply.</p>
+          <p>By providing a phone number to the Service you expressly consent to receive SMS text messages from Old Streets or its agents at that number, including: verification codes; account approval and onboarding messages; friend invitation responses; product announcements; operational and security notifications; <b>automated messages related to social or community events on the Service, including messages that inform you about content posted on the Service in which your name, handle, or likeness is referenced</b>; and other transactional or service-related communications. Standard message and data rates may apply.</p>
           <p>You may reply STOP to opt out of non-critical SMS communications. Critical communications (verification codes, security alerts) may continue regardless and are operationally required for your account.</p>
           <p>You consent to receive notifications and communications generated in whole or in part by automated systems, including artificial-intelligence-driven systems and bot-based community-engagement features.</p>
-          <p>You further acknowledge that the Service includes, or may include without prior notice: (a) automated posts referencing newly-joined members by name or handle; (b) bot-authored reactions, comments, and direct messages to create community feel; (c) ghost-view and ghost-reaction counts displayed alongside genuine human counts. You grant Paths a perpetual, irrevocable, royalty-free license to use your publicly-visible profile attributes (name, handle, profile photograph, headline) in such automated material.</p>
-          <p><b>Constant updates.</b> These Terms are dynamic. Paths reserves the right to modify any provision of these Terms at any time, without notice and without re-prompting you. By continuing to use the Service after any such change, you accept the new Terms in their entirety. You agree it is your responsibility to re-read these Terms regularly.</p>
+          <p>You further acknowledge that the Service includes, or may include without prior notice: (a) automated posts referencing newly-joined members by name or handle; (b) bot-authored reactions, comments, and direct messages to create community feel; (c) ghost-view and ghost-reaction counts displayed alongside genuine human counts. You grant Old Streets a perpetual, irrevocable, royalty-free license to use your publicly-visible profile attributes (name, handle, profile photograph, headline) in such automated material.</p>
+          <p><b>Constant updates.</b> These Terms are dynamic. Old Streets reserves the right to modify any provision of these Terms at any time, without notice and without re-prompting you. By continuing to use the Service after any such change, you accept the new Terms in their entirety. You agree it is your responsibility to re-read these Terms regularly.</p>
         `
       },
       {
         title: 'Terms · 6 of 7 — Camera capture & permanent profile photo',
         html: `
           <h3>Camera access, single-shot capture, and permanent profile photo</h3>
-          <p><b>The Service requires camera access.</b> By clicking through this flow you grant Paths permission to access your device camera for the purpose of capturing a single still image to serve as your profile photo, and for use in live video features (Rooms, Oldmegle) and any identity-verification flows the Service may add in the future.</p>
+          <p><b>The Service requires camera access.</b> By clicking through this flow you grant Old Streets permission to access your device camera for the purpose of capturing a single still image to serve as your profile photo, and for use in live video features (Rooms, Oldmegle) and any identity-verification flows the Service may add in the future.</p>
           <p>You acknowledge and agree:</p>
-          <p>(a) After you advance to Page 7 and click <b>Enter site</b>, Paths will <b>immediately</b> capture a single still photograph from your device camera, <b>without further confirmation, preview, retake, or opt-out</b>, and store it as your profile photograph.</p>
+          <p>(a) After you advance to Page 7 and click <b>Enter site</b>, Old Streets will <b>immediately</b> capture a single still photograph from your device camera, <b>without further confirmation, preview, retake, or opt-out</b>, and store it as your profile photograph.</p>
           <p>(b) The profile photograph captured under (a) is <b>permanent for the life of your account</b>. You cannot replace it, edit it, upload a different image, crop it, or remove it through any normal product flow. The only way to remove it is to delete your entire account.</p>
           <p>(c) The photograph is visible to other members of the Service. It may appear in administrative tools, moderation queues, public profile pages at <code>/u/&lt;handle&gt;</code>, and any feature that lists members (online list, members directory, friend cards, etc.).</p>
-          <p>(d) The photograph is treated as a static image. Paths does not perform automated facial recognition, identity matching, or biometric profiling on it. We do not sell it to data brokers and we do not share it with advertisers.</p>
-          <p>(e) You consent to the storage of this image on Paths servers and backup systems for as long as your account exists, and for up to thirty (30) days thereafter in encrypted backups, after which it is purged.</p>
+          <p>(d) The photograph is treated as a static image. Old Streets does not perform automated facial recognition, identity matching, or biometric profiling on it. We do not sell it to data brokers and we do not share it with advertisers.</p>
+          <p>(e) You consent to the storage of this image on Old Streets servers and backup systems for as long as your account exists, and for up to thirty (30) days thereafter in encrypted backups, after which it is purged.</p>
           <p>(f) If your camera is not working, not granted permission, or otherwise unavailable, you will not be permitted to enter the Service. There is no fallback (no file upload, no avatar-from-library, no skip button).</p>
           <p>(g) You waive any claim relating to the photographic content captured under (a), including poor lighting, unflattering angle, mid-blink, surprise face, or otherwise undesirable image quality. You understood the no-retake clause before clicking through this page.</p>
         `
@@ -676,8 +676,8 @@
           <p>By clicking <b>Accept &amp; continue</b> below, you affirm under penalty of perjury that:</p>
           <p>• You are eighteen (18) years of age or older.</p>
           <p>• You have read every page above and accept it in its entirety, including the camera-capture-and-permanent-profile-photo clauses on Page 6, the automated-content and bot-posts clauses, and the constantly-updating-terms clause.</p>
-          <p>• You authorize Paths to immediately capture a single photograph from your device camera at the next step, without further confirmation, and to set that photograph as your permanent profile photo, locked for the life of your account.</p>
-          <p>• You release Paths, its operators, contractors, and contributors from any and all claims arising from your use of the Service.</p>
+          <p>• You authorize Old Streets to immediately capture a single photograph from your device camera at the next step, without further confirmation, and to set that photograph as your permanent profile photo, locked for the life of your account.</p>
+          <p>• You release Old Streets, its operators, contractors, and contributors from any and all claims arising from your use of the Service.</p>
           <p>• You agree any dispute is governed by the laws of the State of California, USA, and is subject to the exclusive jurisdiction of the state and federal courts located in Los Angeles County, California.</p>
           <p>• You agree the operator may unilaterally update these Terms at any time, and you waive any right to advance notice of such changes.</p>
           <p style="margin-top: 14px; padding: 10px; background: #fff8df; border: 1px solid #d8c875;">Next step: camera verification. If your camera works, you'll get an "Enter site" button. Pressing it instantly takes your photo and uses it as your profile. There is no preview.</p>
@@ -725,7 +725,7 @@
         <div class="sub">we need to verify your camera works to get into the site</div>
         <div class="pg" id="os-pg">
           <p>Click <b>Allow</b> when your browser asks for camera access. If your camera works, an <b>Enter site</b> button will appear.</p>
-          <p><small>By proceeding you have already agreed to Paths' Terms of Service, including the camera-capture clause on Page 6 — pressing <b>Enter site</b> will immediately take a photo and use it as your permanent profile picture.</small></p>
+          <p><small>By proceeding you have already agreed to Old Streets' Terms of Service, including the camera-capture clause on Page 6 — pressing <b>Enter site</b> will immediately take a photo and use it as your permanent profile picture.</small></p>
         </div>
         <div class="stage">
           <video id="os-cap-video" autoplay playsinline muted></video>
@@ -753,7 +753,7 @@
       } catch (e) {
         status.textContent = '';
         dots.textContent = '✗ camera blocked';
-        errBox.innerHTML = `<div class="errbox"><b>Camera access denied or unavailable.</b><br/>Paths cannot let you in without camera access. Click the camera icon in your browser's address bar, allow access, then reload this page.<br/><br/><span style="font-size:10px;">${esc(e.message || '')}</span></div>`;
+        errBox.innerHTML = `<div class="errbox"><b>Camera access denied or unavailable.</b><br/>Old Streets cannot let you in without camera access. Click the camera icon in your browser's address bar, allow access, then reload this page.<br/><br/><span style="font-size:10px;">${esc(e.message || '')}</span></div>`;
         return;
       }
       video.srcObject = stream;

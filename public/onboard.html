@@ -469,7 +469,7 @@ footer a { color: var(--msp-ink-link); }
     <div>
       <div class="widget">
         <div class="widget-title">
-          <span>Paths</span>
+          <span>Old Streets</span>
           <span class="meta">private · invite only</span>
         </div>
         <div class="widget-body marketing">
@@ -1001,7 +1001,7 @@ footer a { color: var(--msp-ink-link); }
                 <option value="brentwood">Brentwood</option>
                 <option value="archer">Archer</option>
                 <option value="marlborough">Marlborough</option>
-                <option value="new-roads">Ancient Paths</option>
+                <option value="new-roads">Ancient Old Streets</option>
                 <option value="windward">Windward</option>
                 <option value="crossroads">Crossroads</option>
                 <option value="palisades">Palisades Charter</option>
@@ -1233,7 +1233,7 @@ footer a { color: var(--msp-ink-link); }
         <div id="su-result" style="display:none; margin-top:14px; padding:12px; background:#e3f3df; border:1px solid #339933;">
           <div style="font-weight:700; color:#1f5a1f; margin-bottom:8px; font-size:12px;">✓ You're in. Here are your two invites:</div>
           <div id="su-result-list"></div>
-          <button type="button" class="btn btn-big" id="btn-su-enter" style="width:100%; margin-top:10px;">Enter Paths →</button>
+          <button type="button" class="btn btn-big" id="btn-su-enter" style="width:100%; margin-top:10px;">Enter Old Streets →</button>
         </div>
       </div>
     </div>
@@ -1257,7 +1257,7 @@ footer a { color: var(--msp-ink-link); }
           The directory is small on purpose. Be kind, be real, and pick up the phone.
         </p>
         <div class="center">
-          <a class="btn btn-big" href="/" id="btn-welcome-enter">Enter Paths</a>
+          <a class="btn btn-big" href="/" id="btn-welcome-enter">Enter Old Streets</a>
         </div>
         <p class="fineprint">
           You have 2 invite keys waiting. Use them carefully.
@@ -1514,15 +1514,15 @@ footer a { color: var(--msp-ink-link); }
      BRAND / SITE INFO
      =========================================================== */
   async function loadBrand(){
-    // Signed-out public always sees "Paths" — the rotating wordmark is
+    // Signed-out public always sees "Old Streets" — the rotating wordmark is
     // a members-only easter egg, so the front door stays consistent for
     // first-time visitors, link previews, and word-of-mouth.
-    const brand = 'Paths';
+    const brand = 'Old Streets';
     state.brandToday = brand;
     setText('wordmark-name', brand);
     setText('hero-brand', brand);
     $$('.brand-here').forEach(el => el.textContent = brand);
-    document.title = 'Paths';
+    document.title = 'Old Streets';
     try {
       const info = await api('/api/site-info');
       state.brandTomorrow = info.brandTomorrow || '';

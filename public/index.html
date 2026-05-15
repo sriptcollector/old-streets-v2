@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Paths</title>
+<title>Old Streets</title>
 <link rel="icon" type="image/svg+xml" href="logo.svg" />
 <link rel="apple-touch-icon" href="logo.svg" />
 <!-- Shared chrome — rainbow announcement banner + theme sync + viral hooks.
      chrome.js skips nav injection on the home page (we already have inline
      nav) but still runs loadAnnouncements / phantom typing / theme. -->
 <link rel="stylesheet" href="/chrome.css?v=20260514a"/>
-<script src="/chrome.js?v=20260514a"></script>
+<script src="/chrome.js?v=20260515c"></script>
 
 <!-- ====================================================================
      LANDER OLD-URL REDIRECT. If we landed on the deprecated host, send
@@ -1053,7 +1053,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
 <!-- Boot loader (shown while we resolve whoami) -->
 <div id="boot" class="boot-screen">
   <div class="b-card">
-    <div class="b-title">Paths</div>
+    <div class="b-title">Old Streets</div>
     <div class="b-bar"><i></i></div>
     <div style="color: var(--msp-mute);">checking your session...</div>
   </div>
@@ -1068,7 +1068,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
 
   <!-- Invite gate banner -->
   <div id="invite-gate" class="invite-gate hidden">
-    Both of your starting referrals need to join before Paths opens up. Send your two invites below.
+    Both of your starting referrals need to join before Old Streets opens up. Send your two invites below.
   </div>
 
   <!-- Greeting -->
@@ -1283,11 +1283,11 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
 
   <div class="foot">
     <a href="/profile-edit.html">Account</a> |
-    <a href="#" onclick="os.toast('Privacy: Paths is invite-only and not affiliated with any school.');return false;">Privacy</a> |
+    <a href="#" onclick="os.toast('Privacy: Old Streets is invite-only and not affiliated with any school.');return false;">Privacy</a> |
     <a href="#" onclick="os.toast('Have a tip? message admin@old-streets in the inbox.');return false;">Contact</a> |
     <a href="#" onclick="os.logout();return false;">Sign Out</a>
     <div style="margin-top: 4px; color: var(--msp-mute);">
-      <span id="footer-brand">Paths</span> &copy; <span id="footer-year">2026</span>
+      <span id="footer-brand">Old Streets</span> &copy; <span id="footer-year">2026</span>
     </div>
   </div>
 </div>
@@ -1544,17 +1544,17 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
   // ==========================================================
   function paintShell() {
     const u = state.user;
-    const brand = (state.siteInfo && state.siteInfo.brandToday) || 'Paths';
+    const brand = (state.siteInfo && state.siteInfo.brandToday) || 'Old Streets';
 
-    document.title = 'Paths';
+    document.title = 'Old Streets';
 
     const bt = $('brand-text'); if (bt) bt.textContent = brand;
     const fb = $('footer-brand'); if (fb) fb.textContent = brand;
     const fy = $('footer-year'); if (fy) fy.textContent = new Date().getFullYear();
     // Show the user's school next to the wordmark — "(Beverly Hills High)"
-    // Per-school wordmark — replaces "Paths" with the school-flavored
+    // Per-school wordmark — replaces "Old Streets" with the school-flavored
     // brand. Edition subtitle goes below in tiny italic.
-    // School branding removed — wordmark is just "Paths" via chrome.js
+    // School branding removed — wordmark is just "Old Streets" via chrome.js
     const ed = $('brand-edition');
     if (ed) ed.textContent = '';
 
@@ -1623,7 +1623,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     // School-flavored wordmark overrides the daily rotation when a school
     // is locked in. Falls back to the rotation for users without a school
     // (which after the forced lock won't happen, but keeps it safe).
-    const brand = 'Paths';
+    const brand = 'Old Streets';
     const bt = $('brand-text'); if (bt) bt.textContent = brand;
     const fb = $('footer-brand'); if (fb) fb.textContent = brand;
     const t = $('tomorrow-name');
@@ -1746,7 +1746,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     if (u.mustSpendInitialInvites) {
       document.body.classList.add('gated');
       banner.classList.remove('hidden', 'is-clear');
-      banner.innerHTML = '&#128274; Both of your starting referrals need to join before Paths opens up. (' + claimed + '/2 in) Send your two invites below.';
+      banner.innerHTML = '&#128274; Both of your starting referrals need to join before Old Streets opens up. (' + claimed + '/2 in) Send your two invites below.';
     } else if (claimed >= 2 && u.referralsEarned && u.referralsEarned >= 2) {
       document.body.classList.remove('gated');
       banner.classList.remove('hidden');
@@ -2951,7 +2951,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     try { navigator.clipboard.writeText(url); showToast('copied!'); } catch { showToast(url); }
   }
   function openSms(url, phone) {
-    const body = (state.user.name || 'a friend') + ' invited you to Paths — a small invite-only place. Open: ' + url;
+    const body = (state.user.name || 'a friend') + ' invited you to Old Streets — a small invite-only place. Open: ' + url;
     window.location.href = `sms:${phone};?&body=${encodeURIComponent(body)}`;
   }
 
@@ -3144,14 +3144,14 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     } catch (e) { console.warn('[tos-gate]', e.message); }
   }
 
-  // forever after that. Three schools only: Ancient Paths, Beverly Hills,
+  // forever after that. Three schools only: Ancient Old Streets, Beverly Hills,
   // Crossroads.
   function maybePromptSchoolConfirm() {
     try {
       if (state.user.schoolLocked) return;
       if (state.user.isAdmin) return; // admin bypass
       const LAUNCH = [
-        { id: 'new-roads',     name: 'Ancient Paths' },
+        { id: 'new-roads',     name: 'Ancient Old Streets' },
         { id: 'beverly-hills', name: 'Beverly Hills High' },
         { id: 'crossroads',    name: 'Crossroads' }
       ];
@@ -3292,7 +3292,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
   }
   function openCreateRoom() {
     openModal('Create a live room', `
-      <p>Spin up a room. Anyone on Paths can drop in.</p>
+      <p>Spin up a room. Anyone on Old Streets can drop in.</p>
       <div class="form-row" style="margin:8px 0;">
         <label for="room-name">Room name</label>
         <input id="room-name" type="text" maxlength="60" placeholder="e.g. friday night gossip" style="width:100%;"/>
@@ -3453,7 +3453,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
     ];
     const current = document.documentElement.dataset.theme || 'classic';
     openModal('Page Themes', `
-      <p>Pick a color for your Paths dashboard. Saved to your profile.</p>
+      <p>Pick a color for your Old Streets dashboard. Saved to your profile.</p>
       <div class="theme-grid" id="theme-grid">
         ${themes.map(t => `
           <button class="theme-cell ${t.id===current?'is-on':''}" data-theme="${t.id}" onclick="os.pickTheme('${t.id}')">
@@ -3789,7 +3789,7 @@ body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
         <a href="${esc(u.songUrl||'#')}" target="_blank">${esc(u.songUrl || 'tap to play')}</a>
       </div>
     `).join('') : '<div style="color:var(--msp-mute);font-style:italic;">no one has set a song yet. add one in your profile!</div>';
-    openModal('Paths Music', html);
+    openModal('Old Streets Music', html);
   }
 
   function openTopFriends() {

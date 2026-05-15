@@ -311,7 +311,7 @@ app.use((req, res, next) => {
     return res.status(200).set('Cache-Control', 'no-store').type('html').send(`<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paths — paused</title>
+<title>Old Streets — paused</title>
 <link rel="icon" type="image/svg+xml" href="/logo.svg"/>
 <style>
   html, body { margin:0; padding:0; min-height:100%; background:#0a0c10; color:#e6e8eb;
@@ -339,7 +339,7 @@ app.use((req, res, next) => {
 <body>
   <div class="card">
     <img class="gif" src="${SITE_PAUSE_GIF}" alt="paused"/>
-    <div class="title">⏸ Paths is temporarily paused</div>
+    <div class="title">⏸ Old Streets is temporarily paused</div>
     <div class="body">${escapeHtmlServer(SITE_PAUSE_MESSAGE)}</div>
     <div class="apology">${apologyHtml}</div>
     <div class="teasers-label">coming next:</div>
@@ -352,7 +352,7 @@ app.use((req, res, next) => {
   res.status(200).set('Cache-Control', 'no-store').type('html').send(`<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paths — we moved</title>
+<title>Old Streets — we moved</title>
 <link rel="icon" type="image/svg+xml" href="/logo.svg"/>
 <meta http-equiv="refresh" content="8;url=${NEW_URL}">
 <style>
@@ -419,7 +419,7 @@ app.use((req, res, next) => {
       if (p === 'granted') {
         btn.textContent = '✓ notifications on';
         btn.classList.add('granted');
-        new Notification('Paths', { body: "you're set — see you on the new URL", icon: '/logo.svg' });
+        new Notification('Old Streets', { body: "you're set — see you on the new URL", icon: '/logo.svg' });
       } else {
         btn.textContent = 'denied — enable in browser settings';
       }
@@ -692,7 +692,7 @@ const EVENTS_FILE = path.join(DATA_DIR, 'events.json');
 const BRAND_VOTE_FILE = path.join(DATA_DIR, 'brand-votes.json');
 const APPROVAL_DM_QUEUE_FILE = path.join(DATA_DIR, 'approval-dm-queue.json');
 const REENGAGE_FILE = path.join(DATA_DIR, 'reengage.json');
-// Per-school directories for non-Ancient-Paths schools. Ancient Paths uses the
+// Per-school directories for non-Ancient-Old Streets schools. Ancient Old Streets uses the
 // legacy lib/directory.json. Future schools each get their own file.
 const SCHOOL_DIRECTORIES_DIR = path.join(DATA_DIR, 'school-directories');
 const EMAIL_VERIFY_FILE = path.join(DATA_DIR, 'email-verify.json');
@@ -732,7 +732,7 @@ let config = {
   adminUsername: 'admin',
   adminPasscode: 'change-me-admin',
   emailDomain: '',
-  siteName: 'Paths',
+  siteName: 'Old Streets',
   resendApiKey: '',
   emailFrom: 'Lander <noreply@lander.host>',
   publicUrl: 'http://localhost:3001'
@@ -1207,17 +1207,17 @@ function loadAll() {
     if (typeof p.expiresAt !== 'number' && p.expiresAt !== null) p.expiresAt = null;
   }
   console.log(`users loaded: ${users.length}`);
-  // One-shot rename: "New Roads" → "Ancient Paths" on existing users.
+  // One-shot rename: "New Roads" → "Ancient Old Streets" on existing users.
   // schoolId 'new-roads' stays the same; only the display name flips.
   {
     let renamed = 0;
     for (const u of users) {
-      if (u && u.schoolId === 'new-roads' && u.schoolName !== 'Ancient Paths') {
-        u.schoolName = 'Ancient Paths';
+      if (u && u.schoolId === 'new-roads' && u.schoolName !== 'Ancient Old Streets') {
+        u.schoolName = 'Ancient Old Streets';
         renamed++;
       }
     }
-    if (renamed > 0) { saveUsers(); console.log(`[rename] flipped schoolName on ${renamed} users → Ancient Paths`); }
+    if (renamed > 0) { saveUsers(); console.log(`[rename] flipped schoolName on ${renamed} users → Ancient Old Streets`); }
   }
   // Seed high-water marks from disk so the guard knows the current peak.
   updateHWM('users', users.length);
@@ -1543,7 +1543,7 @@ function unsubArtifacts(toEmail, { transactional = false } = {}) {
   const footerHtml = `
     <p style="color:#888;font-size:11px;margin-top:18px;border-top:1px solid #eee;padding-top:10px;line-height:1.5;text-align:center;">
       You're receiving this at ${escapeHtmlServer(toEmail)}.
-      <a href="${url}" style="color:#888;text-decoration:underline;">Unsubscribe</a> from Paths emails.
+      <a href="${url}" style="color:#888;text-decoration:underline;">Unsubscribe</a> from Old Streets emails.
     </p>`;
   return { headers, footerHtml, blocked, url };
 }
@@ -1566,9 +1566,9 @@ function handleUnsub(req, res) {
   console.log('[unsub] removed', email);
   res.type('html').send(`<!doctype html><meta charset=utf-8><title>unsubscribed</title>
     <body style="font-family:Helvetica,Arial,sans-serif;max-width:540px;margin:48px auto;padding:24px;color:#1c1c1c;">
-      <div style="background:#3B5998;color:white;padding:11px 16px;font-weight:bold;">[ Paths ]</div>
+      <div style="background:#3B5998;color:white;padding:11px 16px;font-weight:bold;">[ Old Streets ]</div>
       <h2 style="color:#3B5998;margin-top:24px;">You're unsubscribed.</h2>
-      <p><strong>${escapeHtmlServer(email)}</strong> won't receive any more marketing emails from Paths (digests, invites, mention notifications).</p>
+      <p><strong>${escapeHtmlServer(email)}</strong> won't receive any more marketing emails from Old Streets (digests, invites, mention notifications).</p>
       <p style="font-size:13px;color:#666;">Account-critical emails like password resets and admin approvals will still go through. Changed your mind? Just sign in again — we'll re-enable email.</p>
     </body>`);
 }
@@ -2879,10 +2879,10 @@ async function sendTimeoutEmail({ toName, toEmail, until, reason }) {
   const days = Math.max(1, Math.round((until - Date.now()) / (24 * 60 * 60 * 1000)));
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c; background: #fff;">
-      <div style="background:#a31515;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Paths · Account notice ]</div>
+      <div style="background:#a31515;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Old Streets · Account notice ]</div>
       <h2 style="color:#a31515;font-size:22px;margin:22px 0 8px;">You've been timed out</h2>
       <p style="font-size:14px;line-height:1.55;">Hey ${escapeHtmlServer(toName || 'there')},</p>
-      <p style="font-size:14px;line-height:1.55;">An admin put your Paths account on a temporary timeout. While the timeout is active you can still log in but you can't post, comment, or react.</p>
+      <p style="font-size:14px;line-height:1.55;">An admin put your Old Streets account on a temporary timeout. While the timeout is active you can still log in but you can't post, comment, or react.</p>
       <p style="font-size:14px;line-height:1.55;background:#fff4f4;border:1px solid #f5c5c5;padding:10px 14px;margin:12px 0;">
         <strong>Reason:</strong> ${escapeHtmlServer(reason || 'posting dumb stuff')}<br/>
         <strong>Duration:</strong> ~${days} day${days === 1 ? '' : 's'}<br/>
@@ -2898,7 +2898,7 @@ async function sendTimeoutEmail({ toName, toEmail, until, reason }) {
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [toEmail],
-        subject: `Paths — you've been timed out (${days}d)`,
+        subject: `Old Streets — you've been timed out (${days}d)`,
         html,
         headers: _u.headers
       })
@@ -2913,12 +2913,12 @@ async function sendUntimeoutEmail({ toName, toEmail }) {
   if (_u.blocked) return { skipped: true, unsubscribed: true };
   const html = `
     <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:540px;margin:0 auto;padding:24px;color:#1c1c1c;background:#fff;">
-      <div style="background:#3B5998;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Paths ]</div>
+      <div style="background:#3B5998;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Old Streets ]</div>
       <h2 style="color:#3B5998;font-size:22px;margin:22px 0 8px;">You're back in 🎉</h2>
       <p style="font-size:14px;line-height:1.55;">Hey ${escapeHtmlServer(toName || 'there')},</p>
       <p style="font-size:14px;line-height:1.55;">An admin lifted your timeout. You can post, comment, and react again. Try not to do dumb stuff this time.</p>
       <p style="margin:20px 0;">
-        <a href="${config.publicUrl || 'https://old-streets.fly.dev'}" style="display:inline-block;background:#3B5998;color:white;padding:10px 18px;text-decoration:none;font-weight:bold;border:1px solid #2f477b;">Open Paths →</a>
+        <a href="${config.publicUrl || 'https://old-streets.fly.dev'}" style="display:inline-block;background:#3B5998;color:white;padding:10px 18px;text-decoration:none;font-weight:bold;border:1px solid #2f477b;">Open Old Streets →</a>
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -2929,7 +2929,7 @@ async function sendUntimeoutEmail({ toName, toEmail }) {
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [toEmail],
-        subject: `Paths — your timeout has been lifted`,
+        subject: `Old Streets — your timeout has been lifted`,
         html,
         headers: _u.headers
       })
@@ -2946,7 +2946,7 @@ async function sendMentionEmail({ toName, toEmail, fromName, postPreview, postId
   const link = postId ? `${siteUrl}/#post=${postId}` : siteUrl;
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c; background: #fff;">
-      <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Paths ]</div>
+      <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Old Streets ]</div>
       <h2 style="color: #3B5998; font-size: 22px; margin: 22px 0 8px;">${escapeHtmlServer(fromName)} mentioned you on the wall.</h2>
       <p style="font-size: 14px; line-height: 1.55; background: #fffbe5; border: 1px solid #f0e0a0; padding: 10px 14px; margin: 12px 0;">
         "${escapeHtmlServer((postPreview || '').slice(0, 200))}${(postPreview || '').length > 200 ? '…' : ''}"
@@ -2955,7 +2955,7 @@ async function sendMentionEmail({ toName, toEmail, fromName, postPreview, postId
         <a href="${link}" style="display: inline-block; background: #3B5998; color: white; padding: 10px 18px; text-decoration: none; font-weight: bold; border: 1px solid #2f477b;">See the post →</a>
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 18px; line-height: 1.55;">
-        Paths is independent — not affiliated with any school.
+        Old Streets is independent — not affiliated with any school.
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -2966,7 +2966,7 @@ async function sendMentionEmail({ toName, toEmail, fromName, postPreview, postId
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [toEmail],
-        subject: `${fromName} mentioned you on Paths`,
+        subject: `${fromName} mentioned you on Old Streets`,
         html,
         headers: _u.headers
       })
@@ -3351,11 +3351,11 @@ app.post('/api/admin/passkey/register/options', rateLimit({ key: 'pk-reg', max: 
   try {
     const userIdBytes = crypto.randomBytes(16);
     const opts = await generateRegistrationOptions({
-      rpName: 'Paths',
+      rpName: 'Old Streets',
       rpID: rpHost(),
       userID: userIdBytes,
       userName: 'admin',
-      userDisplayName: 'Paths admin',
+      userDisplayName: 'Old Streets admin',
       attestationType: 'none',
       authenticatorSelection: {
         residentKey: 'preferred',
@@ -3523,15 +3523,15 @@ app.post('/api/passcode-check', (req, res) => {
 // is deliberately excluded — that was the school the platform got in
 // trouble with, so the brand evokes it without ever saying it.
 const NEW_ROADS_SYNONYMS = [
-  'Old Lanes', 'Paths', 'Old Trails', 'Old Avenues',
-  'Old Boulevards', 'Old Paths', 'Old Routes', 'Old Roads',
+  'Old Lanes', 'Old Streets', 'Old Trails', 'Old Avenues',
+  'Old Boulevards', 'Old Old Streets', 'Old Routes', 'Old Roads',
   'Antique Streets', 'Antique Lanes', 'Antique Roads', 'Antique Trails',
-  'Ancient Lanes', 'Ancient Paths', 'Ancient Routes',
-  'Forgotten Paths', 'Forgotten Drives', 'Forgotten Crossings',
+  'Ancient Lanes', 'Ancient Old Streets', 'Ancient Routes',
+  'Forgotten Old Streets', 'Forgotten Drives', 'Forgotten Crossings',
   'Hidden Streets', 'Hidden Trails', 'Hidden Bridges', 'Hidden Lanes',
   'Lost Avenues', 'Lost Byways', 'Lost Tracks',
   'Quiet Lanes', 'Quiet Walks', 'Quiet Roads',
-  'Winding Paths', 'Winding Roads',
+  'Winding Old Streets', 'Winding Roads',
   'Crooked Streets', 'Crooked Lanes',
   'Narrow Passages', 'Narrow Lanes',
   'Empty Highways', 'Empty Boulevards',
@@ -3790,7 +3790,7 @@ function consumeVerifyTicket(ticket) {
 
 // ===================================================================
 // SCHOOL DIRECTORIES — per-school student lists used during signup for
-// the 3-refs picker. Ancient Paths uses lib/directory.json (legacy). Each
+// the 3-refs picker. Ancient Old Streets uses lib/directory.json (legacy). Each
 // other school gets its own JSON file at data/school-directories/<id>.json
 // with shape: [{ name, email, gradYear? }, ...].
 // ===================================================================
@@ -3802,7 +3802,7 @@ ensureSchoolDirectoriesDir();
 function loadSchoolDirectory(schoolId) {
   const safe = String(schoolId || '').replace(/[^a-z0-9_-]/g, '');
   if (!safe) return [];
-  // Ancient Paths always uses the legacy directory
+  // Ancient Old Streets always uses the legacy directory
   if (safe === 'new-roads') return directory || [];
   const file = path.join(SCHOOL_DIRECTORIES_DIR, safe + '.json');
   try {
@@ -3890,7 +3890,7 @@ function saveEmailVerifyState() {
 
 async function sendVerifyEmail(toEmail, code, schoolName) {
   const key = process.env.RESEND_API_KEY || '';
-  const from = process.env.RESEND_FROM || 'Paths <no-reply@oldstreets.org>';
+  const from = process.env.RESEND_FROM || 'Old Streets <no-reply@oldstreets.org>';
   const subject = `your old streets code: ${code}`;
   const html = `
     <div style="font:14px/1.5 -apple-system,Segoe UI,sans-serif;color:#111;max-width:480px;margin:0 auto;padding:24px;">
@@ -4421,7 +4421,7 @@ app.post('/api/auth/signup', rateLimit({ key: 'signup-finish', max: 10, windowMs
       g.messages.push({
         id: 'sys-' + Date.now().toString(36),
         from: 'system',
-        fromName: 'Paths',
+        fromName: 'Old Streets',
         text: `${newUser.name} just joined — this is your locked starter group. only the original three live here. say hi.`,
         createdAt: now,
         readBy: []
@@ -4787,7 +4787,7 @@ app.post('/api/me/waitlist/speedup', rateLimit({ key: 'wl-speedup', max: 4, wind
   pushNotif(me.email || ('id:' + me.id), {
     type: 'unlocked',
     fromName: '🔓 You\'re in',
-    text: 'You skipped the line. Paths is open to you.',
+    text: 'You skipped the line. Old Streets is open to you.',
     ts: now
   });
 
@@ -4872,7 +4872,7 @@ app.post('/api/invites/mint-link', rateLimit({ key: 'invite-link', max: 10, wind
   const base = (config.publicUrl || 'https://old-streets.fly.dev').replace(/\/$/, '');
   const inviteUrl = `${base}/i/${newInvite.inviteToken}`;
   const smsBody = viralInviteSms(me.name, inviteUrl, me.schoolName);
-  // Fire via server Twilio — the recipient sees the Paths number,
+  // Fire via server Twilio — the recipient sees the Old Streets number,
   // not the inviter's. Anonymity is the point of the new copy.
   twilioSendSms(newInvite.contact || phoneE164, smsBody).catch(()=>{});
   res.json({
@@ -4899,7 +4899,7 @@ app.post('/api/invites/send', rateLimit({ key: 'invite-send', max: 10, windowMs:
   const phoneE164 = normPhoneE164(req.body && req.body.phone);
   if (!phoneE164) return res.status(400).json({ error: 'invalid phone number' });
   if (phoneE164 === me.phoneE164) return res.status(400).json({ error: "can't invite yourself" });
-  if (findUserByPhone(phoneE164)) return res.status(409).json({ error: 'that person is already on Paths' });
+  if (findUserByPhone(phoneE164)) return res.status(409).json({ error: 'that person is already on Old Streets' });
   // Dedupe — nobody else has this phone in an outstanding invite
   for (const u of users) {
     for (const inv of (u.pendingInvites || [])) {
@@ -4931,7 +4931,7 @@ app.post('/api/invites/send', rateLimit({ key: 'invite-send', max: 10, windowMs:
 
   const inviteUrl = buildInviteUrl(newInvite.inviteToken);
   const smsBody = viralInviteSms(me.name, inviteUrl, me.schoolName);
-  // Fire via server Twilio — the recipient sees the Paths number,
+  // Fire via server Twilio — the recipient sees the Old Streets number,
   // not the inviter's. Mystery framing requires hiding the sender.
   twilioSendSms(phoneE164, smsBody).catch(()=>{});
   res.json({
@@ -5008,7 +5008,7 @@ function approveWaitlistUser(u, opts) {
   try { sendLetInSms(u); } catch (e) { console.warn('[approve] sms failed', e.message); }
   try { scheduleApprovalDms(u); } catch (e) { console.warn('[approve] dms failed', e.message); }
   try { bumpWaitlistVibeOnApprove(); } catch (e) {}
-  const note = `You're in. Welcome to Paths.`;
+  const note = `You're in. Welcome to Old Streets.`;
   pushNotif(u.email || ('id:' + u.id), {
     type: 'approved',
     fromName: '✅ You\'re in',
@@ -5060,14 +5060,14 @@ function spawnAnonBotPostAbout(user) {
   // SMS the new joiner that they were posted about (TOS p.5 + p.6 cover this).
   if (user.phoneE164) {
     try {
-      twilioSendSms(user.phoneE164, `Someone posted about you on Paths. Tap to see: https://old-streets.fly.dev/ — reply STOP to opt out.`).catch(()=>{});
+      twilioSendSms(user.phoneE164, `Someone posted about you on Old Streets. Tap to see: https://old-streets.fly.dev/ — reply STOP to opt out.`).catch(()=>{});
     } catch (e) { console.warn('[bot-post] sms failed', e.message); }
   }
   // In-app notification too, in case SMS isn't configured.
   pushNotif(user.email || ('id:' + user.id), {
     type: 'mention',
     fromName: 'someone',
-    text: `posted about you on Paths.`,
+    text: `posted about you on Old Streets.`,
     postId: post.id,
     ts: now
   });
@@ -5548,7 +5548,7 @@ async function sendEmergencyPasswordEmail(user, newPassword) {
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c;">
       <div style="background: #c0392b; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">
-        🚨 [ Paths ] EMERGENCY PASSWORD RESET
+        🚨 [ Old Streets ] EMERGENCY PASSWORD RESET
       </div>
       <h2 style="color: #c0392b; font-size: 22px; margin: 22px 0 8px;">Your account has been locked down.</h2>
       <p style="font-size: 14px; line-height: 1.6;">
@@ -5577,7 +5577,7 @@ async function sendEmergencyPasswordEmail(user, newPassword) {
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [user.email],
-        subject: `🚨 Paths — emergency password reset for your account`,
+        subject: `🚨 Old Streets — emergency password reset for your account`,
         html,
         headers: _u.headers
       })
@@ -5674,14 +5674,14 @@ async function sendResetEmail(user) {
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c;">
       <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">
-        [ Paths ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">password reset</span>
+        [ Old Streets ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">password reset</span>
       </div>
       <h2 style="color: #3B5998; font-size: 22px; margin: 22px 0 8px;">Reset your password.</h2>
       <p style="font-size: 14px; line-height: 1.55;">
         Hey ${escapeHtmlServer(user.name.split(' ')[0] || user.name)} —
       </p>
       <p style="font-size: 14px; line-height: 1.55;">
-        Someone (probably you) asked to reset your Paths password. Click below to set a new one.
+        Someone (probably you) asked to reset your Old Streets password. Click below to set a new one.
         This link expires in <strong>1 hour</strong>.
       </p>
       <p style="margin: 22px 0;">
@@ -5695,7 +5695,7 @@ async function sendResetEmail(user) {
         Didn't ask for this? Ignore the email — your password won't change. The link will expire on its own.
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 10px; line-height: 1.55;">
-        Paths is independent — not affiliated with any school. We don't condone bullying.
+        Old Streets is independent — not affiliated with any school. We don't condone bullying.
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -5706,7 +5706,7 @@ async function sendResetEmail(user) {
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [user.email],
-        subject: 'Reset your Paths password',
+        subject: 'Reset your Old Streets password',
         html,
         headers: _u.headers
       })
@@ -6770,7 +6770,7 @@ app.get('/api/users/profile/:email', (req, res) => {
         friendCount: 0,
         mood: '', moodId: '',
         headline: '',
-        aboutMe: `${dirEntry.name.split(' ')[0]} hasn't joined Paths yet — send them a 💌 love letter to pull them in.`,
+        aboutMe: `${dirEntry.name.split(' ')[0]} hasn't joined Old Streets yet — send them a 💌 love letter to pull them in.`,
         interests: '', heroes: '', pronouns: '', websiteUrl: '',
         theme: 'classic',
         top8: [], blinkies: [],
@@ -7039,7 +7039,7 @@ app.post('/api/me/resend-school-verify', async (req, res) => {
 // for accounts that signed up before the field existed).
 //
 // TRAP: middle-school grades (6/7/8) get the account hard-deleted immediately.
-// Paths is upper-school only. If a middle-schooler picks their real
+// Old Streets is upper-school only. If a middle-schooler picks their real
 // grade, we yank the account on the spot — no warning, no recovery.
 app.post('/api/me/set-grade', (req, res) => {
   const me = requireUser(req, res);
@@ -7137,7 +7137,7 @@ function maybeFireAnniversary(user) {
   saveUsers();
   pushNotif(user.email, {
     type: 'anniversary',
-    fromName: '🎂 1 year on Paths',
+    fromName: '🎂 1 year on Old Streets',
     fromEmail: '',
     text: `you've been here a whole year. look how cringe day-one you was.`
   });
@@ -7879,7 +7879,7 @@ setTimeout(scheduleBotReact, 60 * 1000);
 // the Chats tab shows them like any other thread.
 // ===================================================================
 const SYS_SENDER_EMAIL  = 'system@old-streets.internal';
-const SYS_SENDER_NAME   = 'Paths';
+const SYS_SENDER_NAME   = 'Old Streets';
 const ANON_SENDER_EMAIL = 'anonymous@old-streets.internal';
 const ANON_SENDER_NAME  = 'anonymous';
 const ANON_GREETINGS = [
@@ -8544,19 +8544,19 @@ app.post('/api/me/set-school', (req, res) => {
 // Aligned with SCHOOL_CATALOG ids+names so community feeds (which key on
 // schoolId) stay consistent and no existing user's display name flips.
 const LAUNCH_THREE = [
-  { id: 'new-roads',     name: 'Ancient Paths' },
+  { id: 'new-roads',     name: 'Ancient Old Streets' },
   { id: 'beverly-hills', name: 'Beverly Hills High' },
   { id: 'crossroads',    name: 'Crossroads' }
 ];
 app.get('/api/launch-schools', (_req, res) => res.json({ schools: LAUNCH_THREE }));
 
-// School selection removed — auto-lock anyone who hits this to "Ancient Paths".
+// School selection removed — auto-lock anyone who hits this to "Ancient Old Streets".
 app.post('/api/me/auto-lock-school', (req, res) => {
   const me = findUserByToken(req.headers['x-user-token']);
   if (!me) return res.status(401).json({ error: 'sign in first' });
   if (me.schoolLocked) return res.json({ ok: true, user: publicUser(me) });
   me.schoolId = 'new-roads';
-  me.schoolName = 'Ancient Paths';
+  me.schoolName = 'Ancient Old Streets';
   me.schoolLocked = true;
   me.schoolLockedAt = Date.now();
   saveUsers();
@@ -8574,7 +8574,7 @@ app.post('/api/me/lock-school', (req, res) => {
     return res.status(400).json({ error: 'confirm-required', message: 'pass confirm:"PERMANENT" to lock' });
   }
   const s = LAUNCH_THREE.find(x => x.id === slug);
-  if (!s) return res.status(400).json({ error: 'must-be-launch-three', message: 'pick Ancient Paths, Beverly Hills, or Crossroads' });
+  if (!s) return res.status(400).json({ error: 'must-be-launch-three', message: 'pick Ancient Old Streets, Beverly Hills, or Crossroads' });
   me.schoolId = s.id;
   me.schoolName = s.name;
   me.schoolLocked = true;
@@ -8763,11 +8763,11 @@ app.get('/api/me/streak-status', (req, res) => {
 });
 
 app.get('/api/directory', (req, res) => {
-  // HARD school isolation. Legacy directory.json is Ancient Paths data
+  // HARD school isolation. Legacy directory.json is Ancient Old Streets data
   // (the original school the platform launched for). For each future
   // school we'll import its own directory under a school-scoped key.
   // - Admin: sees everything.
-  // - Ancient Paths viewer: sees legacy directory.json + their school's user records.
+  // - Ancient Old Streets viewer: sees legacy directory.json + their school's user records.
   // - Other school viewer: sees only their school's user records (no directory yet).
   const me = findUserByToken(req.headers['x-user-token']);
   if (!me) return res.json([]);
@@ -8782,7 +8782,7 @@ app.get('/api/directory', (req, res) => {
       if (r.email) referredEmails.add(r.email.toLowerCase());
     }
   }
-  // Treat legacy directory.json as Ancient Paths. Show it only to admins + Ancient Paths viewers.
+  // Treat legacy directory.json as Ancient Old Streets. Show it only to admins + Ancient Old Streets viewers.
   const showLegacyDir = me.isAdmin || me.schoolId === 'new-roads';
   const legacyList = showLegacyDir ? directory.map(d => {
     const lc = (d.email || '').toLowerCase();
@@ -8825,10 +8825,10 @@ async function sendNewUrlEmail({ toName, toEmail, newUrl }) {
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c; background: #fff;">
       <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">
-        [ Paths ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">we moved</span>
+        [ Old Streets ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">we moved</span>
       </div>
       <h2 style="color: #3B5998; font-size: 22px; margin: 22px 0 8px; line-height: 1.25;">
-        We just moved Paths to a new home.
+        We just moved Old Streets to a new home.
       </h2>
       <p style="font-size: 14.5px; line-height: 1.55;">Hey ${escapeHtmlServer(first)} —</p>
       <p style="font-size: 14.5px; line-height: 1.55;">
@@ -8850,7 +8850,7 @@ async function sendNewUrlEmail({ toName, toEmail, newUrl }) {
         realistic feel overall. Go check it out.
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 30px; line-height: 1.55; border-top: 1px solid #eee; padding-top: 12px;">
-        Paths · independent and not affiliated with any school.
+        Old Streets · independent and not affiliated with any school.
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -8861,7 +8861,7 @@ async function sendNewUrlEmail({ toName, toEmail, newUrl }) {
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [toEmail],
-        subject: 'Paths moved — new URL inside',
+        subject: 'Old Streets moved — new URL inside',
         html,
         headers: _u.headers
       })
@@ -8920,32 +8920,32 @@ async function sendInviteEmail({ toName, toEmail, fromName, fromEmail }) {
 
   // Subject lines: rotate based on whether we have any activity
   const subject = stats.totalPosts > 0
-    ? `${safeFrom} picked you for Paths — you might already be on the wall`
-    : `${safeFrom} saved you a spot on Paths`;
+    ? `${safeFrom} picked you for Old Streets — you might already be on the wall`
+    : `${safeFrom} saved you a spot on Old Streets`;
 
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c; background: #fff;">
 
       <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px; letter-spacing: 0.01em;">
-        [ Paths ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">members only</span>
+        [ Old Streets ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">members only</span>
       </div>
 
       <h2 style="color: #3B5998; font-size: 24px; margin: 22px 0 8px; line-height: 1.2; letter-spacing: -0.01em;">
         ${escapeHtmlServer(safeFrom)} picked you.
       </h2>
       <p style="font-size: 13px; color: #777; margin: 0 0 12px;">
-        For Paths — the private invite-only network.
+        For Old Streets — the private invite-only network.
       </p>
 
       <div style="background: #f0f9f4; border-left: 3px solid #2ea44f; padding: 8px 12px; margin: 14px 0; font-size: 11px; color: #1a5132;">
-        ✓ <strong>Safe to click.</strong> This email is from <strong>${escapeHtmlServer(safeFrom)}</strong>, another Paths member, sent through Paths — a private invite-only platform.
+        ✓ <strong>Safe to click.</strong> This email is from <strong>${escapeHtmlServer(safeFrom)}</strong>, another Old Streets member, sent through Old Streets — a private invite-only platform.
       </div>
 
       <p style="font-size: 14.5px; line-height: 1.55;">
         Hey ${escapeHtmlServer(toName.split(' ')[0] || toName)},
       </p>
       <p style="font-size: 14.5px; line-height: 1.55;">
-        <strong>${escapeHtmlServer(safeFrom)}</strong> just joined Paths and used one of their 3 invites on you.
+        <strong>${escapeHtmlServer(safeFrom)}</strong> just joined Old Streets and used one of their 3 invites on you.
         It's a private wall + video chat — <strong>built by a student, for students</strong> — members get in through an invite and a waitlist review.
       </p>
 
@@ -8965,7 +8965,7 @@ async function sendInviteEmail({ toName, toEmail, fromName, fromEmail }) {
       </p>
 
       <p style="color: #888; font-size: 11px; margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px; line-height: 1.5;">
-        Paths · members only · invite-only.<br/>
+        Old Streets · members only · invite-only.<br/>
         Don't tell the principal. If you weren't expecting this, ignore it — no one will know.
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 10px; line-height: 1.55;">
@@ -9105,7 +9105,7 @@ app.get('/api/inbox', (req, res) => {
       const other = (m.from === me ? m.to : m.from);
       const otherUser = findUserByEmail(other);
       // HARD school isolation — hide threads with cross-school users.
-      // System pseudo-senders (Paths / anonymous) always show.
+      // System pseudo-senders (Old Streets / anonymous) always show.
       if (otherUser && !viewerCanSeeUser(user, otherUser)) continue;
       const cur = byOther.get(other);
       if (!cur || cur.lastTs < m.createdAt) {
@@ -9400,7 +9400,7 @@ app.post('/api/dm/with/:email', (req, res) => {
   const otherUser = findUserByEmail(other);
   if (!otherUser || otherUser.status === 'banned') return res.status(404).json({ error: 'user not found' });
   // HARD school isolation — block sends to cross-school users. System
-  // pseudo-senders (Paths / anonymous) are always reachable.
+  // pseudo-senders (Old Streets / anonymous) are always reachable.
   if (!viewerCanSeeUser(user, otherUser)) return res.status(404).json({ error: 'user not found' });
   const text = String((req.body && req.body.text) || '').trim();
   if (!text) return res.status(400).json({ error: 'empty' });
@@ -9786,7 +9786,7 @@ app.get('/api/leaderboard', (req, res) => {
   // Pad the leaderboard with phantom names drawn from the ecosystem pool so the
   // board never looks dead. NEVER inject 'anonymous' — that'd be a tell.
   // PHANTOM PADDING REMOVED — leaderboard returns real same-school scores
-  // only. Cross-school leak (Beverly Hills viewer seeing Ancient Paths names
+  // only. Cross-school leak (Beverly Hills viewer seeing Ancient Old Streets names
   // in the ghost pool) was a critical isolation bug.
   res.json(ranked.slice(0, 5));
 });
@@ -9833,7 +9833,7 @@ async function sendLoveLetterEmail({ toEmail, toName, fromHint, letterId, messag
     </p>` : '';
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c; background: #fff;">
-      <div style="background: #ff6ec7; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Paths ] 💌 love letter</div>
+      <div style="background: #ff6ec7; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Old Streets ] 💌 love letter</div>
       <h2 style="color: #ff3b85; font-size: 22px; margin: 22px 0 8px;">Someone has a crush on you. 💌</h2>
       <p style="font-size: 14px; line-height: 1.55;">
         Hi ${escapeHtmlServer((toName || '').split(' ')[0] || 'you')} —
@@ -9842,7 +9842,7 @@ async function sendLoveLetterEmail({ toEmail, toName, fromHint, letterId, messag
       </p>
       ${noteBlock}
       <div style="background: #f0f9f4; border-left: 3px solid #2ea44f; padding: 8px 12px; margin: 14px 0; font-size: 11px; color: #1a5132;">
-        ✓ <strong>Safe to click.</strong> This email is from another Paths member through Paths — a private invite-only platform. We never share your address.
+        ✓ <strong>Safe to click.</strong> This email is from another Old Streets member through Old Streets — a private invite-only platform. We never share your address.
       </div>
       <h3 style="color: #ff3b85; font-size: 16px; margin: 22px 0 4px;">Who do you think it is?</h3>
       <p style="font-size: 13px; line-height: 1.55;">
@@ -9853,10 +9853,10 @@ async function sendLoveLetterEmail({ toEmail, toName, fromHint, letterId, messag
         <a href="${link}" style="display: inline-block; background: #ff6ec7; color: white; padding: 12px 22px; text-decoration: none; font-weight: bold; border-radius: 4px; border: 1px solid #d8438f;">Pick 3 →</a>
       </p>
       <p style="font-size: 12px; line-height: 1.55; color: #555; background: #fafafa; padding: 10px 14px; border-left: 3px solid #ff6ec7; margin: 14px 0;">
-        <strong>Not on Paths yet?</strong> It's a private wall + video chat <strong>invite-only</strong>. Click the button — we'll walk you through signing up in under a minute. Members get in through an invite.
+        <strong>Not on Old Streets yet?</strong> It's a private wall + video chat <strong>invite-only</strong>. Click the button — we'll walk you through signing up in under a minute. Members get in through an invite.
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 18px; line-height: 1.55; text-align: center;">
-        invite-only · Paths is independent, not affiliated with any school
+        invite-only · Old Streets is independent, not affiliated with any school
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -9867,7 +9867,7 @@ async function sendLoveLetterEmail({ toEmail, toName, fromHint, letterId, messag
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [toEmail],
-        subject: `💌 someone has a crush on you — Paths`,
+        subject: `💌 someone has a crush on you — Old Streets`,
         html,
         headers: _u.headers
       })
@@ -9965,7 +9965,7 @@ async function sendCrushMatchEmail({ toEmail, toName, otherName, otherEmail }) {
         <a href="${link}" style="display: inline-block; background: #ff3b85; color: white; padding: 12px 22px; text-decoration: none; font-weight: bold; border-radius: 4px;">View their profile →</a>
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 18px; line-height: 1.55;">
-        Paths is independent — not affiliated with any school. We only tell you when there's a mutual match. Unmatched crushes stay anonymous forever.
+        Old Streets is independent — not affiliated with any school. We only tell you when there's a mutual match. Unmatched crushes stay anonymous forever.
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -10196,7 +10196,7 @@ app.delete('/api/admin/announcements/:id', (req, res) => {
 app.post('/api/admin/broadcast', (req, res) => {
   if (!requireAdmin(req, res)) return;
   const text = String(req.body?.text || '').trim().slice(0, 240);
-  const title = String(req.body?.title || '📣 Paths').trim().slice(0, 60);
+  const title = String(req.body?.title || '📣 Old Streets').trim().slice(0, 60);
   const link = String(req.body?.link || '').trim().slice(0, 500);
   const audience = String(req.body?.audience || 'all'); // 'all' | 'online' | 'active'
   if (!text) return res.status(400).json({ error: 'text required' });
@@ -10279,7 +10279,7 @@ app.post('/api/admin/stir-now', async (req, res) => {
       const daysSince = Math.floor((now - lastPostMs) / ONE_DAY_MS);
       pushNotif(u.email, {
         type: 'missed-you',
-        fromName: '💛 Paths',
+        fromName: '💛 Old Streets',
         fromEmail: '',
         text: `you haven't posted in ${daysSince} days — the crew misses you. come back.`
       });
@@ -10432,12 +10432,12 @@ async function sendVerificationCodeEmail({ toEmail, code, purpose, schoolName })
   if (!config.resendApiKey) return { skipped: true };
   const _u = unsubArtifacts(toEmail, { transactional: true });
   const purposeText = purpose === 'login'
-    ? `Someone tried to sign into <strong>${escapeHtmlServer(schoolName || 'Paths')}</strong>. If that was you, here's your code:`
-    : `Verifying your personal email for Paths. Here's your code:`;
+    ? `Someone tried to sign into <strong>${escapeHtmlServer(schoolName || 'Old Streets')}</strong>. If that was you, here's your code:`
+    : `Verifying your personal email for Old Streets. Here's your code:`;
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c; background: #fff;">
       <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">
-        🔐 Paths — verification code
+        🔐 Old Streets — verification code
       </div>
       <h2 style="color: #3B5998; font-size: 22px; margin: 22px 0 8px;">${purpose === 'login' ? 'Sign-in code' : 'Verify your personal email'}</h2>
       <p style="font-size: 14px; line-height: 1.55;">${purposeText}</p>
@@ -10460,7 +10460,7 @@ async function sendVerificationCodeEmail({ toEmail, code, purpose, schoolName })
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [toEmail],
-        subject: `🔐 Paths — your code is ${code}`,
+        subject: `🔐 Old Streets — your code is ${code}`,
         html,
         headers: _u.headers
       })
@@ -12185,7 +12185,7 @@ app.post('/api/poke', async (req, res) => {
       type: 'poke',
       fromName: user.name,
       fromEmail: user.email,
-      text: `👉 ${user.name} poked you on Paths`
+      text: `👉 ${user.name} poked you on Old Streets`
     });
   } else if (toName) {
     // Recipient isn't a member yet → email them a poke
@@ -12199,15 +12199,15 @@ app.post('/api/poke', async (req, res) => {
             body: JSON.stringify({
               from: config.emailFrom || 'Lander <noreply@lander.host>',
               to: [toEmail],
-              subject: `👉 ${user.name} poked you on Paths`,
+              subject: `👉 ${user.name} poked you on Old Streets`,
               html: `<div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px;">
-                <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Paths ] 👉 poke</div>
+                <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Old Streets ] 👉 poke</div>
                 <h2 style="color: #3B5998; font-size: 22px; margin: 22px 0 8px;">${escapeHtmlServer(user.name)} poked you.</h2>
-                <p style="font-size: 14px; line-height: 1.55;">Hi ${escapeHtmlServer((toName || '').split(' ')[0] || 'you')} — another member wants you on Paths. Someone else has already vouched for you, so you're cleared to sign up directly.</p>
+                <p style="font-size: 14px; line-height: 1.55;">Hi ${escapeHtmlServer((toName || '').split(' ')[0] || 'you')} — another member wants you on Old Streets. Someone else has already vouched for you, so you're cleared to sign up directly.</p>
                 <p style="margin: 20px 0;">
                   <a href="${config.publicUrl || 'http://localhost:3001'}" style="display: inline-block; background: #3B5998; color: white; padding: 12px 22px; text-decoration: none; font-weight: bold; border-radius: 4px;">Sign up →</a>
                 </p>
-                <p style="color: #888; font-size: 9px; margin-top: 18px;">invite-only · Paths is independent</p>
+                <p style="color: #888; font-size: 9px; margin-top: 18px;">invite-only · Old Streets is independent</p>
                 ${_u.footerHtml}
               </div>`,
               headers: _u.headers
@@ -12243,7 +12243,7 @@ app.post('/api/admin/mass-crush', async (req, res) => {
       message: text,
       fromEmailHash: senderHash,
       fromEmail: senderEmail,
-      fromName: fromEmail ? (findUserByEmail(fromEmail)?.name || senderEmail) : 'Paths',
+      fromName: fromEmail ? (findUserByEmail(fromEmail)?.name || senderEmail) : 'Old Streets',
       parentId: null,
       chainDepth: 0,
       createdAt: Date.now(),
@@ -12292,7 +12292,7 @@ app.post('/api/invite-single', async (req, res) => {
   if (!toEmail || !toName) return res.status(400).json({ error: 'email + name required' });
   // already a member?
   const existing = findUserByEmail(toEmail);
-  if (existing) return res.status(409).json({ error: 'already on Paths' });
+  if (existing) return res.status(409).json({ error: 'already on Old Streets' });
   // rate limit: 10 invites/day per user
   user._inviteHistory = (user._inviteHistory || []).filter(t => t > Date.now() - ONE_DAY_MS);
   if (user._inviteHistory.length >= 10) return res.status(429).json({ error: '10 invites/day max' });
@@ -12903,7 +12903,7 @@ function awardWeeklyRoyalty(opts = {}) {
       u.royalty = { kind: w.kind, crown: w.crown, title: w.title, weekKey: wk, ts: w.ts };
       pushNotif(u.email, {
         type: 'royalty',
-        fromName: '👑 Paths',
+        fromName: '👑 Old Streets',
         fromEmail: '',
         text: `you got the ${w.title} crown 🎉 ${w.summary}`,
         crown: w.crown
@@ -13172,7 +13172,7 @@ setInterval(() => {
     const payload = tpl(u);
     pushNotif(u.email, {
       type: 'phantom',
-      fromName: 'Paths',
+      fromName: 'Old Streets',
       fromEmail: '',
       text: payload.text
     });
@@ -13238,7 +13238,7 @@ const SCHOOL_CATALOG = [
   { id: 'brentwood', name: 'Brentwood', region: 'Westside' },
   { id: 'archer', name: 'Archer', region: 'Westside' },
   { id: 'marlborough', name: 'Marlborough', region: 'Westside' },
-  { id: 'new-roads', name: 'Ancient Paths', region: 'Westside' },
+  { id: 'new-roads', name: 'Ancient Old Streets', region: 'Westside' },
   { id: 'windward', name: 'Windward', region: 'Westside' },
   { id: 'crossroads', name: 'Crossroads', region: 'Westside' },
   { id: 'palisades', name: 'Palisades Charter', region: 'Westside' },
@@ -13453,10 +13453,10 @@ async function sendApprovalEmail(user) {
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c; background: #fff;">
       <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">
-        [ Paths ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">you're in</span>
+        [ Old Streets ] <span style="font-weight: normal; opacity: 0.75; font-size: 12px; float: right; padding-top: 2px;">you're in</span>
       </div>
       <h2 style="color: #3B5998; font-size: 24px; margin: 22px 0 8px; line-height: 1.2;">
-        You're approved. Welcome to Paths.
+        You're approved. Welcome to Old Streets.
       </h2>
       <p style="font-size: 14.5px; line-height: 1.55;">
         Hey ${escapeHtmlServer((user.name || '').split(' ')[0] || user.name)} —
@@ -13465,16 +13465,16 @@ async function sendApprovalEmail(user) {
         Your account is active. Log in any time at the link below to post on the wall, comment, vote, DM, and video chat.
       </p>
       <p style="margin: 22px 0;">
-        <a href="${siteUrl}" style="display: inline-block; background: #3B5998; color: white; padding: 12px 22px; text-decoration: none; font-weight: bold; border: 1px solid #2f477b; font-size: 14px;">Open Paths →</a>
+        <a href="${siteUrl}" style="display: inline-block; background: #3B5998; color: white; padding: 12px 22px; text-decoration: none; font-weight: bold; border: 1px solid #2f477b; font-size: 14px;">Open Old Streets →</a>
       </p>
       <p style="font-size: 13px; line-height: 1.55; background: #f3f5fa; border-left: 3px solid #3B5998; padding: 10px 14px; margin: 16px 0; color: #333;">
-        <strong>What this is:</strong> Paths is built and run by a student, for students. It's a private invite-only wall and chat — members get in through invites + waitlist review. We're not selling anything, not collecting weird data, not affiliated with the school's administration in any way.
+        <strong>What this is:</strong> Old Streets is built and run by a student, for students. It's a private invite-only wall and chat — members get in through invites + waitlist review. We're not selling anything, not collecting weird data, not affiliated with the school's administration in any way.
       </p>
       <p style="font-size: 13px; color: #555; line-height: 1.55;">
         House rules: no bullying, no harassment, no slurs, no threats. Use the report button on anything that crosses the line — I review every report. Don't share the site with anyone outside school.
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 30px; line-height: 1.55; border-top: 1px solid #eee; padding-top: 12px;">
-        Paths · created by members · independent and not affiliated with, endorsed by, or operated by any school. We don't condone bullying. Posts are individual opinions.
+        Old Streets · created by members · independent and not affiliated with, endorsed by, or operated by any school. We don't condone bullying. Posts are individual opinions.
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -13485,7 +13485,7 @@ async function sendApprovalEmail(user) {
       body: JSON.stringify({
         from: config.emailFrom || 'Lander <noreply@lander.host>',
         to: [user.email],
-        subject: `you're in — Paths is unlocked for you`,
+        subject: `you're in — Old Streets is unlocked for you`,
         html,
         headers: _u.headers
       })
@@ -13675,7 +13675,7 @@ app.post('/api/admin/test-email', async (req, res) => {
   const r = await sendInviteEmail({
     toName: 'test recipient',
     toEmail: to,
-    fromName: 'Paths Admin',
+    fromName: 'Old Streets Admin',
     fromEmail: 'admin@oldstreets.test'
   });
   res.json(r);
@@ -13924,7 +13924,7 @@ app.post('/api/admin/test/onboarding', async (req, res) => {
   if (!requireAdmin(req, res)) return;
   const to = String((req.body && req.body.to) || '').trim();
   if (!to) return res.status(400).json({ error: 'to required' });
-  const fromName = req.body?.fromName || 'Paths Admin';
+  const fromName = req.body?.fromName || 'Old Streets Admin';
   const r = await sendInviteEmail({
     toName: req.body?.toName || 'test recipient',
     toEmail: to, fromName,
@@ -16030,10 +16030,10 @@ async function sendRecoveryBlastOnce() {
   const siteUrl = config.publicUrl || 'https://old-streets.fly.dev';
   const html = (toName) => `
     <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1c1c1c;background:#fff;">
-      <div style="background:#c92a2a;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Paths · Security Notice ]</div>
+      <div style="background:#c92a2a;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Old Streets · Security Notice ]</div>
       <h2 style="color:#c92a2a;font-size:22px;margin:22px 0 8px;">Was your account stolen?</h2>
       <p style="font-size:14px;line-height:1.55;">Hey ${escapeHtmlServer(toName || 'there')},</p>
-      <p style="font-size:14px;line-height:1.55;">Some Paths accounts have been hijacked — passwords leaked, accounts signed in by people who shouldn't have access. If yours was one of them, you can take it back right now.</p>
+      <p style="font-size:14px;line-height:1.55;">Some Old Streets accounts have been hijacked — passwords leaked, accounts signed in by people who shouldn't have access. If yours was one of them, you can take it back right now.</p>
       <p style="font-size:14px;line-height:1.55;background:#fff5f5;border:1px solid #f5c5c5;padding:12px 14px;margin:12px 0;">
         <strong>How recovery works:</strong><br/>
         1) Click the button below<br/>
@@ -16056,9 +16056,9 @@ async function sendRecoveryBlastOnce() {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + config.resendApiKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: config.emailFrom || 'Paths <noreply@lander.host>',
+          from: config.emailFrom || 'Old Streets <noreply@lander.host>',
           to: [u.email],
-          subject: 'Paths: was your account stolen? Reclaim it here.',
+          subject: 'Old Streets: was your account stolen? Reclaim it here.',
           html: html(u.name)
         })
       });
@@ -16091,11 +16091,11 @@ function wipeAndSeedFriendlyOnce() {
   }
   const friendlyTexts = [
     "fresh start. wall just got wiped — share something good ☀️",
-    "welcome to the new Paths. clean slate, be cool to each other.",
+    "welcome to the new Old Streets. clean slate, be cool to each other.",
     "what's the best song you've heard this week? drop it below 🎵",
     "shoutout to whoever held the door this morning. small things count.",
     "if you found this site funny / useful / a little chaotic — tell a friend.",
-    "Paths is a hangout, not a battleground. let's keep it like that.",
+    "Old Streets is a hangout, not a battleground. let's keep it like that.",
     "post about your day. literally anything. that's the whole vibe.",
     "anonymous posting is OFF now. say what you think with your name on it 💪",
     "be the reason someone smiles in the hallway tomorrow",
@@ -16218,10 +16218,10 @@ async function sendWelcomeBlastOnce() {
   const siteUrl = config.publicUrl || 'https://old-streets.fly.dev';
   const html = (toName) => `
     <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#1c1c1c;background:#fff;">
-      <div style="background:#3B5998;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Paths ]</div>
-      <h2 style="color:#3B5998;font-size:22px;margin:22px 0 8px;">Welcome to the new Paths ✨</h2>
+      <div style="background:#3B5998;color:white;padding:11px 16px;font-weight:bold;font-size:17px;">[ Old Streets ]</div>
+      <h2 style="color:#3B5998;font-size:22px;margin:22px 0 8px;">Welcome to the new Old Streets ✨</h2>
       <p style="font-size:14px;line-height:1.55;">Hey ${escapeHtmlServer(toName || 'there')},</p>
-      <p style="font-size:14px;line-height:1.55;">We just rebuilt Paths from the ground up — your account is ready and waiting. <strong>Every  student is already registered.</strong> No signup, no password to remember.</p>
+      <p style="font-size:14px;line-height:1.55;">We just rebuilt Old Streets from the ground up — your account is ready and waiting. <strong>Every  student is already registered.</strong> No signup, no password to remember.</p>
       <p style="font-size:14px;line-height:1.55;background:#f0f4fc;border:1px solid #c4d3ee;padding:12px 14px;margin:12px 0;">
         <strong>How to sign in (takes 10 seconds):</strong><br/>
         1) Open the site<br/>
@@ -16231,10 +16231,10 @@ async function sendWelcomeBlastOnce() {
       </p>
       <p style="font-size:14px;line-height:1.55;">No personal email needed. The code goes straight to your school inbox.</p>
       <p style="margin:20px 0;">
-        <a href="${siteUrl}/" style="display:inline-block;background:#3B5998;color:white;padding:12px 22px;text-decoration:none;font-weight:bold;border:1px solid #2f477b;font-size:15px;">Open Paths →</a>
+        <a href="${siteUrl}/" style="display:inline-block;background:#3B5998;color:white;padding:12px 22px;text-decoration:none;font-weight:bold;border:1px solid #2f477b;font-size:15px;">Open Old Streets →</a>
       </p>
       <p style="font-size:12px;line-height:1.55;color:#666;">If you signed up before and were waiting for referrals, you're already in — open the site and sign in with your name.</p>
-      <p style="font-size:11px;line-height:1.55;color:#999;margin-top:18px;">Paths is independent — not affiliated with any school. To stop these emails, just don't sign in.</p>
+      <p style="font-size:11px;line-height:1.55;color:#999;margin-top:18px;">Old Streets is independent — not affiliated with any school. To stop these emails, just don't sign in.</p>
     </div>`;
   let sent = 0, failed = 0;
   for (const u of users) {
@@ -16245,9 +16245,9 @@ async function sendWelcomeBlastOnce() {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + config.resendApiKey, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: config.emailFrom || 'Paths <noreply@lander.host>',
+          from: config.emailFrom || 'Old Streets <noreply@lander.host>',
           to: [u.email],
-          subject: 'Your new Paths account — welcome to the program',
+          subject: 'Your new Old Streets account — welcome to the program',
           html: html(u.name)
         })
       });
@@ -16890,7 +16890,7 @@ app.post('/api/bot/alert', (req, res) => {
     if (u.status !== 'active') continue;
     pushNotif(u.email, {
       type: 'admin-alert',
-      fromName: '📢 Paths',
+      fromName: '📢 Old Streets',
       fromEmail: '',
       text: String(text).slice(0, 240)
     });
@@ -16909,7 +16909,7 @@ app.post('/api/bot/test/invite', async (req, res) => {
   if (!checkBotKey(req, res)) return;
   const { to, toName } = req.body || {};
   if (!to) return res.status(400).json({ error: 'to required' });
-  const r = await sendInviteEmail({ toName: toName || 'friend', toEmail: to, fromName: 'Paths', fromEmail: 'admin@oldstreets.test' });
+  const r = await sendInviteEmail({ toName: toName || 'friend', toEmail: to, fromName: 'Old Streets', fromEmail: 'admin@oldstreets.test' });
   res.json(r);
 });
 
@@ -17175,14 +17175,14 @@ async function sendDigestEmail(user, topPosts) {
   }).join('');
   const html = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 540px; margin: 0 auto; padding: 24px; color: #1c1c1c;">
-      <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Paths ] today's digest</div>
+      <div style="background: #3B5998; color: white; padding: 11px 16px; font-weight: bold; font-size: 17px;">[ Old Streets ] today's digest</div>
       <h2 style="color: #3B5998; font-size: 20px; margin: 18px 0 12px;">What you missed today</h2>
       ${items}
       <p style="margin: 22px 0;">
         <a href="${siteUrl}" style="display: inline-block; background: #3B5998; color: white; padding: 10px 18px; text-decoration: none; font-weight: bold; border: 1px solid #2f477b;">See it all →</a>
       </p>
       <p style="color: #aaa; font-size: 9px; margin-top: 18px; line-height: 1.55;">
-        Paths is independent — not affiliated with any school. We don't condone bullying.
+        Old Streets is independent — not affiliated with any school. We don't condone bullying.
       </p>
       ${_u.footerHtml}
     </div>`;
@@ -17192,7 +17192,7 @@ async function sendDigestEmail(user, topPosts) {
     body: JSON.stringify({
       from: config.emailFrom || 'Lander <noreply@lander.host>',
       to: [user.email],
-      subject: `Paths · today's digest · ${topPosts.length} top posts`,
+      subject: `Old Streets · today's digest · ${topPosts.length} top posts`,
       html,
       headers: _u.headers
     })

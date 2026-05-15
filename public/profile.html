@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>profile</title>
 <link rel="stylesheet" href="/chrome.css?v=20260513y"/>
-<script src="/chrome.js?v=20260513y"></script>
+<script src="/chrome.js?v=20260515c"></script>
 <style>
 /* =========================================================
    MySpace 2006 profile clone
@@ -556,12 +556,12 @@ img{border:0;}
 
 <!-- ============================== CHROME ============================== -->
 <div class="topstrip">
-  <a class="brand" href="/"><span id="brand-name">Paths</span><span class="dot">.</span><span style="font-weight:normal;font-size:10px;color:#666;">com</span></a>
+  <a class="brand" href="/"><span id="brand-name">Old Streets</span><span class="dot">.</span><span style="font-weight:normal;font-size:10px;color:#666;">com</span></a>
   <a class="home" href="/">Home</a>
   <span class="bar">|</span>
   <span class="scope">
     <label><input type="radio" name="scope" value="web" />The Web</label>
-    <label><input type="radio" name="scope" value="site" checked id="scope-site" /><span id="scope-site-label">Paths</span></label>
+    <label><input type="radio" name="scope" value="site" checked id="scope-site" /><span id="scope-site-label">Old Streets</span></label>
   </span>
   <form class="search" onsubmit="event.preventDefault();doSearch();">
     <input type="text" id="topsearch" placeholder="" />
@@ -609,7 +609,7 @@ img{border:0;}
 
 <div class="footer">
   <a href="/">home</a> &nbsp;&middot;&nbsp; <a href="/?view=help">help</a> &nbsp;&middot;&nbsp; <a href="/?view=tos">terms</a> &nbsp;&middot;&nbsp; <a href="/?view=privacy">privacy</a>
-  <div style="opacity:.7;margin-top:4px;">&copy; <span id="ftr-year"></span> <span id="ftr-brand">Paths</span> &mdash; built like 2006</div>
+  <div style="opacity:.7;margin-top:4px;">&copy; <span id="ftr-year"></span> <span id="ftr-brand">Old Streets</span> &mdash; built like 2006</div>
 </div>
 
 <!-- ============================== MODALS ============================== -->
@@ -637,7 +637,7 @@ const state = {
   isOwner:   false,
   blog:      null,   // latest blog entry
   comments: [],
-  brand:     'Paths',
+  brand:     'Old Streets',
   siteInfo:  null,
   token:     null,
   notFound:  false
@@ -735,7 +735,7 @@ async function boot(){
   // brand: pull /api/site-info for daily wordmark
   api('GET', '/api/site-info').then(info => {
     state.siteInfo = info;
-    state.brand = info.brandToday || 'Paths';
+    state.brand = info.brandToday || 'Old Streets';
     document.getElementById('brand-name').textContent = state.brand;
     document.getElementById('scope-site-label').textContent = state.brand;
     document.getElementById('ftr-brand').textContent = state.brand;
