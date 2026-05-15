@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 56" width="280" height="56" role="img" aria-label="Old Streets">
+  <defs>
+    <linearGradient id="wmBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#4a6cb4"/>
+      <stop offset="100%" stop-color="#2f477b"/>
+    </linearGradient>
+  </defs>
+  <!-- monogram tile on the left -->
+  <rect x="2" y="2" width="52" height="52" rx="9" ry="9" fill="url(#wmBg)" stroke="#1d2c50" stroke-width="2"/>
+  <text x="28" y="38" text-anchor="middle" fill="#fff"
+        font-family="'Times New Roman', Georgia, serif" font-weight="900"
+        font-size="28" letter-spacing="-1">OS</text>
+  <g transform="translate(16,42)" fill="#ffd84a" stroke="#1d2c50" stroke-width="1">
+    <polygon points="0,0 22,0 26,3 22,6 0,6"/>
+  </g>
+  <!-- wordmark -->
+  <text x="68" y="34" fill="#1d2c50"
+        font-family="'Times New Roman', Georgia, serif" font-weight="900"
+        font-size="26" letter-spacing="-0.5">old streets</text>
+  <text x="68" y="48" fill="#3B5998"
+        font-family="'Courier New', monospace" font-weight="700"
+        font-size="9" letter-spacing="2.5">A · PRIVATE · BLOCK</text>
+</svg>

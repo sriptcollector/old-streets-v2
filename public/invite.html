@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Invite · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">Invite Friends</h1></div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">spend a referral · bring someone in · anchor your crew</span></div></div>
+
+  <div class="cols two">
+    <div class="col col-center">
+      <div class="widget">
+        <div class="widget-title green"><span>Bring someone in</span></div>
+        <div class="widget-body">
+          <div class="row-flex" style="gap:18px; margin-bottom:10px; flex-wrap:wrap;">
+            <div><b id="bal" style="font-size:18px; color:var(--msp-blue-d);">—</b><div class="url-mono">referrals</div></div>
+            <div><b id="sent" style="font-size:18px; color:var(--msp-blue-d);">—</b><div class="url-mono">sent</div></div>
+            <div><b id="claimed" style="font-size:18px; color:var(--msp-blue-d);">—</b><div class="url-mono">joined</div></div>
+          </div>
+          <div class="widget-body" style="background:#fff7c2; border:1px solid #d4b243; padding:8px 10px; font-size:11px; margin-bottom:10px;">
+            <b>how it works:</b> start with 2 referrals · earn +1 per 3 posts · +1 monthly · spend by phone or shareable link
+          </div>
+          <div class="form-row">
+            <div class="row-flex" style="flex-wrap:wrap; gap:6px;">
+              <input id="phone" type="tel" value="+1 " style="flex:1; min-width:200px;"/>
+              <button class="btn" id="send-phone">Send invite (phone)</button>
+              <button class="btn alt" id="mint-link">🔗 Shareable link</button>
+            </div>
+          </div>
+          <div id="err" style="color:var(--msp-red); font-size:11px; margin-top:4px;"></div>
+          <div id="ok" style="color:var(--msp-green); font-size:11px; margin-top:4px; font-weight:700;"></div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title"><span>Your Tickets</span><span class="wt-right"><a href="#" id="refresh">refresh</a></span></div>
+        <div class="widget-body none" id="tickets"><div class="empty">loading…</div></div>
+      </div>
+    </div>
+
+    <div class="col col-right">
+      <div class="widget">
+        <div class="widget-title"><span>Why old streets is small</span></div>
+        <div class="widget-body">
+          <p>old streets accepts people <b>only in groups of three</b>. every new member arrives with the people who brought them. nobody is alone here.</p>
+          <p>when you spend an invite, you and the person who joins become <b>permanently grouped</b> with your inviter. that group is locked — never expands, never shrinks.</p>
+          <p class="muted">cap is the cap. earn more by posting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function fmtPhone(p){ if(!p) return ''; const d=String(p).replace(/\D/g,'').replace(/^1/,''); return d.length===10 ? '+1 ('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : p; }
+  function timeAgo(ts){ if(!ts) return '—'; const s=Math.floor((Date.now()-ts)/1000); if(s<60) return s+'s ago'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+  async function api(path, opts){ opts=opts||{}; opts.headers=Object.assign({'Content-Type':'application/json','X-User-Token':TOKEN}, opts.headers||{}); const r=await fetch(path,opts); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||j.message||'http '+r.status); return j; }
+
+  let invites = [];
+  async function refresh(){
+    try {
+      const d = await api('/api/invites/me');
+      invites = d.pendingInvites || [];
+      const bal = d.referralBalance || 0;
+      $('bal').textContent = bal;
+      $('sent').textContent = invites.length;
+      $('claimed').textContent = invites.filter(i => i.claimedBy).length;
+      const out = bal <= 0;
+      $('phone').disabled = out;
+      $('send-phone').disabled = out;
+      $('mint-link').disabled = out;
+      $('err').textContent = out ? "you're out of referrals. earn +1 every 3 posts, +1/month." : '';
+      renderTickets();
+    } catch (e) { if (String(e.message).includes('sign in')) location.replace('/onboard.html'); }
+  }
+  function renderTickets(){
+    const wrap = $('tickets');
+    if (!invites.length) { wrap.innerHTML = '<div class="empty">no invites out yet.</div>'; return; }
+    wrap.innerHTML = invites.map(inv => {
+      const isLink = inv.contactType === 'link';
+      const cls = inv.claimedBy ? 'success' : inv.openedAt ? 'orange' : '';
+      const who = inv.claimedBy ? '✓ joined: ' + esc(inv.claimedName || 'a friend') : isLink ? '🔗 shareable link' : esc(fmtPhone(inv.contact));
+      const status = inv.claimedBy ? 'claimed ' + timeAgo(inv.claimedAt) : inv.openedAt ? 'opened the link ' + timeAgo(inv.openedAt) : 'sent ' + timeAgo(inv.sentAt) + ' · not joined yet';
+      const url = inv.inviteUrl || '';
+      const acts = inv.claimedBy ? '' : `<div class="row-flex" style="margin-top:6px; gap:4px; flex-wrap:wrap;">
+        <button class="btn alt" onclick="navigator.clipboard.writeText('${esc(url)}');this.textContent='copied ✓'">Copy</button>
+        ${isLink ? '' : `<a href="sms:${esc(inv.contact)};?&body=${encodeURIComponent('come thru: '+url)}" style="text-decoration:none;"><button class="btn alt">Text</button></a>`}
+        <button class="btn danger" data-revoke="${esc(inv.inviteToken||'')}">Revoke</button>
+      </div>`;
+      return `<div style="padding:8px 12px; border-bottom:1px solid var(--msp-rule-l); background:${inv.claimedBy?'#e3f3df':inv.openedAt?'#fff7e6':'#fff'};">
+        <div style="font-weight:700; color:var(--msp-blue-d);">${who}</div>
+        <div style="font-size:11px; color:var(--msp-mute); margin-top:2px;">${status} · <a href="${esc(url)}" target="_blank" style="word-break:break-all;">${esc(url)}</a></div>
+        ${acts}
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('[data-revoke]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('revoke and refund the referral?')) return;
+      try { await api('/api/invites/revoke', { method:'POST', body: JSON.stringify({ inviteToken: b.getAttribute('data-revoke') }) }); refresh(); }
+      catch (e) { $('err').textContent = e.message; }
+    }));
+  }
+  // phone formatting
+  (function(){ const i=$('phone'),P='+1 '; function dig(){let d=i.value.replace(/\D/g,''); if(d.startsWith('1')) d=d.slice(1); return d.slice(0,10);} function fm(d){if(!d) return P; if(d.length<=3) return P+'('+d; if(d.length<=6) return P+'('+d.slice(0,3)+') '+d.slice(3); return P+'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);} i.addEventListener('focus',()=>{if(!i.value.startsWith(P)) i.value=P;}); i.addEventListener('input',()=>{ i.value = fm(dig()); }); })();
+  $('send-phone').addEventListener('click', async () => {
+    $('err').textContent=''; $('ok').textContent='';
+    const p = $('phone').value.trim();
+    if (!p || p==='+1') { $('err').textContent='enter a phone'; return; }
+    try { await api('/api/invites/send', { method:'POST', body: JSON.stringify({ phone: p }) }); $('ok').textContent='invite sent.'; $('phone').value='+1 '; refresh(); }
+    catch (e) { $('err').textContent = e.message; }
+  });
+  $('mint-link').addEventListener('click', async () => {
+    $('err').textContent=''; $('ok').textContent='';
+    try {
+      const r = await api('/api/invites/mint-link', { method:'POST' });
+      $('ok').textContent = 'link minted: ' + r.inviteUrl;
+      try { await navigator.clipboard.writeText(r.inviteUrl); $('ok').textContent += ' (copied)'; } catch {}
+      refresh();
+    } catch (e) { $('err').textContent = e.message; }
+  });
+  $('refresh').addEventListener('click', e => { e.preventDefault(); refresh(); });
+  refresh();
+})();
+</script>
+</body>
+</html>

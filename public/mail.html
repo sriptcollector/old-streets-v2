@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Chats · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+
+<div class="page-wrap">
+  <div class="hello-bar">
+    <h1 class="hello-h1">Chats</h1>
+    <span class="url-mono" id="mail-count"></span>
+  </div>
+
+  <div class="cols flip">
+    <!-- LEFT: thread list -->
+    <div class="col col-left">
+      <div class="widget">
+        <div class="widget-title">
+          <span>Threads</span>
+          <span class="wt-right"><a href="#" id="refresh-link">refresh</a></span>
+        </div>
+        <div class="widget-body none">
+          <div style="padding:6px;"><button class="btn wide" id="btn-compose">+ Compose New</button></div>
+          <div id="threads"><div class="empty">loading…</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: active conversation -->
+    <div class="col col-center">
+      <div class="widget">
+        <div class="widget-title" id="convo-head">
+          <span>Pick a thread, or compose a new message.</span>
+        </div>
+        <div id="convo-msgs" class="widget-body" style="min-height:320px; max-height:60vh; overflow-y:auto;">
+          <div class="empty">no conversation selected.</div>
+        </div>
+        <div id="typing-strip" class="widget-body tight muted" style="display:none; border-top:1px solid var(--msp-rule-l); background:var(--msp-tint-2);">
+          <span id="typing-name">someone</span> is typing…
+        </div>
+        <div id="composer" class="widget-body" style="display:none; border-top:1px solid var(--msp-rule); background:var(--msp-tint-2);">
+          <textarea id="reply-text" style="width:100%; height:54px; resize:vertical;" placeholder="say something…"></textarea>
+          <div class="row-flex" style="justify-content:flex-end; margin-top:6px;">
+            <button class="btn" id="btn-send">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Compose modal -->
+<div class="os-modal-back" id="modal-back">
+  <div class="os-modal">
+    <div class="os-modal-head"><span>New message</span><a href="#" id="modal-close">✕</a></div>
+    <div class="os-modal-body">
+      <div class="form-row">
+        <label>To (@handle or name):</label>
+        <input id="m-to" type="text" placeholder="@orion or 'orion jones'"/>
+        <div id="m-suggest" style="display:none; background:#fff; border:1px solid var(--msp-rule); border-top:0; max-height:140px; overflow-y:auto;"></div>
+      </div>
+      <div class="form-row">
+        <label>Message:</label>
+        <textarea id="m-body" style="min-height:80px;" placeholder="say hi…"></textarea>
+      </div>
+      <div class="row-flex" style="justify-content:flex-end;">
+        <button class="btn alt" id="m-cancel">cancel</button>
+        <button class="btn" id="m-send">Send</button>
+      </div>
+      <div id="m-err" style="color:var(--msp-red); margin-top:6px; font-size:11px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function initials(n) { const p = (n||'').trim().split(/\s+/).slice(0,2); return p.map(x=>x[0]||'').join('').toUpperCase()||'?'; }
+  function timeAgo(ts) { if(!ts) return ''; const s=Math.floor((Date.now()-ts)/1000); if(s<60) return s+'s'; if(s<3600) return Math.floor(s/60)+'m'; if(s<86400) return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+  async function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'Content-Type':'application/json', 'X-User-Token': TOKEN }, opts.headers || {});
+    const r = await fetch(path, opts);
+    const j = await r.json().catch(()=>({}));
+    if (!r.ok) throw new Error(j.error || j.message || 'http '+r.status);
+    return j;
+  }
+  let CURRENT = null, threads = [], me = null;
+
+  async function loadThreads() {
+    try {
+      const list = await api('/api/inbox');
+      threads = Array.isArray(list) ? list : (list.threads || []);
+      renderThreads();
+      const unread = threads.filter(t => t.unreadCount > 0).length;
+      $('mail-count').textContent = unread ? `${unread} unread` : '';
+    } catch { $('threads').innerHTML = '<div class="empty">could not load.</div>'; }
+  }
+  function renderThreads() {
+    if (!threads.length) { $('threads').innerHTML = '<div class="empty">no chats yet. compose one above.</div>'; return; }
+    $('threads').innerHTML = threads.map(t => {
+      const u = t.with || {};
+      const sel = (CURRENT && CURRENT.email === u.email) ? ' active' : '';
+      const unr = t.unreadCount > 0 ? ' unread' : '';
+      return `<div class="os-row${sel}${unr}" data-email="${esc(u.email||'')}" data-name="${esc(u.name||'')}" style="cursor:pointer;">
+        <div class="avatar">${u.avatar ? `<img src="${esc(u.avatar)}"/>` : esc(initials(u.name))}</div>
+        <div class="body">
+          <div class="name">${esc(u.name||'unknown')}${u.handle ? ' <span class="handle">@'+esc(u.handle)+'</span>' : ''}</div>
+          <div class="snippet">${esc((t.lastSnippet||t.snippet||'').slice(0,52))}</div>
+          <div class="ts">${esc(timeAgo(t.lastAt||t.lastMessageAt))} ago${t.unreadCount ? ' · <b style="color:var(--msp-red)">'+t.unreadCount+' new</b>' : ''}</div>
+        </div></div>`;
+    }).join('');
+    document.querySelectorAll('#threads .os-row').forEach(row => row.addEventListener('click', () => openThread(row.dataset.email, row.dataset.name)));
+  }
+  async function openThread(email, name) {
+    if (!email) return;
+    CURRENT = { email, name: name || email };
+    renderThreads();
+    $('convo-head').innerHTML = `<span><b>${esc(name||email)}</b></span>`;
+    $('convo-msgs').innerHTML = '<div class="empty">loading…</div>';
+    $('composer').style.display = '';
+    try {
+      const data = await api('/api/dm/with/' + encodeURIComponent(email));
+      const msgs = data.messages || data || [];
+      if (!me) me = (await api('/api/whoami')).user;
+      renderMsgs(msgs);
+    } catch { $('convo-msgs').innerHTML = '<div class="empty">could not load thread.</div>'; }
+  }
+  function renderMsgs(msgs) {
+    if (!msgs.length) { $('convo-msgs').innerHTML = '<div class="empty">no messages yet. say hi.</div>'; return; }
+    $('convo-msgs').innerHTML = msgs.map(m => {
+      const mine = m.from === me.email || m.fromEmail === me.email || m.mine;
+      const who = mine ? 'you' : (m.fromName||m.from||'?');
+      return `<div style="padding:3px 0; border-bottom:1px dotted var(--msp-rule-l); font-size:11px;">
+        <b style="color:${mine?'var(--msp-orange)':'var(--msp-blue-d)'};">${esc(who)}</b>
+        <span style="color:#888; font-size:10px; margin-left:5px;">${esc(timeAgo(m.createdAt||m.ts))} ago</span>
+        <div style="white-space:pre-wrap; word-wrap:break-word;">${esc(m.text||m.body||'')}</div>
+      </div>`;
+    }).join('');
+    $('convo-msgs').scrollTop = $('convo-msgs').scrollHeight;
+  }
+  async function sendReply() {
+    if (!CURRENT) return;
+    const txt = $('reply-text').value.trim(); if (!txt) return;
+    $('btn-send').disabled = true;
+    try {
+      await api('/api/dm/with/' + encodeURIComponent(CURRENT.email), { method:'POST', body: JSON.stringify({ text: txt }) });
+      $('reply-text').value = ''; openThread(CURRENT.email, CURRENT.name);
+    } catch (e) { alert('Send failed: '+e.message); }
+    finally { $('btn-send').disabled = false; }
+  }
+  $('btn-send').addEventListener('click', sendReply);
+  $('reply-text').addEventListener('keydown', e => { if (e.key==='Enter' && (e.metaKey||e.ctrlKey)) { e.preventDefault(); sendReply(); } });
+  $('btn-compose').addEventListener('click', () => { $('modal-back').classList.add('show'); $('m-to').focus(); });
+  $('m-cancel').addEventListener('click', () => $('modal-back').classList.remove('show'));
+  $('modal-close').addEventListener('click', e => { e.preventDefault(); $('modal-back').classList.remove('show'); });
+  $('m-to').addEventListener('input', async () => {
+    const q = $('m-to').value.trim().replace(/^@/,'');
+    if (q.length < 2) { $('m-suggest').style.display='none'; return; }
+    try {
+      const data = await api('/api/search?q='+encodeURIComponent(q)+'&scope=people');
+      const list = (data.results || []).slice(0,8);
+      if (!list.length) { $('m-suggest').style.display='none'; return; }
+      $('m-suggest').innerHTML = list.map(u => `
+        <div class="os-row" data-email="${esc(u.email)}" data-name="${esc(u.name)}" data-handle="${esc(u.handle||'')}" style="cursor:pointer;">
+          <div class="avatar" style="width:28px; height:28px; font-size:11px;">${esc(initials(u.name))}</div>
+          <div class="body"><div class="name">${esc(u.name)}</div><div class="handle">@${esc(u.handle||'')}</div></div>
+        </div>`).join('');
+      $('m-suggest').style.display = '';
+      $('m-suggest').querySelectorAll('.os-row').forEach(r => r.addEventListener('click', () => {
+        $('m-to').value = '@' + (r.dataset.handle || r.dataset.email);
+        $('m-to').dataset.email = r.dataset.email; $('m-to').dataset.name = r.dataset.name;
+        $('m-suggest').style.display='none';
+      }));
+    } catch {}
+  });
+  $('m-send').addEventListener('click', async () => {
+    const email = $('m-to').dataset.email; const name = $('m-to').dataset.name || email;
+    const body = $('m-body').value.trim(); $('m-err').textContent = '';
+    if (!email) { $('m-err').textContent = 'pick a recipient from suggestions'; return; }
+    if (!body) { $('m-err').textContent = 'message is empty'; return; }
+    try {
+      await api('/api/dm/with/' + encodeURIComponent(email), { method:'POST', body: JSON.stringify({ text: body }) });
+      $('modal-back').classList.remove('show'); $('m-to').value=''; $('m-body').value='';
+      delete $('m-to').dataset.email; delete $('m-to').dataset.name;
+      await loadThreads(); openThread(email, name);
+    } catch (e) { $('m-err').textContent = e.message; }
+  });
+  $('refresh-link').addEventListener('click', e => { e.preventDefault(); loadThreads(); });
+
+  // typing
+  (function(){ if (window.io) return wire(); const s=document.createElement('script'); s.src='/socket.io/socket.io.js'; s.onload=wire; document.head.appendChild(s); })();
+  let sock=null,hideT=null,pulseT=null;
+  function wire(){
+    try {
+      sock = window.io({ transports:['websocket','polling'] });
+      sock.on('connect', () => sock.emit('auth', { token: TOKEN }));
+      sock.on('dm-typing', ({ from, fromName }) => {
+        if (!CURRENT || CURRENT.email !== from) return;
+        $('typing-name').textContent = (fromName||'someone').split(' ')[0];
+        $('typing-strip').style.display = '';
+        clearTimeout(hideT); hideT = setTimeout(() => $('typing-strip').style.display='none', 3000);
+      });
+      sock.on('dm-stop-typing', ({ from }) => { if (CURRENT && CURRENT.email===from) $('typing-strip').style.display='none'; });
+      sock.on('dm-new', () => loadThreads());
+    } catch {}
+    $('reply-text').addEventListener('input', () => {
+      if (!CURRENT || !sock) return;
+      sock.emit('dm-typing', { to: CURRENT.email });
+      clearTimeout(pulseT); pulseT = setTimeout(() => sock && sock.emit('dm-stop-typing', { to: CURRENT.email }), 2500);
+    });
+  }
+  loadThreads();
+})();
+</script>
+
+<!-- Phantom note refresher (moved from home right sidebar) -->
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) return;
+  function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  async function refreshPhantomNote(){
+    try {
+      const r = await fetch('/api/me/phantom-note', { headers: { 'X-User-Token': TOKEN } });
+      const j = await r.json();
+      const body = document.getElementById('phantom-note-body');
+      if (!body) return;
+      if (j.locked) {
+        body.innerHTML = `
+          <div style="color:#aa0066; font-weight:700; margin-bottom:6px;">someone ${esc(j.verb || 'wrote you')}.</div>
+          <div style="font-size:11px; color:var(--msp-mute);">🔒 unlock the sender by inviting ${j.needed || 1} more friend${(j.needed||1)===1?'':'s'} in. they're waiting.</div>
+          <a href="/invite.html" class="btn" style="display:block; text-align:center; margin-top:8px;">→ send invites to reveal</a>
+        `;
+      } else {
+        body.innerHTML = `
+          <div style="color:#aa0066; font-weight:700; margin-bottom:6px;">${esc(j.revealedSender || 'someone')} ${esc(j.verb || 'wrote you')}.</div>
+          <div style="font-size:11px; color:var(--msp-mute);">you've unlocked who. check your threads — they may already be in here.</div>
+        `;
+      }
+    } catch {}
+  }
+  refreshPhantomNote();
+  setInterval(refreshPhantomNote, 5 * 60 * 1000);
+})();
+</script>
+</body>
+</html>

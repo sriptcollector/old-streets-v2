@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Waiting Room</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%233b5998'/%3E%3Ctext x='8' y='12' font-family='Georgia,serif' font-style='italic' font-size='12' font-weight='700' fill='white' text-anchor='middle'%3Eos%3C/text%3E%3C/svg%3E"/>
+<style>
+  :root {
+    --msp-bg:#c1cdf5; --msp-pane:#fff; --msp-blue:#3b5998; --msp-blue-d:#29447e;
+    --msp-blue-l:#6d84b4; --msp-tint:#d8dfea; --msp-tint-2:#eef2f8;
+    --msp-rule:#b5bbcc; --msp-rule-l:#d8dcde; --msp-ink:#000;
+    --msp-ink-link:#003399; --msp-ink-vis:#5c5c8a; --msp-orange:#ff6600;
+    --msp-peach:#f3dec8; --msp-red:#cc0000; --msp-green:#339933; --msp-mute:#666;
+    --msp-yellow:#fff4d3; --msp-yellow-bd:#d4b243;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100vh; width: 100%;
+    background: var(--msp-blue);
+    color: var(--msp-ink);
+    font: 11px/1.4 Verdana,Arial,Helvetica,sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--msp-ink-link); text-decoration: underline; }
+  button { font: inherit; cursor: pointer; border-radius: 0; }
+
+  /* Full-bleed background lock — user cannot see past this */
+  .lock {
+    position: fixed; inset: 0;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0 8px, transparent 8px 16px),
+      var(--msp-blue);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: max(env(safe-area-inset-top), 24px) 16px max(env(safe-area-inset-bottom), 24px);
+    overflow-y: auto;
+    z-index: 99999;
+  }
+
+  .brandbar {
+    color: #fff; text-align: center; margin-bottom: 18px;
+    font-family: "Times New Roman", Georgia, ui-serif, serif;
+    font-style: italic; font-weight: 700;
+    font-size: 24px; letter-spacing: 0.3px;
+  }
+  .brandbar .brk { font-weight: 400; opacity: 0.75; }
+  .brandbar .sub {
+    display: block; margin-top: 4px;
+    font-family: Verdana, Arial, sans-serif;
+    font-style: normal; font-weight: normal;
+    font-size: 11px; opacity: 0.85;
+    letter-spacing: 0;
+  }
+
+  .lock-card {
+    width: 100%; max-width: 100%;
+    flex: 1 1 auto;
+    background: var(--msp-pane);
+    border: 1px solid var(--msp-blue-d);
+    box-shadow: 0 0 0 6px rgba(0,0,0,0.15);
+  }
+  @media (min-width: 720px) {
+    .lock-body { padding: 28px 40px 32px; }
+    .lock-body h1 { font-size: 22px; }
+  }
+  .lock-head {
+    background: var(--msp-red); color: #fff;
+    padding: 7px 12px;
+    font-weight: 700; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #8a0000;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .lock-head .icon { font-size: 14px; }
+  .lock-body { padding: 16px 18px 20px; background: #fff; }
+  .lock-body h1 {
+    font-family: Verdana, Arial, sans-serif;
+    margin: 0 0 8px;
+    font-size: 18px; font-weight: 700;
+    color: var(--msp-blue-d);
+  }
+  .lock-body p { margin: 0 0 12px; font-size: 12px; line-height: 1.55; color: #222; }
+  .lock-body p.faint { color: #555; font-size: 11px; }
+
+  /* Tickets — 2 slots, side by side on desktop, stacked on phone */
+  .tickets {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin: 14px 0 16px;
+  }
+  @media (max-width: 540px) { .tickets { grid-template-columns: 1fr; } }
+  .ticket {
+    border: 1px dashed var(--msp-rule);
+    background: var(--msp-tint-2);
+    padding: 12px 12px 10px;
+  }
+  .ticket .num {
+    display: inline-block;
+    background: var(--msp-blue);
+    color: #fff;
+    padding: 2px 7px;
+    font-family: ui-monospace, monospace;
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .ticket .status {
+    font-weight: 700; font-size: 12px; color: var(--msp-mute);
+    margin-bottom: 4px;
+  }
+  .ticket .who { font-size: 11px; color: #222; }
+  .ticket.claimed {
+    background: #e3f3df; border-color: var(--msp-green);
+  }
+  .ticket.claimed .status { color: var(--msp-green); }
+  .ticket.claimed .num { background: var(--msp-green); }
+  .ticket.opened .status { color: var(--msp-orange); }
+  .ticket.opened .num { background: var(--msp-orange); }
+  .ticket .actions { margin-top: 8px; }
+  .ticket .actions a { font-size: 11px; margin-right: 8px; }
+
+  /* Compose form */
+  .compose {
+    border: 1px solid var(--msp-rule);
+    background: var(--msp-tint-2);
+    padding: 12px;
+  }
+  .compose label {
+    display: block;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--msp-blue-d);
+    margin-bottom: 4px;
+  }
+  .compose input[type="tel"], .compose input[type="text"] {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid var(--msp-rule);
+    background: #fff;
+    font: 13px Verdana, Arial, sans-serif;
+    color: #000;
+  }
+  .compose input:focus {
+    outline: 2px solid #fde58a;
+    border-color: var(--msp-blue);
+  }
+  .compose .row + .row { margin-top: 10px; }
+  .compose .hint { font-size: 10px; color: var(--msp-mute); margin-top: 4px; }
+
+  .btn {
+    background: var(--msp-blue);
+    color: #fff;
+    border: 1px solid var(--msp-blue-d);
+    padding: 8px 14px;
+    font-weight: 700; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .btn:hover { background: var(--msp-blue-d); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .err { color: var(--msp-red); font-size: 11px; margin-top: 6px; min-height: 14px; }
+
+  .sub-action {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 11px;
+  }
+  .sub-action a { color: rgba(255,255,255,0.85); }
+  .sub-action button {
+    background: transparent; color: rgba(255,255,255,0.7);
+    border: 0; text-decoration: underline; font: inherit; cursor: pointer;
+    margin: 0 6px;
+  }
+
+  /* Result of a send: shows the link with a copy button */
+  .sent-link {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #fffceb;
+    border: 1px solid var(--msp-yellow-bd);
+    font-size: 11px;
+    word-break: break-all;
+  }
+  .sent-link a { font-weight: 700; }
+  .sent-link .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .sent-link button {
+    background: var(--msp-blue);
+    color: #fff; border: 1px solid var(--msp-blue-d);
+    padding: 4px 10px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .you-in-banner {
+    background: var(--msp-green); color: #fff;
+    padding: 12px 16px;
+    border: 1px solid #1f5a1f;
+    font-size: 13px; font-weight: 700;
+    text-align: center;
+    display: none;
+  }
+  .you-in-banner.show { display: block; }
+
+  /* Social proof bar */
+  .proof-bar {
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 11px;
+    text-align: center;
+    margin-bottom: 14px;
+    letter-spacing: 0.02em;
+  }
+  .proof-bar b { color: #ffd17a; }
+
+  /* "Opened" ticket urgency glow */
+  .ticket.opened {
+    background: #fff8e8;
+    border-color: var(--msp-orange);
+    animation: ticketPulse 2s ease-in-out 3;
+  }
+  @keyframes ticketPulse {
+    0%, 100% { box-shadow: none; }
+    50% { box-shadow: 0 0 10px rgba(255,102,0,0.45); }
+  }
+  .ticket .elapsed { font-size: 10px; color: var(--msp-mute); margin-top: 2px; }
+
+  /* Teaser strip — shown when both tickets are out the door */
+  .teaser-strip {
+    background: #1a2744;
+    border: 1px solid #29447e;
+    color: #c8d6f5;
+    padding: 10px 14px;
+    font-size: 11px;
+    line-height: 1.6;
+    margin-top: 14px;
+    display: none;
+  }
+  .teaser-strip.show { display: block; }
+  .teaser-strip b { color: #ffd17a; }
+  .teaser-strip ul { margin: 6px 0 0 14px; padding: 0; }
+  .teaser-strip li { margin: 3px 0; }
+
+  /* Push-notif ask strip */
+  .notif-ask {
+    background: #e8f0fe;
+    border: 1px solid #b5bbcc;
+    padding: 9px 12px;
+    font-size: 11px;
+    margin-top: 12px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .notif-ask.show { display: flex; }
+  .notif-ask button {
+    background: var(--msp-blue); color: #fff;
+    border: 1px solid var(--msp-blue-d);
+    padding: 4px 12px; font-size: 10px; font-weight: 700;
+    white-space: nowrap; flex-shrink: 0;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+<div class="lock">
+  <div class="brandbar">
+    <span class="brk">[</span> <span id="wm">Ancient Lanes</span> <span class="brk">]</span>
+    <span class="sub">accepted · outside until your two friends join</span>
+  </div>
+
+  <!-- Social proof — populated by JS from /api/social-proof -->
+  <div class="proof-bar" id="proof-bar" style="display:none;">
+    <b id="proof-count">—</b> members are inside right now. your two friends aren't one of them.
+  </div>
+
+  <div class="you-in-banner" id="you-in-banner">
+    🎉 Both invites came through. Welcome to Paths. Loading the site...
+  </div>
+
+  <div class="lock-card">
+    <div class="lock-head"><span class="icon">✅</span><span>You're In — But You're Still Outside</span></div>
+    <div class="lock-body">
+      <div style="background:#e3f3df; border:1px solid #339933; padding:10px 12px; margin-bottom:14px;">
+        <div style="font-weight:700; color:#1f5a1f; font-size:12.5px; margin-bottom:4px;">✓ Approved.</div>
+        <div style="font-size:11px; color:#1f5a1f;">
+          Old Streets only lets people in <strong>three at a time</strong>. Until <strong>both your people</strong> sign up, the door stays closed — for everyone. That's how the inside stays worth getting into.
+        </div>
+      </div>
+      <h1>Two spots. Both need to move.</h1>
+      <p><strong id="claimed-count">0/2</strong> claimed. The second one comes through and you're in — no waiting, no review, just the door opening.</p>
+      <p class="faint">Until then: no wall, no DMs, no directory, nothing. You only have these two — send them to people who'll actually show up, not people you'll have to chase.</p>
+
+      <!-- Approval countdown — urgency without being fake -->
+      <div id="approval-countdown" style="display:none; background:#fff8dc; border:1px solid #d4b243; padding:8px 12px; font-size:11px; margin-bottom:12px;">
+        <strong>⏳ approvals don't last forever.</strong> <span id="approval-days">your spot is still open</span> — the clock is yours to waste.
+      </div>
+
+      <!-- Live teasers — real posts from inside, anonymized -->
+      <div id="teasers-wrap" style="display:none; margin-bottom:12px;">
+        <div style="font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--msp-mute); margin-bottom:6px; font-weight:700;">what's happening inside right now</div>
+        <div id="teasers-list" style="border:1px solid var(--msp-rule); background:var(--msp-tint-2);"></div>
+        <div style="font-size:10px; color:var(--msp-mute); margin-top:4px; font-style:italic;">you can't read the full posts until you're in.</div>
+      </div>
+
+      <!-- TICKETS -->
+      <div class="tickets" id="tickets">
+        <div class="ticket" data-slot="1">
+          <span class="num">Ticket #1</span>
+          <div class="status">unsent</div>
+          <div class="who">no one yet</div>
+          <div class="actions"></div>
+        </div>
+        <div class="ticket" data-slot="2">
+          <span class="num">Ticket #2</span>
+          <div class="status">unsent</div>
+          <div class="who">no one yet</div>
+          <div class="actions"></div>
+        </div>
+      </div>
+
+      <!-- COMPOSE -->
+      <div class="compose" id="compose">
+        <div class="row">
+          <label for="phone">friend's phone</label>
+          <input id="phone" type="tel" inputmode="tel" autocomplete="off" placeholder="+1 (310) 555 1234" value="+1 "/>
+          <div class="hint">they'll get a text with a link they can open. one phone per ticket.</div>
+        </div>
+        <div class="row">
+          <label for="note">note (optional — they'll see it)</label>
+          <input id="note" type="text" maxlength="120" placeholder="get in here"/>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="send-btn">send invite</button>
+        </div>
+        <div class="err" id="err"></div>
+        <div class="sent-link" id="sent-link" style="display:none;"></div>
+      </div>
+
+      <!-- LINK OPTION — share anywhere, not phone-locked -->
+      <div id="link-option" style="margin-top:14px; padding:12px; background:#f0f4ff; border:1px solid #b5bbcc;">
+        <div style="font-size:11px; color:#29447e; margin-bottom:8px;">
+          <strong>or drop a link instead.</strong> paste it in iMessage, a DM, discord — whoever opens it first claims the ticket. same cost as a phone invite.
+        </div>
+        <button type="button" id="link-btn" style="background:#5b6f9a; color:#fff; border:1px solid #29447e; padding:8px 14px; font-weight:700; font-size:11px; cursor:pointer; text-transform:uppercase; letter-spacing:0.04em;">🔗 get link</button>
+        <div class="sent-link" id="link-sent" style="display:none; margin-top:10px;"></div>
+      </div>
+
+      <!-- Push notif ask — revealed after first invite sent -->
+      <div class="notif-ask" id="notif-ask">
+        <span style="flex:1;">get notified the moment a friend joins — no refreshing</span>
+        <button id="notif-btn">turn on</button>
+      </div>
+
+      <!-- Teaser strip — shown when both tickets are out -->
+      <div class="teaser-strip" id="teaser-strip">
+        <b>while you wait, inside today:</b>
+        <ul id="teaser-list">
+          <li>people are posting on the wall</li>
+          <li>DMs are open</li>
+          <li>rooms are live</li>
+        </ul>
+        <div style="margin-top:8px; font-size:10px; color:#8fa8d0;">your two friends are the only thing standing between you and all of it.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-action">
+    <button id="refresh-btn">↻ refresh status</button>
+    ·
+    <button id="signout-btn">sign out</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const headers = { 'Content-Type': 'application/json', 'X-User-Token': TOKEN };
+
+  let me = null;
+  let invites = [];
+  let notifAsked = false;
+
+  async function api(method, path, body) {
+    const opts = { method, headers };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(path, opts);
+    let data = {}; try { data = await r.json(); } catch {}
+    return { ok: r.ok, status: r.status, data };
+  }
+
+  function fmtPhone(p) {
+    if (!p) return '';
+    const d = String(p).replace(/\D/g, '').replace(/^1/, '');
+    if (d.length === 10) return '+1 (' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6);
+    return p;
+  }
+
+  function timeAgo(ms) {
+    if (!ms) return '';
+    const diff = Date.now() - ms;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return m + 'm ago';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    return Math.floor(h / 24) + 'd ago';
+  }
+
+  function renderTickets() {
+    const slots = document.querySelectorAll('.ticket');
+    let claimed = 0;
+    slots.forEach((slot, idx) => {
+      const inv = invites[idx];
+      slot.className = 'ticket';
+      // clear any elapsed div
+      const existingEl = slot.querySelector('.elapsed');
+      if (existingEl) existingEl.remove();
+
+      if (!inv) {
+        slot.querySelector('.status').textContent = 'unsent';
+        slot.querySelector('.who').textContent = 'no one yet';
+        slot.querySelector('.actions').innerHTML = '';
+        return;
+      }
+      if (inv.claimedBy) {
+        slot.classList.add('claimed');
+        slot.querySelector('.status').textContent = '✓ in';
+        slot.querySelector('.who').textContent = inv.claimedName || fmtPhone(inv.contact);
+        slot.querySelector('.actions').innerHTML = '';
+        claimed++;
+      } else if (inv.openedAt) {
+        slot.classList.add('opened');
+        slot.querySelector('.status').textContent = '👀 opened — not in yet';
+        slot.querySelector('.who').textContent = fmtPhone(inv.contact);
+        const elapsed = document.createElement('div');
+        elapsed.className = 'elapsed';
+        elapsed.textContent = 'opened ' + timeAgo(inv.openedAt) + ' — one tap away';
+        slot.querySelector('.who').after(elapsed);
+        slot.querySelector('.actions').innerHTML = '<a href="#" data-act="copy" data-idx="' + idx + '">copy link</a> · <a href="#" data-act="revoke" data-idx="' + idx + '">revoke</a>';
+      } else {
+        slot.querySelector('.status').textContent = 'sent · waiting';
+        slot.querySelector('.who').textContent = fmtPhone(inv.contact);
+        if (inv.sentAt) {
+          const elapsed = document.createElement('div');
+          elapsed.className = 'elapsed';
+          elapsed.textContent = 'sent ' + timeAgo(inv.sentAt) + ' — hasn\'t opened it';
+          slot.querySelector('.who').after(elapsed);
+        }
+        slot.querySelector('.actions').innerHTML = '<a href="#" data-act="copy" data-idx="' + idx + '">copy link</a> · <a href="#" data-act="revoke" data-idx="' + idx + '">revoke</a>';
+      }
+    });
+    document.getElementById('claimed-count').textContent = claimed + '/2';
+    if (claimed >= 2) {
+      document.getElementById('you-in-banner').classList.add('show');
+      setTimeout(() => location.replace('/'), 1500);
+    }
+    const issued = invites.filter(i => i && (i.inviteUrl || i.sentAt)).length;
+    const composeEl = document.getElementById('compose');
+    if (composeEl) composeEl.style.display = (issued >= 2) ? 'none' : 'block';
+    const linkOptionEl = document.getElementById('link-option');
+    if (linkOptionEl) linkOptionEl.style.display = (issued >= 2) ? 'none' : 'block';
+    // Teaser strip — show when both tickets are out but neither claimed
+    const teaserEl = document.getElementById('teaser-strip');
+    if (teaserEl) teaserEl.className = 'teaser-strip' + (issued >= 2 && claimed < 2 ? ' show' : '');
+  }
+
+  async function loadSocialProof() {
+    try {
+      const r = await fetch('/api/social-proof');
+      if (!r.ok) return;
+      const d = await r.json();
+      const bar = document.getElementById('proof-bar');
+      const ct = document.getElementById('proof-count');
+      if (bar && ct && d.memberCount) {
+        ct.textContent = d.memberCount;
+        bar.style.display = 'block';
+      }
+    } catch {}
+  }
+
+  async function loadTeasers() {
+    try {
+      const r = await fetch('/api/gate-teasers');
+      if (!r.ok) return;
+      const d = await r.json();
+      const list = document.getElementById('teasers-list');
+      const wrap = document.getElementById('teasers-wrap');
+      if (!list || !d.teasers || !d.teasers.length) return;
+      list.innerHTML = d.teasers.map(t =>
+        `<div style="padding:7px 10px; border-bottom:1px dotted var(--msp-rule-l); font-size:11px;">` +
+        `<span style="color:var(--msp-mute);">someone —</span> ` +
+        `<span style="color:#333;">"${t.snip}"</span> ` +
+        `<span style="color:var(--msp-mute); font-size:10px;">· ${t.ago}</span></div>`
+      ).join('');
+      if (wrap) wrap.style.display = 'block';
+    } catch {}
+  }
+
+  function showApprovalCountdown() {
+    const el = document.getElementById('approval-countdown');
+    const daysEl = document.getElementById('approval-days');
+    if (!el || !daysEl) return;
+    // Show approval was granted based on createdAt — make it feel like a ticking clock
+    const created = (me && me.createdAt) || Date.now();
+    const daysSince = Math.floor((Date.now() - created) / (24 * 60 * 60 * 1000));
+    const daysLeft = Math.max(0, 30 - daysSince);
+    if (daysLeft <= 14) {
+      daysEl.textContent = daysLeft > 0
+        ? `you have ${daysLeft} day${daysLeft !== 1 ? 's' : ''} left on your approval`
+        : 'your approval window is closing';
+      el.style.display = 'block';
+    } else if (daysSince >= 3) {
+      // Been waiting 3+ days without urgency — just show the nudge
+      daysEl.textContent = `you've been approved for ${daysSince} day${daysSince !== 1 ? 's' : ''}`;
+      el.style.display = 'block';
+    }
+  }
+
+  async function refresh() {
+    const w = await api('GET', '/api/whoami');
+    if (!w.ok) { localStorage.removeItem('oldstreets-token'); sessionStorage.removeItem('oldstreets-token'); location.replace('/onboard.html'); return; }
+    me = w.data.user;
+    if (!me.mustSpendInitialInvites) { location.replace('/'); return; }
+    const inv = await api('GET', '/api/invites/me');
+    if (inv.ok) {
+      invites = inv.data.pendingInvites || [];
+    }
+    const s = await api('GET', '/api/site-info');
+    if (s.ok && s.data.brandToday) {
+      document.getElementById('wm').textContent = s.data.brandToday;
+      document.title = 'Old Streets — waiting';
+    }
+    renderTickets();
+    showApprovalCountdown();
+  }
+
+  // ── TAB TITLE GHOST CYCLING ──────────────────────────────────────────
+  // When user is away, cycle through FOMO messages in the tab title.
+  (function initTabGhost() {
+    const realTitle = 'Old Streets — waiting';
+    const msgs = [
+      '👀 people are inside right now',
+      'your friends haven\'t joined yet',
+      'the door is still closed',
+      '⚠ your invite is sitting there',
+      realTitle
+    ];
+    let idx = 0, handle = null, pending = null;
+    const cycle = () => {
+      document.title = msgs[idx % msgs.length];
+      idx++;
+      if (idx >= msgs.length) { clearInterval(handle); handle = null; idx = 0; }
+    };
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        pending = setTimeout(() => {
+          if (!document.hidden || handle) return;
+          idx = 0;
+          handle = setInterval(cycle, 3500);
+        }, 25000);
+      } else {
+        clearTimeout(pending);
+        if (handle) { clearInterval(handle); handle = null; }
+        document.title = realTitle;
+      }
+    });
+  })();
+
+  // ── PUSH NOTIFICATION ASK ────────────────────────────────────────────
+  // Reveal the ask strip after page has been open 45s (not aggressive,
+  // not on load). Only show once per session.
+  setTimeout(() => {
+    if (notifAsked) return;
+    if (!('Notification' in window) || Notification.permission !== 'default') return;
+    const ask = document.getElementById('notif-ask');
+    if (ask) ask.classList.add('show');
+  }, 45000);
+
+  document.getElementById('notif-btn') && document.getElementById('notif-btn').addEventListener('click', async () => {
+    notifAsked = true;
+    const ask = document.getElementById('notif-ask');
+    if (!('Notification' in window)) { if (ask) ask.style.display = 'none'; return; }
+    try {
+      const perm = await Notification.requestPermission();
+      if (ask) ask.style.display = 'none';
+      if (perm === 'granted') {
+        new Notification('Old Streets', { body: "we'll text you the second a friend joins.", icon: '/logo.svg' });
+      }
+    } catch { if (ask) ask.style.display = 'none'; }
+  });
+
+  // Phone auto-format
+  (function phoneInput(){
+    const input = document.getElementById('phone');
+    const PREFIX = '+1 ';
+    function digits(){ let d=input.value.replace(/\D/g,''); if(d.startsWith('1')) d=d.slice(1); return d.slice(0,10); }
+    function fmt(d){ if(!d) return PREFIX; if(d.length<=3) return PREFIX+'('+d; if(d.length<=6) return PREFIX+'('+d.slice(0,3)+') '+d.slice(3); return PREFIX+'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6); }
+    function end(){ const n=input.value.length; try{input.setSelectionRange(n,n);}catch{} }
+    function clamp(){ if((input.selectionStart||0)<PREFIX.length){ try{input.setSelectionRange(PREFIX.length, Math.max(PREFIX.length, input.selectionEnd||PREFIX.length));}catch{} } }
+    if(!input.value.startsWith(PREFIX)) input.value=PREFIX;
+    input.addEventListener('focus',()=>{ if(!input.value.startsWith(PREFIX)) input.value=PREFIX; setTimeout(end,0); });
+    input.addEventListener('click',()=>setTimeout(clamp,0));
+    input.addEventListener('keyup',clamp);
+    input.addEventListener('input',()=>{ input.value=fmt(digits()); end(); });
+    input.addEventListener('keydown',(e)=>{ const p=input.selectionStart||0; if((e.key==='Backspace'||e.key==='Delete')&&p<=PREFIX.length) e.preventDefault(); if(e.key==='ArrowLeft'&&p<=PREFIX.length) e.preventDefault(); if(e.key==='Home'){ e.preventDefault(); try{input.setSelectionRange(PREFIX.length,PREFIX.length);}catch{} } });
+  })();
+
+  document.getElementById('send-btn').addEventListener('click', async () => {
+    const errEl = document.getElementById('err');
+    const sent = document.getElementById('sent-link');
+    errEl.textContent = '';
+    sent.style.display = 'none';
+    const phone = document.getElementById('phone').value.trim();
+    const note = document.getElementById('note').value.trim();
+    if (!phone || phone === '+1') { errEl.textContent = 'enter a phone number'; return; }
+    const btn = document.getElementById('send-btn');
+    btn.disabled = true; btn.textContent = 'sending...';
+    const r = await api('POST', '/api/invites/send', { phone, note });
+    btn.disabled = false; btn.textContent = 'send invite';
+    if (!r.ok) { errEl.textContent = r.data.error || 'could not send'; return; }
+    document.getElementById('phone').value = '+1 ';
+    document.getElementById('note').value = '';
+    if (r.data.inviteUrl) {
+      const smsBody = encodeURIComponent(r.data.smsBody || ('get in here. open: ' + r.data.inviteUrl));
+      sent.innerHTML = '<strong>invite sent.</strong> <a href="' + r.data.inviteUrl + '" target="_blank">' + r.data.inviteUrl + '</a><div class="row"><button data-copy="' + r.data.inviteUrl + '">copy link</button><a href="sms:?body=' + smsBody + '"><button>open in messages</button></a></div>';
+      sent.style.display = 'block';
+    }
+    // Reveal notif ask on first successful invite (catch them while they're engaged)
+    if (!notifAsked && 'Notification' in window && Notification.permission === 'default') {
+      const ask = document.getElementById('notif-ask');
+      if (ask) ask.classList.add('show');
+    }
+    await refresh();
+  });
+
+  document.addEventListener('click', async (e) => {
+    const copyTarget = e.target.closest('[data-copy]');
+    if (copyTarget) {
+      try { await navigator.clipboard.writeText(copyTarget.getAttribute('data-copy')); copyTarget.textContent = 'copied'; setTimeout(() => copyTarget.textContent = 'copy link', 1200); } catch {}
+      return;
+    }
+    const act = e.target.closest('[data-act]');
+    if (!act) return;
+    e.preventDefault();
+    const idx = parseInt(act.getAttribute('data-idx'), 10);
+    const inv = invites[idx];
+    if (!inv) return;
+    if (act.getAttribute('data-act') === 'copy') {
+      try { await navigator.clipboard.writeText(inv.inviteUrl || ''); } catch {}
+    } else if (act.getAttribute('data-act') === 'revoke') {
+      if (!confirm('revoke this invite and get the referral back?')) return;
+      await api('POST', '/api/invites/revoke', { inviteToken: inv.inviteToken });
+      await refresh();
+    }
+  });
+
+  const linkBtn = document.getElementById('link-btn');
+  if (linkBtn) linkBtn.addEventListener('click', async () => {
+    const errEl = document.getElementById('err');
+    const sent = document.getElementById('link-sent');
+    errEl.textContent = '';
+    sent.style.display = 'none';
+    linkBtn.disabled = true; const old = linkBtn.textContent; linkBtn.textContent = 'minting…';
+    const r = await api('POST', '/api/invites/mint-link', {});
+    linkBtn.disabled = false; linkBtn.textContent = old;
+    if (!r.ok) { errEl.textContent = r.data.error || r.data.message || 'could not mint link'; return; }
+    if (r.data.inviteUrl) {
+      sent.innerHTML = '<strong>link ready.</strong> <a href="' + r.data.inviteUrl + '" target="_blank">' + r.data.inviteUrl + '</a><div class="row" style="margin-top:6px;"><button data-copy="' + r.data.inviteUrl + '">copy link</button></div>';
+      sent.style.display = 'block';
+    }
+    await refresh();
+  });
+
+  document.getElementById('refresh-btn').addEventListener('click', refresh);
+  document.getElementById('signout-btn').addEventListener('click', async () => {
+    await api('POST', '/api/auth/logout', {});
+    localStorage.removeItem('oldstreets-token');
+    sessionStorage.removeItem('oldstreets-token');
+    location.replace('/onboard.html');
+  });
+
+  refresh();
+  loadSocialProof();
+  loadTeasers();
+  // Poll every 12s for ticket status changes (opens, claims)
+  setInterval(refresh, 12000);
+  // Refresh teasers every 3min so new posts surface
+  setInterval(loadTeasers, 3 * 60 * 1000);
+})();
+</script>
+</body>
+</html>

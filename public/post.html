@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Post · Paths</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/chrome.css">
+<script src="/chrome.js?v=20260514" defer></script>
+<style>
+  .post-page { max-width: 720px; margin: 12px auto; padding: 0 8px; }
+  .post-card-full {
+    background: #fff;
+    border: 1px solid var(--msp-rule);
+    margin-bottom: 12px;
+  }
+  .post-card-full .head {
+    background: var(--msp-tint-2);
+    border-bottom: 1px solid var(--msp-rule-l);
+    padding: 8px 10px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+  }
+  .post-card-full .head img.av { width: 36px; height: 36px; object-fit: cover; border: 1px solid var(--msp-rule); }
+  .post-card-full .head .nm { font-weight: 700; }
+  .post-card-full .head .nm a { color: var(--msp-blue-d); }
+  .post-card-full .head .ago { color: var(--msp-mute); font-size: 11px; }
+  .post-card-full .body { padding: 10px 12px; font-size: 13.5px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+  .post-card-full .media img { display:block; max-width: 100%; max-height: 720px; height: auto; margin: 0 auto; border-top: 1px solid var(--msp-rule-l); border-bottom: 1px solid var(--msp-rule-l); }
+  .reactions-strip { padding: 6px 10px; border-top: 1px solid var(--msp-rule-l); font-size: 11px; color: var(--msp-mute); }
+  .reactions-strip b { color: var(--msp-blue-d); }
+  .comment {
+    display: flex; gap: 8px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--msp-rule-l);
+    font-size: 12.5px;
+  }
+  .comment .av { width: 28px; height: 28px; border: 1px solid var(--msp-rule); background: #eee; flex: 0 0 28px; }
+  .comment .av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .comment .meat { flex: 1; }
+  .comment .meat .nm { font-weight: 700; color: var(--msp-blue-d); }
+  .comment .meat .ago { color: var(--msp-mute); font-size: 11px; margin-left: 4px; }
+  .comment .meat .txt { margin-top: 2px; white-space: pre-wrap; word-wrap: break-word; }
+  .comment-compose {
+    display: flex; gap: 8px;
+    padding: 10px 12px;
+    border-top: 2px solid var(--msp-rule-l);
+    background: var(--msp-tint-2);
+  }
+  .comment-compose textarea { flex: 1; padding: 6px; font: 12px Verdana,Tahoma,Arial,sans-serif; border: 1px solid var(--msp-rule); resize: vertical; min-height: 36px; }
+  .comment-compose button { padding: 6px 12px; background: var(--msp-blue); color: #fff; border: 1px solid var(--msp-blue-d); cursor: pointer; font-weight: 700; }
+  .pp-back { display: inline-block; margin: 8px 0; font-size: 12px; }
+  .pp-empty { padding: 30px; text-align: center; color: var(--msp-mute); }
+</style>
+</head>
+<body>
+
+<div class="post-page">
+  <a class="pp-back" href="/">← back to feed</a>
+  <div id="root">
+    <div class="post-card-full"><div class="pp-empty">loading post…</div></div>
+  </div>
+</div>
+
+<script>
+(async function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token') || '';
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const postId = params.get('id') || location.hash.replace(/^#/, '');
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function timeAgo(ts){ if(!ts) return ''; const s=Math.floor((Date.now()-ts)/1000); if(s<60) return s+'s ago'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+  async function api(path, opts){
+    opts = opts || {};
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    if (TOKEN) headers['X-User-Token'] = TOKEN;
+    const r = await fetch(path, { method: opts.method || 'GET', headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    const text = await r.text();
+    let j; try { j = text ? JSON.parse(text) : {}; } catch { j = { _raw: text }; }
+    if (!r.ok) throw new Error(j.error || ('http ' + r.status));
+    return j;
+  }
+
+  if (!postId) {
+    $('root').innerHTML = '<div class="post-card-full"><div class="pp-empty">no post id in URL — try opening from your feed.</div></div>';
+    return;
+  }
+
+  function renderPost(p){
+    const handle = p.authorHandle || (p.authorEmail||'').split('@')[0];
+    const profile = handle ? '/u/' + encodeURIComponent(handle) : '#';
+    const avatar = p.authorAvatar ? `<img class="av" src="${esc(p.authorAvatar)}" alt=""/>` : `<div class="av" style="width:36px;height:36px;background:var(--msp-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">${esc((p.authorName||'?')[0].toUpperCase())}</div>`;
+    let media = '';
+    if (p.gifUrl) media = `<div class="media"><img src="${esc(p.gifUrl)}" alt="media"/></div>`;
+    else if (p.imageUrl) media = `<div class="media"><img src="${esc(p.imageUrl)}" alt="media"/></div>`;
+    const reactionTotal = p.reactionCount || (p.reactions ? Object.values(p.reactions).reduce((n,b)=>n+Object.keys(b||{}).length,0) : 0);
+    const commentCount = (p.comments || []).length;
+    return `
+      <div class="post-card-full">
+        <div class="head">
+          ${avatar}
+          <div style="flex:1;">
+            <div class="nm"><a href="${esc(profile)}">${esc(p.authorName || 'someone')}</a> ${p.authorHandle ? `<span style="color:var(--msp-mute);font-weight:normal;">@${esc(p.authorHandle)}</span>` : ''}</div>
+            <div class="ago">${esc(timeAgo(p.createdAt))}${p.schoolName ? ' · '+esc(p.schoolName) : ''}</div>
+          </div>
+        </div>
+        <div class="body">${esc(p.content || '').replace(/\n/g,'<br/>')}</div>
+        ${media}
+        <div class="reactions-strip">
+          <b>${reactionTotal}</b> reactions · <b>${commentCount}</b> comment${commentCount===1?'':'s'} · <b>${p.viewCount||0}</b> view${(p.viewCount||0)===1?'':'s'}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderComments(p){
+    const list = p.comments || [];
+    if (!list.length) return '<div class="post-card-full"><div class="pp-empty">no comments yet. be the first.</div></div>';
+    return '<div class="post-card-full">' +
+      list.map(c => {
+        const handle = c.authorHandle || (c.authorEmail||'').split('@')[0];
+        const profile = handle ? '/u/' + encodeURIComponent(handle) : '#';
+        const av = c.authorAvatar ? `<img src="${esc(c.authorAvatar)}" alt=""/>` : '';
+        return `
+          <div class="comment">
+            <div class="av">${av}</div>
+            <div class="meat">
+              <span class="nm"><a href="${esc(profile)}">${esc(c.authorName || 'someone')}</a></span>
+              <span class="ago">${esc(timeAgo(c.createdAt))}</span>
+              <div class="txt">${esc(c.text || '').replace(/\n/g,'<br/>')}</div>
+              ${c.gifUrl ? `<img src="${esc(c.gifUrl)}" alt="gif" style="max-width:240px;max-height:240px;display:block;margin-top:4px;border:1px solid var(--msp-rule);"/>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('') +
+      '</div>';
+  }
+
+  function renderCompose(){
+    if (!TOKEN) return '';
+    return `
+      <div class="post-card-full">
+        <div class="comment-compose">
+          <textarea id="cm-input" placeholder="add a comment…" maxlength="500"></textarea>
+          <button id="cm-send">Post</button>
+        </div>
+      </div>
+    `;
+  }
+
+  async function load(){
+    try {
+      const p = await api('/api/posts/' + encodeURIComponent(postId));
+      $('root').innerHTML = renderPost(p) + renderComments(p) + renderCompose();
+      const send = $('cm-send');
+      if (send) send.addEventListener('click', async () => {
+        const txt = ($('cm-input').value || '').trim();
+        if (!txt) return;
+        send.disabled = true;
+        try {
+          await api('/api/posts/' + encodeURIComponent(postId) + '/comments', { method: 'POST', body: { text: txt } });
+          load();
+        } catch (e) { alert(e.message); send.disabled = false; }
+      });
+    } catch (e) {
+      $('root').innerHTML = `<div class="post-card-full"><div class="pp-empty">couldn't load post: ${esc(e.message)}</div></div>`;
+    }
+  }
+  load();
+})();
+</script>
+</body>
+</html>

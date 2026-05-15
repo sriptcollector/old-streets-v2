@@ -1,0 +1,2031 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>profile</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+<style>
+/* =========================================================
+   MySpace 2006 profile clone
+   Single-file, system fonts, no rounded corners, no shadows,
+   no gradients. Two-column body. Verdana base 11px.
+   ========================================================= */
+
+:root{
+  --msp-bg:       #c1cdf5;
+  --msp-pane:     #ffffff;
+  --msp-blue:     #3b5998;
+  --msp-blue-d:   #29447e;
+  --msp-blue-l:   #6d84b4;
+  --msp-tint:     #d8dfea;
+  --msp-tint-2:   #eef2f8;
+  --msp-rule:     #b5bbcc;
+  --msp-rule-l:  #d8dcde;
+  --msp-ink:      #000000;
+  --msp-ink-link: #003399;
+  --msp-ink-vis:  #5c5c8a;
+  --msp-orange:   #ff6600;
+  --msp-peach:    #f3dec8;
+  --msp-red:      #cc0000;
+  --msp-green:    #339933;
+  --msp-mute:     #666666;
+  --lavender:     #e6e6fa;
+  --lavender-d:   #ccccdd;
+}
+
+html,body{margin:0;padding:0;background:var(--msp-bg);}
+body{
+  font-family:"Verdana","Arial","Helvetica",sans-serif;
+  font-size:11px;
+  color:var(--msp-ink);
+  line-height:1.4;
+  min-height:100vh;
+}
+*{box-sizing:border-box;}
+
+a{color:var(--msp-ink-link);text-decoration:underline;cursor:pointer;}
+a:visited{color:var(--msp-ink-vis);}
+a:hover{color:var(--msp-red);}
+img{border:0;}
+
+/* ---------- top white strip ---------- */
+.topstrip{
+  background:#fff;
+  border-bottom:1px solid var(--msp-rule);
+  padding:6px 10px;
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;
+}
+.topstrip .brand{
+  font-family:"Verdana","Arial",sans-serif;
+  font-weight:bold;
+  font-size:13px;
+  color:var(--msp-blue);
+  letter-spacing:-0.5px;
+  margin-right:6px;
+}
+.topstrip .brand .dot{color:var(--msp-orange);}
+.topstrip a.home{font-weight:bold;color:var(--msp-blue-d);}
+.topstrip .bar{color:var(--msp-rule);}
+.topstrip .scope{display:inline-flex;align-items:center;gap:4px;}
+.topstrip .scope label{cursor:pointer;color:var(--msp-blue-d);}
+.topstrip .scope input{vertical-align:middle;margin:0 2px 0 0;}
+.topstrip .search{
+  flex:1;display:flex;gap:5px;align-items:center;max-width:340px;
+}
+.topstrip .search input[type=text]{
+  flex:1;
+  border:1px solid var(--msp-rule);
+  font:11px Verdana,Arial,sans-serif;
+  padding:2px 4px;
+  height:18px;
+}
+.topstrip .search button{
+  font:bold 11px Verdana,Arial,sans-serif;
+  border:1px solid var(--msp-blue-d);
+  background:var(--msp-blue);
+  color:#fff;
+  padding:1px 8px;
+  cursor:pointer;
+  height:20px;
+}
+.topstrip .right{margin-left:auto;display:flex;gap:6px;align-items:center;}
+.topstrip .right a{color:var(--msp-blue-d);font-weight:bold;}
+
+/* ---------- blue nav strip ---------- */
+.navstrip{
+  background:var(--msp-blue);
+  padding:5px 10px;
+  color:#fff;
+  font-size:11px;
+  border-bottom:1px solid var(--msp-blue-d);
+}
+.navstrip a{color:#fff;text-decoration:underline;}
+.navstrip a:visited{color:#fff;}
+.navstrip a:hover{color:#ffe4b3;}
+.navstrip .sep{margin:0 5px;color:#aac;}
+
+/* ---------- page shell ---------- */
+.page{
+  max-width:1000px;
+  margin:0 auto;
+  padding:8px 8px 30px;
+}
+
+.profile-name{
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:24px;
+  font-weight:bold;
+  color:#000;
+  margin:8px 0 10px 4px;
+  letter-spacing:-0.5px;
+}
+.profile-name .small{font-size:11px;font-weight:normal;color:var(--msp-mute);margin-left:8px;}
+
+/* two-column grid */
+.cols{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  gap:10px;
+  align-items:start;
+}
+
+/* generic widget */
+.widget{
+  margin-bottom:10px;
+  border:1px solid var(--msp-rule);
+  background:#fff;
+}
+.widget-title{
+  background:var(--msp-blue);
+  color:#fff;
+  font-weight:bold;
+  font-size:11px;
+  padding:3px 6px;
+  border-bottom:1px solid var(--msp-blue-d);
+}
+.widget-body{padding:6px;}
+.widget.orange{border-color:var(--msp-orange);}
+.widget.orange .widget-title{background:var(--msp-blue);}
+
+/* ---------- LEFT COLUMN ---------- */
+.photo-block{
+  background:#fff;
+  border:1px solid var(--msp-rule);
+  padding:6px;
+  text-align:center;
+}
+.photo-block .photo{
+  width:100%;
+  max-width:190px;
+  height:190px;
+  margin:0 auto;
+  border:1px solid var(--msp-rule);
+  background:#f4f4f4 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="%23ddd"/></svg>') center/cover no-repeat;
+  position:relative;
+  overflow:hidden;
+  display:block;
+}
+.photo-block .photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-block .photo .initials{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:Arial,sans-serif;font-size:54px;font-weight:bold;
+  color:#fff;background:var(--msp-blue);
+}
+.photo-block .photo .change{
+  position:absolute;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.6);color:#fff;
+  font-size:10px;padding:3px;text-align:center;
+  display:none;cursor:pointer;
+}
+.photo-block .photo:hover .change.editable{display:block;}
+.photo-block .smiley{
+  margin-top:6px;font-style:italic;font-size:11px;color:#000;
+  word-break:break-word;
+}
+.photo-block .smiley.editable{cursor:pointer;}
+.photo-block .smiley.editable:hover{background:#ffffd0;}
+.basic-info{
+  margin-top:6px;
+  text-align:left;
+  font-size:11px;
+  line-height:1.5;
+  padding:0 2px;
+}
+.basic-info .row{padding:1px 0;}
+.basic-info .row b{font-weight:normal;}
+.basic-info .row.upper{text-transform:uppercase;}
+.basic-info .editable{cursor:pointer;border-bottom:1px dotted #999;}
+.basic-info .editable:hover{background:#ffffd0;}
+.online-now{
+  margin-top:6px;
+  padding:2px 0;
+  font-weight:bold;
+  color:var(--msp-orange);
+  font-size:11px;
+}
+.online-now .star{color:var(--msp-orange);margin-right:3px;}
+.last-login{padding:1px 0;color:#000;font-size:11px;}
+.view-my{padding:3px 0 1px;}
+.view-my a{margin-right:4px;}
+
+/* Contacting widget */
+.contacting{margin-top:10px;}
+.contacting .body{
+  background:var(--msp-tint-2);
+  padding:5px;
+  border-top:1px solid var(--msp-blue-d);
+}
+.contacting table{width:100%;border-collapse:collapse;}
+.contacting td{
+  width:50%;
+  padding:3px 2px;
+  vertical-align:middle;
+  font-size:10px;
+}
+.contacting td a{
+  display:flex;align-items:center;gap:4px;
+  text-decoration:none;color:var(--msp-ink-link);
+  padding:2px;
+}
+.contacting td a:hover{text-decoration:underline;background:#fff;}
+.contacting td a.disabled{color:#999;cursor:not-allowed;}
+.contacting td a.disabled:hover{text-decoration:none;background:transparent;}
+.contact-icon{
+  width:14px;height:14px;display:inline-block;flex:0 0 14px;
+  background:var(--msp-blue);color:#fff;text-align:center;
+  font-size:9px;line-height:14px;font-weight:bold;
+  font-family:Arial,sans-serif;
+}
+.contact-icon.gold{background:var(--msp-orange);}
+.contact-icon.red{background:var(--msp-red);}
+.contact-icon.green{background:var(--msp-green);}
+
+/* URL widget */
+.url-widget .body{padding:6px;font-size:11px;}
+.url-widget .url{
+  word-break:break-all;
+  background:var(--msp-tint-2);
+  border:1px solid var(--msp-rule-l);
+  padding:4px;
+  font-family:"Courier New",Courier,monospace;
+  font-size:11px;
+}
+.url-widget .copy{
+  display:inline-block;margin-top:4px;font-size:10px;
+}
+
+/* Interests widget  -  table style */
+.interests-tbl{width:100%;border-collapse:collapse;background:#fff;}
+.interests-tbl td{
+  vertical-align:top;
+  border:1px solid var(--msp-rule-l);
+  padding:3px 4px;
+  font-size:11px;
+}
+.interests-tbl td.label{
+  background:var(--lavender);
+  width:78px;
+  font-weight:bold;
+  color:var(--msp-blue-d);
+}
+.interests-tbl td.val{background:#fff;}
+.interests-tbl td.val.editable{cursor:pointer;}
+.interests-tbl td.val.editable:empty::before{content:"(click to add)";color:#bbb;}
+.interests-tbl td.val:hover.editable{background:#ffffd0;}
+
+/* Details widget */
+.details-tbl{width:100%;border-collapse:collapse;}
+.details-tbl td{
+  border:1px solid var(--msp-rule-l);
+  padding:3px 4px;
+  vertical-align:top;
+  font-size:11px;
+}
+.details-tbl td.label{
+  background:var(--lavender);
+  width:90px;
+  font-weight:bold;
+  color:var(--msp-blue-d);
+}
+.details-tbl td.val.editable{cursor:pointer;}
+.details-tbl td.val.editable:empty::before{content:"(click to add)";color:#bbb;}
+.details-tbl td.val:hover.editable{background:#ffffd0;}
+
+/* ---------- RIGHT COLUMN ---------- */
+.network-banner{
+  background:#fff;
+  border:1px solid var(--msp-rule);
+  padding:5px 8px;
+  font-weight:bold;
+  font-size:11px;
+  color:#000;
+  margin-bottom:10px;
+}
+.network-banner em{color:var(--msp-blue-d);font-style:normal;}
+
+.latest-blog{
+  background:#fff;
+  border:1px solid var(--msp-rule);
+  padding:6px 8px;
+  margin-bottom:6px;
+  font-size:11px;
+}
+.latest-blog .head{font-weight:bold;color:#000;}
+.latest-blog .head a{margin-left:6px;font-weight:normal;font-size:10px;}
+.latest-blog .title{font-weight:bold;color:var(--msp-ink-link);margin-top:4px;}
+.latest-blog .excerpt{color:#000;margin-top:2px;}
+.latest-blog .empty{color:#777;font-style:italic;margin-top:4px;}
+
+.promo-list{
+  background:#fff;
+  border:1px solid var(--msp-rule);
+  padding:6px 8px;
+  font-size:11px;
+  margin-bottom:10px;
+}
+.promo-list ul{margin:0;padding:0 0 0 14px;list-style:disc;}
+.promo-list li{padding:1px 0;}
+.promo-list .all-blog{margin-top:6px;font-weight:bold;}
+
+/* Blurbs */
+.blurbs{border:2px solid var(--msp-orange);background:#fff;margin-bottom:10px;}
+.blurbs .widget-title{
+  background:var(--msp-blue);color:#fff;border-bottom:1px solid var(--msp-blue-d);
+  padding:3px 6px;font-weight:bold;
+}
+.blurbs .body{padding:6px 8px;}
+.blurbs h4{
+  margin:0 0 3px 0;font-size:11px;color:var(--msp-orange);
+  text-transform:none;font-weight:bold;
+  border-bottom:1px dotted var(--msp-orange);
+  padding-bottom:1px;
+}
+.blurbs .blurb-text{
+  white-space:pre-wrap;font-size:11px;padding:2px 0 8px;
+  color:#000;
+}
+.blurbs .blurb-text.editable{cursor:pointer;}
+.blurbs .blurb-text.editable:empty::before{content:"(click to fill in)";color:#aaa;font-style:italic;}
+.blurbs .blurb-text:hover.editable{background:#ffffd0;}
+
+/* Friend Space */
+.friend-space .body{padding:6px;}
+.friend-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px 6px;
+}
+.friend-cell{
+  text-align:center;
+  font-size:10px;
+  word-break:break-word;
+}
+.friend-cell .av{
+  width:100%;aspect-ratio:1/1;
+  background:#eee;border:1px solid var(--msp-rule);
+  display:block;
+  overflow:hidden;
+}
+.friend-cell .av img{width:100%;height:100%;object-fit:cover;display:block;}
+.friend-cell .av .ini{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--msp-blue);color:#fff;font-weight:bold;font-size:18px;
+  font-family:Arial,sans-serif;
+}
+.friend-cell .nm{
+  margin-top:2px;color:var(--msp-ink-link);font-weight:bold;
+  display:block;text-decoration:none;
+}
+.friend-cell .nm:hover{text-decoration:underline;}
+.friend-space .meta{
+  padding:4px 6px;border-top:1px dotted var(--msp-rule);
+  font-size:10px;color:var(--msp-mute);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.friend-space .meta a{font-size:10px;}
+
+/* Comments */
+.comments-widget .body{padding:0;}
+.comment-list{padding:0;margin:0;list-style:none;}
+.comment-list li{
+  border-bottom:1px solid var(--msp-rule-l);
+  padding:6px;
+  display:flex;gap:6px;
+  font-size:11px;
+}
+.comment-list li:last-child{border-bottom:none;}
+.comment-list .cav{
+  width:50px;height:50px;flex:0 0 50px;
+  border:1px solid var(--msp-rule);background:#eee;
+  overflow:hidden;
+}
+.comment-list .cav img{width:100%;height:100%;object-fit:cover;}
+.comment-list .cav .ini{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:Arial,sans-serif;background:var(--msp-blue);color:#fff;
+  font-weight:bold;font-size:18px;
+}
+.comment-list .cbody{flex:1;min-width:0;}
+.comment-list .cname{font-weight:bold;color:var(--msp-ink-link);}
+.comment-list .ctime{color:var(--msp-mute);font-size:10px;margin-left:6px;}
+.comment-list .ctext{margin-top:2px;white-space:pre-wrap;word-wrap:break-word;}
+.comment-list .cdel{font-size:10px;margin-left:6px;}
+.comment-composer{
+  padding:8px;
+  border-top:1px solid var(--msp-rule);
+  background:var(--msp-tint-2);
+}
+.comment-composer textarea{
+  width:100%;font:11px Verdana,Arial,sans-serif;
+  border:1px solid var(--msp-rule);padding:4px;
+  min-height:50px;resize:vertical;
+}
+.comment-composer .row{display:flex;justify-content:space-between;align-items:center;margin-top:4px;gap:6px;}
+.comment-composer .row label{font-size:10px;color:#000;}
+.comment-composer button{
+  font:bold 11px Verdana,Arial,sans-serif;
+  border:1px solid var(--msp-blue-d);background:var(--msp-blue);color:#fff;
+  padding:3px 10px;cursor:pointer;
+}
+
+/* Pinned posts */
+.pinned-list{padding:0;margin:0;list-style:none;}
+.pinned-list li{
+  padding:6px 8px;border-bottom:1px solid var(--msp-rule-l);
+  font-size:11px;
+}
+.pinned-list li:last-child{border-bottom:none;}
+.pinned-list .pt{font-weight:bold;color:var(--msp-ink-link);}
+.pinned-list .ptext{margin-top:2px;white-space:pre-wrap;}
+
+/* Background music */
+.music-widget .body{padding:8px;font-size:11px;}
+.music-widget iframe{width:100%;border:1px solid var(--msp-rule);background:#eee;}
+.music-widget .compose{margin-top:6px;display:flex;gap:4px;}
+.music-widget .compose input{flex:1;font:11px Verdana,Arial;border:1px solid var(--msp-rule);padding:3px;}
+.music-widget .compose button{
+  font:bold 11px Verdana,Arial,sans-serif;
+  border:1px solid var(--msp-blue-d);background:var(--msp-blue);color:#fff;
+  padding:2px 8px;cursor:pointer;
+}
+
+/* MODAL */
+.modal-back{
+  position:fixed;inset:0;background:rgba(0,0,40,.5);
+  display:none;align-items:flex-start;justify-content:center;
+  z-index:1000;padding:60px 10px 10px;overflow:auto;
+}
+.modal-back.on{display:flex;}
+.modal{
+  width:100%;max-width:460px;
+  background:#fff;border:1px solid var(--msp-blue-d);
+  font-size:11px;
+}
+.modal .head{
+  background:var(--msp-blue);color:#fff;font-weight:bold;
+  padding:4px 8px;display:flex;justify-content:space-between;align-items:center;
+}
+.modal .head a{color:#fff;font-weight:normal;text-decoration:none;}
+.modal .body{padding:10px;}
+.modal textarea, .modal input[type=text]{
+  width:100%;font:11px Verdana,Arial;padding:4px;
+  border:1px solid var(--msp-rule);
+}
+.modal textarea{min-height:90px;}
+.modal .actions{
+  margin-top:8px;display:flex;gap:6px;justify-content:flex-end;
+}
+.modal button{
+  font:bold 11px Verdana,Arial;border:1px solid var(--msp-blue-d);
+  background:var(--msp-blue);color:#fff;
+  padding:3px 10px;cursor:pointer;
+}
+.modal button.ghost{background:#fff;color:var(--msp-blue-d);}
+.modal .star-row{font-size:22px;color:#ccc;cursor:pointer;display:flex;gap:3px;margin:8px 0;}
+.modal .star-row span.on{color:var(--msp-orange);}
+.modal .group-list{max-height:200px;overflow:auto;border:1px solid var(--msp-rule);margin-top:6px;}
+.modal .group-list .gi{padding:5px 8px;border-bottom:1px solid var(--msp-rule-l);cursor:pointer;}
+.modal .group-list .gi:hover{background:var(--msp-tint-2);}
+.modal .dm-thread{max-height:200px;overflow:auto;border:1px solid var(--msp-rule);padding:4px;background:var(--msp-tint-2);margin-bottom:6px;}
+.modal .dm-msg{padding:2px 4px;}
+.modal .dm-msg.mine{text-align:right;color:var(--msp-blue-d);}
+
+/* gate banner */
+.gate-banner{
+  background:#fff8d1;border:1px solid #c0a000;
+  padding:6px 10px;margin:0 0 10px;font-size:11px;
+  color:#000;
+}
+.gate-banner b{color:#8a6500;}
+
+/* Empty / 404 state */
+.notfound{
+  background:#fff;border:1px solid var(--msp-rule);
+  padding:30px;text-align:center;margin-top:20px;
+}
+.notfound h2{margin:0 0 8px;font-family:Arial;font-size:18px;color:var(--msp-blue-d);}
+
+/* footer */
+.footer{
+  text-align:center;font-size:10px;color:#fff;padding:14px 8px 4px;
+}
+.footer a{color:#fff;}
+
+/* ---------- MOBILE ---------- */
+@media (max-width:700px){
+  body{font-size:12px;}
+  .topstrip{flex-wrap:wrap;}
+  .topstrip .brand{font-size:14px;}
+  .topstrip .scope{display:none;}
+  .topstrip .search{order:99;flex-basis:100%;max-width:none;margin-top:6px;}
+  .topstrip .right{margin-left:auto;}
+  .navstrip{overflow-x:auto;white-space:nowrap;}
+  .profile-name{font-size:20px;margin-left:0;text-align:center;}
+  .cols{grid-template-columns:1fr;}
+  .photo-block .photo{max-width:230px;height:230px;}
+  .friend-grid{grid-template-columns:repeat(3,1fr);}
+  .contacting td{display:block;width:100%;}
+  .contacting td a{padding:8px 4px;min-height:32px;}
+  .modal-back{padding:0;align-items:stretch;}
+  .modal{max-width:none;min-height:100vh;border:none;}
+  .widget-title, .topstrip button, .navstrip a{padding:6px 8px;}
+  .navstrip a{display:inline-block;padding:6px 8px;}
+  .contact-icon{width:18px;height:18px;line-height:18px;font-size:11px;flex-basis:18px;}
+  .friend-cell{font-size:11px;}
+  .basic-info{font-size:12px;}
+}
+
+/* tiny utility */
+.muted{color:var(--msp-mute);}
+.bold{font-weight:bold;}
+.center{text-align:center;}
+.hidden{display:none !important;}
+.spinner{display:inline-block;width:10px;height:10px;border:2px solid #ccc;border-top-color:var(--msp-blue);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.inline-input{font:11px Verdana,Arial;border:1px solid var(--msp-rule);padding:2px 4px;width:100%;}
+.inline-textarea{font:11px Verdana,Arial;border:1px solid var(--msp-rule);padding:3px;width:100%;min-height:50px;resize:vertical;}
+.editable-pen{font-size:10px;color:var(--msp-blue);margin-left:4px;}
+</style>
+</head>
+<body>
+
+<!-- ============================== CHROME ============================== -->
+<div class="topstrip">
+  <a class="brand" href="/"><span id="brand-name">Paths</span><span class="dot">.</span><span style="font-weight:normal;font-size:10px;color:#666;">com</span></a>
+  <a class="home" href="/">Home</a>
+  <span class="bar">|</span>
+  <span class="scope">
+    <label><input type="radio" name="scope" value="web" />The Web</label>
+    <label><input type="radio" name="scope" value="site" checked id="scope-site" /><span id="scope-site-label">Paths</span></label>
+  </span>
+  <form class="search" onsubmit="event.preventDefault();doSearch();">
+    <input type="text" id="topsearch" placeholder="" />
+    <button type="submit">Search</button>
+  </form>
+  <span class="right">
+    <a href="/?help=1">Help</a>
+    <span class="bar">|</span>
+    <a href="#" id="signout-link">SignOut</a>
+  </span>
+</div>
+<div class="navstrip" id="navstrip">
+  <a href="/">Home</a><span class="sep">|</span>
+  <a href="/?view=browse">Browse</a><span class="sep">|</span>
+  <a href="/?view=search">Search</a><span class="sep">|</span>
+  <a href="/?view=invite">Invite</a><span class="sep">|</span>
+  <a href="/?view=film">Film</a><span class="sep">|</span>
+  <a href="/?view=mail">Mail</a><span class="sep">|</span>
+  <a href="/?view=blog">Blog</a><span class="sep">|</span>
+  <a href="/?view=favorites">Favorites</a><span class="sep">|</span>
+  <a href="/?view=forum">Forum</a><span class="sep">|</span>
+  <a href="/?view=groups">Groups</a><span class="sep">|</span>
+  <a href="/?view=events">Events</a><span class="sep">|</span>
+  <a href="/?view=videos">Videos</a><span class="sep">|</span>
+  <a href="/?view=music">Music</a><span class="sep">|</span>
+  <a href="/?view=comedy">Comedy</a><span class="sep">|</span>
+  <a href="/?view=classifieds">Classifieds</a>
+</div>
+
+<div class="page" id="page-root">
+  <!-- gate banner inserted by JS if needed -->
+  <div id="gate-banner-host"></div>
+
+  <!-- BIG NAME -->
+  <div class="profile-name" id="big-name">
+    <span id="name-text">&nbsp;</span>
+    <span class="small" id="name-handle"></span>
+  </div>
+
+  <div id="content-root">
+    <!-- Spinner during boot -->
+    <div class="center muted" style="padding:30px;"><span class="spinner"></span> loading profile...</div>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="/">home</a> &nbsp;&middot;&nbsp; <a href="/?view=help">help</a> &nbsp;&middot;&nbsp; <a href="/?view=tos">terms</a> &nbsp;&middot;&nbsp; <a href="/?view=privacy">privacy</a>
+  <div style="opacity:.7;margin-top:4px;">&copy; <span id="ftr-year"></span> <span id="ftr-brand">Paths</span> &mdash; built like 2006</div>
+</div>
+
+<!-- ============================== MODALS ============================== -->
+<div class="modal-back" id="modal-back">
+  <div class="modal" id="modal-shell">
+    <div class="head">
+      <span id="modal-title">title</span>
+      <a href="#" onclick="event.preventDefault();closeModal();">[close]</a>
+    </div>
+    <div class="body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   STATE + BOOT
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+const root = $('content-root');
+
+const state = {
+  me:        null,   // viewer (from /api/whoami)
+  profile:   null,   // the user being viewed
+  handle:    '',     // requested handle
+  isOwner:   false,
+  blog:      null,   // latest blog entry
+  comments: [],
+  brand:     'Paths',
+  siteInfo:  null,
+  token:     null,
+  notFound:  false
+};
+
+document.getElementById('ftr-year').textContent = new Date().getFullYear();
+
+/* ---------- parse handle from URL ---------- */
+function parseHandle(){
+  // matches /u/<handle>  OR  /profile.html?h=<handle>  OR ?h=<handle>
+  const m = location.pathname.match(/^\/u\/([a-z0-9_]+)/i);
+  if (m) return m[1].toLowerCase();
+  const sp = new URLSearchParams(location.search);
+  const h = sp.get('h') || sp.get('handle') || '';
+  return (h || '').toLowerCase();
+}
+
+/* ---------- token ---------- */
+function getToken(){
+  try {
+    return localStorage.getItem('os.token') || localStorage.getItem('userToken') || localStorage.getItem('token') || '';
+  } catch(_) { return ''; }
+}
+
+/* ---------- HTML escape ---------- */
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+
+/* ---------- format date M/D/YYYY ---------- */
+function fmtDate(ts){
+  if (!ts) return '';
+  const d = new Date(ts);
+  return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+}
+function fmtRelative(ts){
+  if (!ts) return '';
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m+'m ago';
+  const h = Math.floor(m/60);
+  if (h < 24) return h+'h ago';
+  const d = Math.floor(h/24);
+  if (d < 7) return d+'d ago';
+  return fmtDate(ts);
+}
+
+/* ---------- API helper ---------- */
+async function api(method, path, body){
+  const headers = { 'Content-Type':'application/json' };
+  const t = getToken();
+  if (t) headers['x-user-token'] = t;
+  const opts = { method, headers, credentials:'same-origin' };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const r = await fetch(path, opts);
+  let json = null;
+  try { json = await r.json(); } catch(_){ json = null; }
+  if (!r.ok) {
+    const err = new Error((json && json.error) || ('http '+r.status));
+    err.status = r.status;
+    err.payload = json;
+    throw err;
+  }
+  return json;
+}
+
+/* =========================================================
+   INITIALS / AVATAR
+   ========================================================= */
+function initials(name){
+  if (!name) return '?';
+  const parts = String(name).trim().split(/\s+/);
+  let s = (parts[0]||'')[0] || '';
+  if (parts.length > 1) s += (parts[parts.length-1]||'')[0] || '';
+  return s.toUpperCase() || '?';
+}
+function avatarHtml(name, avatarUrl, size){
+  const hueIni = initials(name);
+  if (avatarUrl) {
+    return `<img src="${esc(avatarUrl)}" alt="${esc(name)}" />`;
+  }
+  return `<div class="ini">${esc(hueIni)}</div>`;
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+async function boot(){
+  state.handle = parseHandle();
+  state.token = getToken();
+
+  // brand: pull /api/site-info for daily wordmark
+  api('GET', '/api/site-info').then(info => {
+    state.siteInfo = info;
+    state.brand = info.brandToday || 'Paths';
+    document.getElementById('brand-name').textContent = state.brand;
+    document.getElementById('scope-site-label').textContent = state.brand;
+    document.getElementById('ftr-brand').textContent = state.brand;
+    document.title = (state.profile && state.profile.name ? state.profile.name + ' on ' : '') + state.brand;
+  }).catch(()=>{});
+
+  // who am I (best effort)
+  try {
+    state.me = (await api('GET', '/api/whoami')).user;
+  } catch (e) {
+    state.me = null;
+  }
+
+  if (!state.handle) {
+    if (state.me && state.me.handle) {
+      // own profile by default
+      state.handle = state.me.handle;
+      // update URL so /u/<me> shows in bar without reloading
+      try { history.replaceState(null, '', '/u/'+state.handle); } catch(_){}
+    } else {
+      renderNotFound("No handle in the URL. Try /u/&lt;handle&gt;.");
+      return;
+    }
+  }
+
+  // load profile
+  let userByHandle;
+  try {
+    userByHandle = (await api('GET', '/api/u/'+encodeURIComponent(state.handle))).user;
+  } catch (e) {
+    if (e.status === 404) {
+      renderNotFound("This profile doesn't exist on "+esc(state.brand)+".");
+    } else {
+      renderNotFound("Couldn't load profile: "+esc(e.message));
+    }
+    return;
+  }
+
+  // Hydrate richer profile (board, viewerSentFriendReq, etc.) via /api/users/profile/:email
+  let rich = userByHandle;
+  try {
+    const r2 = await api('GET', '/api/users/profile/'+encodeURIComponent(userByHandle.email.toLowerCase()));
+    rich = Object.assign({}, userByHandle, r2);
+  } catch(_){ /* not fatal; we still have the public stub */ }
+
+  state.profile = rich;
+  state.isOwner = !!(state.me && state.me.email && rich.email &&
+    state.me.email.toLowerCase() === rich.email.toLowerCase());
+
+  // load comments (profileBoard)
+  try {
+    state.comments = await api('GET', '/api/users/profile/'+encodeURIComponent(rich.email.toLowerCase())+'/board');
+  } catch(_){ state.comments = []; }
+
+  // latest blog by this author
+  try {
+    const blogs = await api('GET', '/api/blogs');
+    const mine = (blogs || []).filter(b => (b.authorEmail||'').toLowerCase() === rich.email.toLowerCase());
+    state.blog = mine[0] || null;
+  } catch(_){ state.blog = null; }
+
+  render();
+}
+
+/* =========================================================
+   404 / EMPTY
+   ========================================================= */
+function renderNotFound(msg){
+  state.notFound = true;
+  root.innerHTML = `
+    <div class="notfound">
+      <h2>Sorry!</h2>
+      <p>${msg}</p>
+      <p style="margin-top:18px;"><a href="/">&laquo; back to home</a></p>
+    </div>`;
+}
+
+/* =========================================================
+   MAIN RENDER
+   ========================================================= */
+function render(){
+  const u = state.profile;
+  if (!u) return;
+
+  // big name
+  $('name-text').textContent = u.name || 'unnamed';
+  $('name-handle').textContent = u.handle ? '@'+u.handle : '';
+  document.title = (u.name || u.handle || 'profile') + ' on ' + state.brand;
+
+  // gate banner  -  read-only viewer states
+  const banner = $('gate-banner-host');
+  banner.innerHTML = '';
+  if (state.me && (state.me.status === 'waitlist' || state.me.mustSpendInitialInvites)) {
+    banner.innerHTML = `<div class="gate-banner">
+      <b>Read-only mode.</b> You're on the waitlist / haven't spent your invites yet, so contacting actions are disabled.
+    </div>`;
+  } else if (!state.me) {
+    banner.innerHTML = `<div class="gate-banner">
+      <b>You're not signed in.</b> <a href="/">Sign in</a> to message, friend, or comment.
+    </div>`;
+  }
+
+  // Custom CSS/HTML — prefers the new customProfile.css, falls back to the
+  // legacy u.customCss / u.customHtmlSafe fields. Scoped to .profile-custom-frame.
+  const customSrc = (u.customProfile && u.customProfile.css)
+    ? { css: u.customProfile.css, html: u.customProfile.html || '' }
+    : { css: u.customCss || '', html: u.customHtmlSafe || u.customHtml || '' };
+  const customCss = customSrc.css ? `<style>${customSrc.css}</style>` : '';
+  const customHtml = customSrc.html ? `<div class="profile-custom-decor">${customSrc.html}</div>` : '';
+
+  root.innerHTML = `
+    ${customCss}
+    <div class="profile-custom-frame">
+      ${customHtml}
+      <div class="cols">
+        <div class="left-col">${renderLeftCol(u)}</div>
+        <div class="right-col">${renderRightCol(u)}</div>
+      </div>
+    </div>`;
+
+  wireLeftCol();
+  wireRightCol();
+  wireRating();
+  wireViewers();
+  wireAutoTopFriends();
+}
+
+/* =========================================================
+   RATING WIDGET
+   ========================================================= */
+function wireRating(){
+  const root = document.getElementById('rate-body');
+  if (!root) return;
+  const handle = root.dataset.handle;
+  if (!handle) return;
+  const avgEl = document.getElementById('rate-avg');
+  const starsEl = document.getElementById('rate-stars');
+  let my = 0;
+  function paint(stats){
+    avgEl.textContent = stats.count
+      ? `★ ${stats.avg.toFixed(1)}/5 (${stats.count} rater${stats.count===1?'':'s'})`
+      : 'no ratings yet — be the first.';
+    my = stats.myRating || 0;
+    drawStars(my);
+  }
+  function drawStars(filled){
+    starsEl.innerHTML = '12345'.split('').map(n => {
+      const k = Number(n);
+      return `<span data-n="${k}" style="color:${k<=filled?'#cc7700':'#bbb'};">★</span>`;
+    }).join('');
+    starsEl.querySelectorAll('span').forEach(s => {
+      s.addEventListener('mouseenter', () => drawHover(Number(s.dataset.n)));
+      s.addEventListener('mouseleave', () => drawStars(my));
+      s.addEventListener('click', async () => {
+        const n = Number(s.dataset.n);
+        const stars = (n === my) ? 0 : n;
+        try {
+          const r = await fetch(`/api/u/${encodeURIComponent(handle)}/rate`, { method:'POST', headers: {'Content-Type':'application/json','X-User-Token': localStorage.getItem('oldstreets-token') || ''}, body: JSON.stringify({ stars }) });
+          if (!r.ok) throw new Error('rate-fail');
+          const stats = await r.json();
+          paint(stats);
+        } catch {}
+      });
+    });
+  }
+  function drawHover(n){
+    starsEl.querySelectorAll('span').forEach(s => { s.style.color = Number(s.dataset.n) <= n ? '#cc7700' : '#bbb'; });
+  }
+  fetch(`/api/u/${encodeURIComponent(handle)}/rating`, { headers: { 'X-User-Token': localStorage.getItem('oldstreets-token') || '' } })
+    .then(r => r.ok ? r.json() : { avg:0, count:0, myRating:0 })
+    .then(paint)
+    .catch(() => paint({ avg:0, count:0, myRating:0 }));
+}
+
+/* =========================================================
+   PROFILE VIEWERS — show who's been looking
+   ========================================================= */
+function wireViewers(){
+  const root = document.getElementById('views-body');
+  if (!root) return;
+  const handle = root.dataset.handle;
+  fetch(`/api/u/${encodeURIComponent(handle)}/viewers`, { headers: { 'X-User-Token': localStorage.getItem('oldstreets-token') || '' } })
+    .then(r => r.ok ? r.json() : { viewers: [] })
+    .then(d => {
+      const list = d.viewers || [];
+      if (!list.length) { root.innerHTML = '<div class="muted">no one has stopped by yet.</div>'; return; }
+      const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      function ago(ts){ const s=Math.floor((Date.now()-ts)/1000); if(s<60)return s+'s'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+      root.innerHTML = '<div style="font-size:11px;color:#666;margin-bottom:6px;">' + (d.totalViewers||0) + ' unique · ' + (d.totalViews||0) + ' total views</div>' +
+        list.slice(0,12).map(v => `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px dotted #ddd;font-size:11px;">
+          ${v.avatar ? `<img src="${esc(v.avatar)}" style="width:24px;height:24px;object-fit:cover;border:1px solid #bbb;"/>` : `<div style="width:24px;height:24px;background:#3b5998;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">${esc((v.name||'?')[0].toUpperCase())}</div>`}
+          ${v.handle ? `<a href="/u/${esc(v.handle)}" style="font-weight:700;flex:1;">${esc(v.name||'someone')}</a>` : `<b style="flex:1;">${esc(v.name||'someone')}</b>`}
+          <span style="color:#888;font-size:10px;">${ago(v.ts)}${v.revisits>1?' · '+v.revisits+'×':''}</span>
+        </div>`).join('');
+    })
+    .catch(() => { root.innerHTML = '<div class="muted">could not load.</div>'; });
+}
+
+/* =========================================================
+   AUTO TOP FRIENDS — pulled from /api/u/:h/top-friends
+   ========================================================= */
+function wireAutoTopFriends(){
+  const grid = document.querySelector('.friend-space .body');
+  if (!grid) return;
+  const u = state.profile;
+  if (!u || !u.handle) return;
+  // If they have a manually-curated top8, respect it. Otherwise auto-fill.
+  if (u.top8 && u.top8.length) return;
+  fetch(`/api/u/${encodeURIComponent(u.handle)}/top-friends`, { headers: { 'X-User-Token': localStorage.getItem('oldstreets-token') || '' } })
+    .then(r => r.ok ? r.json() : { topFriends: [] })
+    .then(d => {
+      const list = (d.topFriends || []).slice(0, 8);
+      if (!list.length) return; // keep default
+      const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      grid.innerHTML = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">' +
+        list.map(f => `<a href="/u/${esc(f.handle)}" style="text-decoration:none;color:inherit;text-align:center;display:block;">
+          ${f.avatar ? `<img src="${esc(f.avatar)}" style="width:100%;aspect-ratio:1/1;object-fit:cover;border:1px solid #bbb;display:block;"/>` : `<div style="width:100%;aspect-ratio:1/1;background:#3b5998;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;">${esc((f.name||'?')[0].toUpperCase())}</div>`}
+          <div style="font-size:11px;font-weight:700;margin-top:2px;color:#003399;">${esc(f.name||'')}</div>
+        </a>`).join('') + '</div>';
+    })
+    .catch(()=>{});
+}
+
+/* =========================================================
+   LEFT COLUMN
+   ========================================================= */
+function renderLeftCol(u){
+  const onlineWindowMs = 5 * 60 * 1000;
+  const isOnline = u.online || (u.lastSeen && (Date.now() - u.lastSeen < onlineWindowMs));
+  const gender   = u.gender || '';
+  const age      = computeAge(u);
+  const city     = u.city || '';
+  const stateP   = u.state || '';
+  const country  = u.country || '';
+  const lastLogin = u.lastSeen ? fmtDate(u.lastSeen) : (u.lastVisitAt ? fmtDate(u.lastVisitAt) : 'never');
+  const interests = parseInterests(u);
+  const url       = (location.hostname || 'oldstreets.org') + '/u/' + (u.handle || '');
+  const headline  = u.headline || (state.isOwner ? '' : ':-)');
+  const own = state.isOwner;
+  const editClass = own ? ' editable' : '';
+  const photoEditOverlay = own ? `<div class="change editable" id="photo-change">Change Photo</div>` : '';
+
+  return `
+    <div class="photo-block">
+      <div class="photo" id="profile-photo">
+        ${ u.avatar ? `<img src="${esc(u.avatar)}" alt="${esc(u.name)}" />`
+                    : `<div class="initials">${esc(initials(u.name))}</div>` }
+        ${photoEditOverlay}
+      </div>
+      <div class="smiley${editClass}" id="headline-field" data-field="headline">${ headline ? esc(headline) : (own ? '<span class="muted">(add a tagline)</span>' : ':-)') }</div>
+
+      <div class="basic-info">
+        <div class="row${editClass}" data-field="gender" id="bi-gender">${gender ? esc(gender) : (own ? '<span class="muted">(gender)</span>' : '')}</div>
+        <div class="row${editClass}" data-field="age" id="bi-age">${age ? esc(age+' years old') : (own ? '<span class="muted">(age)</span>' : '')}</div>
+        <div class="row${editClass}" data-field="city" id="bi-city">${city ? esc(city+',') : (own ? '<span class="muted">(city)</span>' : '')}</div>
+        <div class="row upper${editClass}" data-field="state" id="bi-state">${stateP ? esc(stateP) : (own ? '<span class="muted">(state)</span>' : '')}</div>
+        <div class="row${editClass}" data-field="country" id="bi-country">${country ? esc(country) : (own ? '<span class="muted">(country)</span>' : 'United States')}</div>
+
+        ${ isOnline ? `<div class="online-now"><span class="star">★</span>Online Now!</div>`
+                    : `<div class="online-now" style="color:#777;"><span class="star" style="color:#aaa;">☆</span>Offline</div>` }
+        <div class="last-login"><b>Last Login:</b> ${esc(lastLogin)}</div>
+        <div class="view-my">
+          <b>View My:</b>
+          <a href="/?h=${esc(u.handle)}&view=pics">Pics</a> |
+          <a href="/?h=${esc(u.handle)}&view=videos">Videos</a>
+        </div>
+      </div>
+    </div>
+
+    ${renderContactingWidget(u)}
+    ${renderBroughtInBy(u)}
+
+    <div class="widget url-widget">
+      <div class="widget-title">${state.brand} URL:</div>
+      <div class="body">
+        <div class="url">${esc(url)}</div>
+        <a class="copy" href="#" id="copy-url">[Copy]</a>
+      </div>
+    </div>
+
+    <div class="widget interests-widget">
+      <div class="widget-title">${esc(u.name||'')}'s Interests</div>
+      <table class="interests-tbl">
+        <tr><td class="label">General</td><td class="val${editClass}" data-field="interests.general" id="int-general">${esc(interests.general)}</td></tr>
+        <tr><td class="label">Music</td><td class="val${editClass}" data-field="interests.music" id="int-music">${esc(interests.music)}</td></tr>
+        <tr><td class="label">Movies</td><td class="val${editClass}" data-field="interests.movies" id="int-movies">${esc(interests.movies)}</td></tr>
+        <tr><td class="label">Television</td><td class="val${editClass}" data-field="interests.television" id="int-television">${esc(interests.television)}</td></tr>
+        <tr><td class="label">Books</td><td class="val${editClass}" data-field="interests.books" id="int-books">${esc(interests.books)}</td></tr>
+        <tr><td class="label">Heroes</td><td class="val${editClass}" data-field="interests.heroes" id="int-heroes">${esc(u.heroes||interests.heroes||'')}</td></tr>
+      </table>
+    </div>
+
+    <div class="widget details-widget">
+      <div class="widget-title">${esc(u.name||'')}'s Details</div>
+      <table class="details-tbl">
+        <tr><td class="label">Status</td><td class="val${editClass}" data-field="relationshipStatus">${esc(u.relationshipStatus||'')}</td></tr>
+        <tr><td class="label">Here for</td><td class="val${editClass}" data-field="hereFor">${esc(u.hereFor||'')}</td></tr>
+        <tr><td class="label">Hometown</td><td class="val${editClass}" data-field="hometown">${esc(u.hometown||'')}</td></tr>
+        <tr><td class="label">Orientation</td><td class="val${editClass}" data-field="orientation">${esc(u.orientation||'')}</td></tr>
+        <tr><td class="label">Body type</td><td class="val${editClass}" data-field="bodyType">${esc(u.bodyType||'')}</td></tr>
+        <tr><td class="label">Ethnicity</td><td class="val${editClass}" data-field="ethnicity">${esc(u.ethnicity||'')}</td></tr>
+        <tr><td class="label">Zodiac sign</td><td class="val${editClass}" data-field="zodiac">${esc(u.zodiac||'')}</td></tr>
+        <tr><td class="label">Children</td><td class="val${editClass}" data-field="children">${esc(u.children||'')}</td></tr>
+        <tr><td class="label">Smoke / Drink</td><td class="val${editClass}" data-field="vices">${esc(u.vices||'')}</td></tr>
+        <tr><td class="label">Education</td><td class="val${editClass}" data-field="education">${esc(u.education||u.schoolName||'')}</td></tr>
+        <tr><td class="label">Occupation</td><td class="val${editClass}" data-field="occupation">${esc(u.occupation||'')}</td></tr>
+        <tr><td class="label">Income</td><td class="val${editClass}" data-field="income">${esc(u.income||'')}</td></tr>
+        <tr><td class="label">Religion</td><td class="val${editClass}" data-field="religion">${esc(u.religion||'')}</td></tr>
+      </table>
+    </div>
+  `;
+}
+
+function renderBroughtInBy(u) {
+  // Public invitation tree — Lobste.rs-style accountability + social proof.
+  if (!u || !u.invitedByName) return '';
+  const handle = u.invitedByHandle || '';
+  const link = handle ? `<a href="/u/${esc(handle)}" style="color:var(--msp-ink-link); text-decoration:none; font-weight:700;">@${esc(handle)}</a>` : `<b>${esc(u.invitedByName)}</b>`;
+  return `<div class="widget">
+    <div class="widget-title">Brought in by</div>
+    <div class="body" style="padding:8px 10px; font-size:11px;">
+      ${link} vouched for ${esc((u.name||'this person').split(' ')[0])}.
+      <div style="margin-top:4px; color:var(--msp-mute); font-size:10px; font-style:italic;">
+        every member arrives with the person who brought them. it's all visible.
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderContactingWidget(u){
+  const gated = (!state.me) || (state.me.status === 'waitlist') || state.me.mustSpendInitialInvites;
+  const own = state.isOwner;
+  // On own profile, hide contacting (or show a self message)
+  if (own) {
+    return `
+    <div class="widget contacting">
+      <div class="widget-title">This is you</div>
+      <div class="body" style="background:var(--msp-tint-2);">
+        <div style="padding:6px;font-size:11px;">
+          <b>You're looking at your own profile.</b><br>
+          Click any cell with a dotted underline to edit it.<br>
+          <a href="/profile-edit.html">[ Full editor ]</a>
+          &nbsp;<a href="/?view=settings">[ Settings ]</a>
+        </div>
+      </div>
+    </div>`;
+  }
+  const disClass = gated ? ' disabled' : '';
+  return `
+    <div class="widget contacting">
+      <div class="widget-title">Contacting ${esc((u.name||'').split(' ')[0])}</div>
+      <div class="body">
+        <table>
+          <tr>
+            <td><a href="#" id="act-send-msg" class="${disClass.trim()}"><span class="contact-icon">💬</span>Chat</a></td>
+            <td><a href="#" id="act-forward"><span class="contact-icon gold">F</span>Forward to Friend</a></td>
+          </tr>
+          <tr>
+            <td><a href="#" id="act-add-friend" class="${disClass.trim()}"><span class="contact-icon green">+</span>${friendButtonLabel(u)}</a></td>
+            <td><a href="#" id="act-favorite"><span class="contact-icon gold">★</span>Add to Favorites</a></td>
+          </tr>
+          <tr>
+            <td><a href="#" id="act-im" class="${disClass.trim()}"><span class="contact-icon">IM</span>Instant Message</a></td>
+            <td><a href="#" id="act-block"><span class="contact-icon red">B</span>Block User</a></td>
+          </tr>
+          <tr>
+            <td><a href="#" id="act-group"><span class="contact-icon">G</span>Add to Group</a></td>
+            <td><a href="#" id="act-rank"><span class="contact-icon gold">R</span>Rank User</a></td>
+          </tr>
+        </table>
+      </div>
+    </div>`;
+}
+
+function friendButtonLabel(u){
+  if (u.viewerSentFriendReq) return 'Friend Request Sent';
+  if (u.viewerReceivedFriendReq) return 'Approve Friend Request';
+  if (state.me && (state.me.friends||[]).map(e=>(e||'').toLowerCase()).includes((u.email||'').toLowerCase())) return 'Already Friends';
+  return 'Add to Friends';
+}
+
+/* age helper */
+function computeAge(u){
+  if (typeof u.age === 'number' && u.age > 0) return u.age;
+  if (u.classOf && u.classOf > 1900) {
+    // crude: assume age 18 in grad year
+    const diff = (new Date().getFullYear()) - u.classOf;
+    return 18 + diff;
+  }
+  if (u.gradYear && Number(u.gradYear) > 1900) {
+    const diff = (new Date().getFullYear()) - Number(u.gradYear);
+    return 18 + diff;
+  }
+  return '';
+}
+
+/* parse interests blob  -  old server stores as a single string; we accept object too */
+function parseInterests(u){
+  const out = {general:'',music:'',movies:'',television:'',books:'',heroes:''};
+  if (u.interests && typeof u.interests === 'object') {
+    Object.assign(out, u.interests);
+    return out;
+  }
+  if (typeof u.interests === 'string' && u.interests.trim()) {
+    // Try parse "General: ...\nMusic: ..."
+    const lines = u.interests.split(/\n+/);
+    let matched = false;
+    for (const line of lines) {
+      const m = line.match(/^\s*(general|music|movies|television|books|heroes)\s*:\s*(.+)$/i);
+      if (m) {
+        out[m[1].toLowerCase()] = m[2].trim();
+        matched = true;
+      }
+    }
+    if (!matched) out.general = u.interests;
+  }
+  if (u.heroes) out.heroes = u.heroes;
+  return out;
+}
+
+/* serialize interests object back to string for /api/users/me */
+function serializeInterests(obj){
+  const order = ['general','music','movies','television','books','heroes'];
+  return order
+    .filter(k => (obj[k]||'').trim())
+    .map(k => k[0].toUpperCase()+k.slice(1)+': '+obj[k].trim())
+    .join('\n');
+}
+
+/* =========================================================
+   RIGHT COLUMN
+   ========================================================= */
+function renderRightCol(u){
+  const own = state.isOwner;
+  const editClass = own ? ' editable' : '';
+  const blog = state.blog;
+  const songEmbedSrc = (u.songEmbed && u.songEmbed.embedSrc) || (u.songEmbed && u.songEmbed.src) || '';
+  const top8 = (u.top8 && u.top8.length ? u.top8 : (u.friends||[]).slice(0,12));
+
+  return `
+    <div class="network-banner">
+      ${ own ? `Welcome to your profile, ${esc(u.name||'')}.` :
+               `${esc(u.name||'')} is in your extended network` }
+    </div>
+
+    <div class="widget rating-widget">
+      <div class="widget-title">⭐ Rate ${esc(u.name||'')}</div>
+      <div class="body" id="rate-body" data-handle="${esc(u.handle||'')}" style="padding:10px 12px;">
+        <div id="rate-avg" style="margin-bottom:6px;">loading…</div>
+        <div id="rate-stars" style="font-size:24px; cursor:pointer; letter-spacing:4px;"></div>
+        <div class="muted" style="font-size:10px; margin-top:4px;">click a star to rate · click the same star to clear</div>
+      </div>
+    </div>
+
+    <div class="widget views-widget">
+      <div class="widget-title">👀 Recent Viewers</div>
+      <div class="body" id="views-body" data-handle="${esc(u.handle||'')}" style="padding:10px 12px;">
+        <div class="muted">loading…</div>
+      </div>
+    </div>
+
+    <div class="widget blurbs">
+      <div class="widget-title">${esc(u.name||'')}'s Blurbs</div>
+      <div class="body">
+        <h4>About me:</h4>
+        <div class="blurb-text${editClass}" id="blurb-about" data-field="aboutMe">${esc(u.aboutMe||'')}</div>
+        <h4>Who I'd like to meet:</h4>
+        <div class="blurb-text${editClass}" id="blurb-meet" data-field="whoIdLikeToMeet">${esc(u.whoIdLikeToMeet || u.heroes ? (u.whoIdLikeToMeet || '') : '')}</div>
+      </div>
+    </div>
+
+    ${ songEmbedSrc || own ? `
+    <div class="widget music-widget">
+      <div class="widget-title">${esc(u.name||'')}'s Music Player</div>
+      <div class="body">
+        ${ songEmbedSrc ? `<iframe src="${esc(songEmbedSrc)}" height="80" allow="autoplay; encrypted-media" referrerpolicy="no-referrer"></iframe>`
+                         : (own ? `<div class="muted">No song yet.</div>` : '') }
+        ${ own ? `
+          <div class="compose">
+            <input type="text" id="song-url-input" placeholder="paste a YouTube / Spotify / SoundCloud URL" value="${esc(u.songUrl||'')}" />
+            <button id="song-save-btn">Save</button>
+          </div>
+          ${ u.songUrl ? `<a href="#" id="song-clear-btn" style="font-size:10px;">[ remove song ]</a>` : '' }
+        ` : '' }
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="widget friend-space">
+      <div class="widget-title">${esc(u.name||'')}'s Friend Space</div>
+      <div class="body">
+        ${ renderFriendGrid(u, top8) }
+      </div>
+      <div class="meta">
+        <span>${esc(u.name||'')} has <b>${esc(u.friendCount || (u.friends||[]).length || 0)}</b> friends.</span>
+        <span>
+          <a href="/?view=friends&h=${esc(u.handle||'')}">View All</a>
+          ${ own ? ' | <a href="#" id="edit-top8">Edit Top 8</a>' : '' }
+        </span>
+      </div>
+    </div>
+
+    ${ u.pinnedPosts && u.pinnedPosts.length ? `
+    <div class="widget">
+      <div class="widget-title">${esc(u.name||'')}'s Pinned Posts</div>
+      <ul class="pinned-list">
+        ${ u.pinnedPosts.map(p => `
+          <li>
+            <div class="pt">${esc(p.title || (p.text||'').slice(0,50) || 'post')}</div>
+            <div class="ptext">${esc((p.text||'').slice(0,180))}${(p.text||'').length>180?'...':''}</div>
+          </li>`).join('') }
+      </ul>
+    </div>
+    ` : '' }
+
+    <div class="widget comments-widget">
+      <div class="widget-title">${esc(u.name||'')}'s Friends Comments</div>
+      <div class="body">
+        ${ renderCommentList() }
+        ${ state.me ? renderCommentComposer() : '' }
+      </div>
+    </div>
+  `;
+}
+
+function renderFriendGrid(u, top8){
+  if (!top8 || !top8.length) {
+    return `<div class="muted" style="padding:14px;text-align:center;">No top friends yet. ${state.isOwner ? 'Add some friends and they show up here automatically based on who you talk to most.' : esc(u.name||'they') + ' haven\'t made friends here yet.'}</div>`;
+  }
+  // top8 may be {email,name,avatar} or strings
+  const cells = top8.slice(0, 12).map(f => {
+    if (typeof f === 'string') {
+      return { email:f, name:f.split('@')[0], avatar:'', handle:'' };
+    }
+    return { email:f.email||'', name:f.name||'?', avatar:f.avatar||'', handle:f.handle||'' };
+  });
+  return `<div class="friend-grid">${
+    cells.map(c => `
+      <div class="friend-cell">
+        <a class="av" href="${c.handle ? '/u/'+esc(c.handle) : '/?h='+esc(c.email)}">
+          ${ c.avatar ? `<img src="${esc(c.avatar)}" alt="${esc(c.name)}" />`
+                      : `<div class="ini">${esc(initials(c.name))}</div>` }
+        </a>
+        <a class="nm" href="${c.handle ? '/u/'+esc(c.handle) : '/?h='+esc(c.email)}">${esc(c.name)}</a>
+      </div>`).join('')
+  }</div>`;
+}
+
+function renderCommentList(){
+  if (!state.comments.length) {
+    return `<div class="muted" style="padding:10px;text-align:center;">No comments yet. Be the first to leave one.</div>`;
+  }
+  return `<ul class="comment-list">${
+    state.comments.slice(0, 25).map(c => {
+      const canDel = state.me && (
+        (c.authorEmail && c.authorEmail.toLowerCase() === state.me.email.toLowerCase()) ||
+        state.isOwner
+      );
+      return `<li>
+        <div class="cav">
+          <div class="ini">${esc(initials(c.authorName||'?'))}</div>
+        </div>
+        <div class="cbody">
+          <div>
+            <span class="cname">${esc(c.authorName || 'anonymous')}</span>
+            <span class="ctime">${esc(fmtRelative(c.createdAt))}</span>
+            ${ canDel ? `<a class="cdel" href="#" data-del="${esc(c.id)}">[delete]</a>` : '' }
+          </div>
+          <div class="ctext">${esc(c.text||'')}</div>
+        </div>
+      </li>`;
+    }).join('')
+  }</ul>`;
+}
+
+function renderCommentComposer(){
+  if (state.isOwner) {
+    return `
+      <div class="comment-composer">
+        <textarea id="comment-text" placeholder="Leave a note on your own wall..."></textarea>
+        <div class="row">
+          <label><input type="checkbox" id="comment-anon" /> post anonymously</label>
+          <button id="comment-post">Post Comment</button>
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="comment-composer">
+      <textarea id="comment-text" placeholder="Add Comment to ${esc((state.profile.name||'').split(' ')[0])}'s Profile..."></textarea>
+      <div class="row">
+        <label><input type="checkbox" id="comment-anon" /> post anonymously</label>
+        <button id="comment-post">Post Comment</button>
+      </div>
+    </div>`;
+}
+
+/* =========================================================
+   WIRING  -  LEFT COLUMN
+   ========================================================= */
+function wireLeftCol(){
+  if (state.isOwner) {
+    // photo change
+    const pc = document.getElementById('photo-change');
+    if (pc) pc.addEventListener('click', triggerPhotoChange);
+    const photo = document.getElementById('profile-photo');
+    if (photo) photo.addEventListener('click', () => {
+      if (state.isOwner) triggerPhotoChange();
+    });
+
+    // inline editables  -  bind any element with class "editable" inside left
+    document.querySelectorAll('#content-root .editable').forEach(el => {
+      el.addEventListener('click', () => beginInlineEdit(el));
+    });
+  }
+
+  // copy URL
+  const copy = document.getElementById('copy-url');
+  if (copy) copy.addEventListener('click', (e) => {
+    e.preventDefault();
+    const url = (location.hostname || 'oldstreets.org') + '/u/' + (state.profile.handle||'');
+    try {
+      navigator.clipboard.writeText(url);
+      copy.textContent = '[Copied!]';
+      setTimeout(()=>{ copy.textContent = '[Copy]'; }, 1500);
+    } catch(_){
+      window.prompt('Copy this URL:', url);
+    }
+  });
+
+  // contacting widget actions
+  bindAction('act-send-msg',   openSendMessageModal);
+  bindAction('act-forward',    openForwardModal);
+  bindAction('act-add-friend', addFriend);
+  bindAction('act-favorite',   toggleFavorite);
+  bindAction('act-im',         openImModal);
+  bindAction('act-block',      blockUser);
+  bindAction('act-group',      openGroupPickerModal);
+  bindAction('act-rank',       openRankModal);
+}
+
+function bindAction(id, fn){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (el.classList.contains('disabled')) {
+      alert("This action is locked until you finish onboarding.");
+      return;
+    }
+    fn();
+  });
+}
+
+/* =========================================================
+   WIRING  -  RIGHT COLUMN
+   ========================================================= */
+function wireRightCol(){
+  if (state.isOwner) {
+    document.querySelectorAll('#content-root .blurb-text.editable, #content-root .details-tbl .val.editable, #content-root .interests-tbl .val.editable')
+      .forEach(el => {
+        el.addEventListener('click', () => beginInlineEdit(el));
+      });
+
+    const t8 = document.getElementById('edit-top8');
+    if (t8) t8.addEventListener('click', (e)=>{ e.preventDefault(); openTop8Picker(); });
+
+    const ss = document.getElementById('song-save-btn');
+    if (ss) ss.addEventListener('click', saveSong);
+    const sc = document.getElementById('song-clear-btn');
+    if (sc) sc.addEventListener('click', (e)=>{ e.preventDefault(); clearSong(); });
+  }
+
+  // comment composer
+  const post = document.getElementById('comment-post');
+  if (post) post.addEventListener('click', postComment);
+
+  // delete-comment buttons
+  document.querySelectorAll('[data-del]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = a.getAttribute('data-del');
+      deleteComment(id);
+    });
+  });
+}
+
+/* =========================================================
+   INLINE EDIT
+   ========================================================= */
+async function beginInlineEdit(el){
+  if (el.dataset.editing) return;
+  el.dataset.editing = '1';
+  const field = el.dataset.field;
+  const current = readFieldValue(field) || '';
+  const isLong  = (field === 'aboutMe' || field === 'whoIdLikeToMeet' || /^interests\./.test(field));
+  const input = document.createElement(isLong ? 'textarea' : 'input');
+  input.className = isLong ? 'inline-textarea' : 'inline-input';
+  if (!isLong) input.type = 'text';
+  input.value = current;
+  const savedHtml = el.innerHTML;
+  el.innerHTML = '';
+  el.appendChild(input);
+  input.focus();
+  if (typeof input.select === 'function') input.select();
+
+  function finish(commit){
+    if (!el.dataset.editing) return;
+    delete el.dataset.editing;
+    const val = input.value;
+    if (!commit) {
+      el.innerHTML = savedHtml;
+      return;
+    }
+    saveField(field, val)
+      .then(() => {
+        // re-render that one element with the new text
+        if (!val.trim()) el.innerHTML = `<span class="muted">(empty)</span>`;
+        else el.innerHTML = esc(val);
+      })
+      .catch(err => {
+        alert('Save failed: '+err.message);
+        el.innerHTML = savedHtml;
+      });
+  }
+  input.addEventListener('blur', () => finish(true));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    if (e.key === 'Enter' && !isLong) { e.preventDefault(); finish(true); }
+  });
+}
+
+function readFieldValue(field){
+  const u = state.profile;
+  if (!field) return '';
+  if (field.indexOf('interests.') === 0) {
+    const sub = field.split('.')[1];
+    return parseInterests(u)[sub] || '';
+  }
+  return u[field] || '';
+}
+
+async function saveField(field, val){
+  const u = state.profile;
+  if (!field) return;
+
+  if (field.indexOf('interests.') === 0) {
+    const sub = field.split('.')[1];
+    const cur = parseInterests(u);
+    cur[sub] = val;
+    if (sub === 'heroes') {
+      // server stores heroes as its own field too
+      await api('POST', '/api/users/me', { heroes: val, interests: serializeInterests(cur) });
+      u.heroes = val;
+    } else {
+      await api('POST', '/api/users/me', { interests: serializeInterests(cur) });
+    }
+    u.interests = serializeInterests(cur);
+    return;
+  }
+
+  // Simple top-level fields the server already knows
+  const known = {
+    headline:'headline',
+    aboutMe:'aboutMe',
+    whoIdLikeToMeet:'whoIdLikeToMeet'   // optional, may be ignored server-side
+  };
+  if (known[field]) {
+    const payload = {};
+    payload[known[field]] = val;
+    try {
+      await api('POST', '/api/users/me', payload);
+    } catch (e) {
+      // tolerant: server may not know whoIdLikeToMeet  -  stash via aboutMe addendum
+      if (field === 'whoIdLikeToMeet') {
+        // fallback: persist as part of aboutMe with a separator
+        // STUB: server doesn't have a `whoIdLikeToMeet` field. Stored client-side
+        // in profile object only; will not persist across reloads until the
+        // server adds it. Recommended endpoint enhancement noted in the report.
+        try { localStorage.setItem('os.whoIdLikeToMeet.'+u.handle, val); } catch(_){}
+      } else { throw e; }
+    }
+    u[field] = val;
+    return;
+  }
+
+  // Extended profile fields that the server doesn't currently persist  - 
+  // STUB: client-side only via localStorage scoped to handle. Server route
+  // /api/users/me only persists a known whitelist; these would need to be
+  // added there to persist.
+  const extendedFields = new Set([
+    'gender','age','city','state','country',
+    'relationshipStatus','hereFor','hometown','orientation','bodyType',
+    'ethnicity','zodiac','children','vices','education','occupation','income','religion'
+  ]);
+  if (extendedFields.has(field)) {
+    u[field] = val;
+    try {
+      const key = 'os.extprofile.'+u.handle;
+      const blob = JSON.parse(localStorage.getItem(key) || '{}');
+      blob[field] = val;
+      localStorage.setItem(key, JSON.stringify(blob));
+    } catch(_){}
+    // Attempt server save too  -  server will ignore unknown fields.
+    try { await api('POST', '/api/users/me', { [field]: val }); } catch(_){}
+    return;
+  }
+
+  // unknown field
+  console.warn('unknown field save:', field);
+}
+
+/* Load extended-profile blob from localStorage at boot */
+function hydrateExtended(){
+  const u = state.profile;
+  if (!u || !u.handle) return;
+  try {
+    const blob = JSON.parse(localStorage.getItem('os.extprofile.'+u.handle) || '{}');
+    Object.keys(blob).forEach(k => { if (!u[k]) u[k] = blob[k]; });
+    const wm = localStorage.getItem('os.whoIdLikeToMeet.'+u.handle);
+    if (wm && !u.whoIdLikeToMeet) u.whoIdLikeToMeet = wm;
+  } catch(_){}
+}
+
+/* =========================================================
+   PHOTO UPLOAD  -  downscale via canvas, cap ~800KB
+   ========================================================= */
+function triggerPhotoChange(){
+  if (!state.isOwner) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.addEventListener('change', () => {
+    if (input.files && input.files[0]) handlePhotoFile(input.files[0]);
+  });
+  input.click();
+}
+function handlePhotoFile(file){
+  if (!/^image\//.test(file.type)) { alert('Pick an image.'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 480;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else      { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      let q = 0.85;
+      let data = cv.toDataURL('image/jpeg', q);
+      while (data.length > 800*1024 && q > 0.3) {
+        q -= 0.1;
+        data = cv.toDataURL('image/jpeg', q);
+      }
+      saveAvatar(data);
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+async function saveAvatar(dataUri){
+  try {
+    await api('PUT', '/api/users/me', { avatar: dataUri });
+    state.profile.avatar = dataUri;
+    if (state.me) state.me.avatar = dataUri;
+    // re-render photo
+    const photo = document.getElementById('profile-photo');
+    if (photo) {
+      photo.innerHTML = `<img src="${esc(dataUri)}" alt="" />` +
+        `<div class="change editable" id="photo-change">Change Photo</div>`;
+      document.getElementById('photo-change').addEventListener('click', triggerPhotoChange);
+    }
+  } catch(e){
+    alert('Photo upload failed: '+e.message);
+  }
+}
+
+/* =========================================================
+   CONTACTING ACTIONS
+   ========================================================= */
+
+/* --- Send Message: opens a modal that POSTs to /api/dm/with/:email --- */
+function openSendMessageModal(){
+  const u = state.profile;
+  openModal('Chat with '+(u.name||''), `
+    <div>Compose a message. They'll get it in their Inbox.</div>
+    <textarea id="dm-text" placeholder="say hi..."></textarea>
+    <div class="actions">
+      <button class="ghost" onclick="closeModal()">Cancel</button>
+      <button onclick="sendDm()">Send</button>
+    </div>
+  `);
+}
+window.sendDm = async function(){
+  const txt = (document.getElementById('dm-text').value || '').trim();
+  if (!txt) { alert('Empty message.'); return; }
+  try {
+    await api('POST', '/api/dm/with/'+encodeURIComponent(state.profile.email), { text: txt });
+    closeModal();
+    toast('Message sent.');
+  } catch(e){ alert('Couldn\'t send: '+e.message); }
+};
+
+/* --- Forward to Friend: just copy profile URL + offer share --- */
+function openForwardModal(){
+  const url = location.origin + '/u/' + (state.profile.handle||'');
+  openModal('Forward Profile', `
+    <div>Share this profile with a friend:</div>
+    <input type="text" id="fwd-url" value="${esc(url)}" readonly />
+    <div class="actions">
+      <button class="ghost" onclick="closeModal()">Close</button>
+      <button onclick="forwardCopy()">Copy Link</button>
+    </div>
+  `);
+}
+window.forwardCopy = function(){
+  const inp = document.getElementById('fwd-url');
+  inp.select();
+  try { navigator.clipboard.writeText(inp.value); } catch(_){ document.execCommand('copy'); }
+  toast('Link copied.');
+};
+
+/* --- Add to Friends --- */
+async function addFriend(){
+  const u = state.profile;
+  if (u.viewerSentFriendReq) {
+    toast("You've already sent them a request.");
+    return;
+  }
+  try {
+    await api('POST', '/api/friend-requests/send', { toEmail: u.email });
+    u.viewerSentFriendReq = true;
+    const link = document.getElementById('act-add-friend');
+    if (link) link.innerHTML = `<span class="contact-icon green">+</span>Friend Request Sent`;
+    toast('Friend request sent.');
+  } catch(e){
+    alert("Couldn't send friend request: "+e.message);
+  }
+}
+
+/* --- Add to Favorites (localStorage) --- */
+function toggleFavorite(){
+  const u = state.profile;
+  const key = 'os.favorites';
+  let favs = [];
+  try { favs = JSON.parse(localStorage.getItem(key) || '[]'); } catch(_){}
+  const ex = favs.findIndex(f => f.handle === u.handle);
+  if (ex >= 0) {
+    favs.splice(ex, 1);
+    toast('Removed from favorites.');
+  } else {
+    favs.push({ handle: u.handle, name: u.name, addedAt: Date.now() });
+    toast('Added to favorites!');
+  }
+  localStorage.setItem(key, JSON.stringify(favs));
+}
+
+/* --- Instant Message popup (full-thread DM modal) --- */
+async function openImModal(){
+  const u = state.profile;
+  openModal('IM with '+(u.name||''), `
+    <div class="dm-thread" id="im-thread">loading...</div>
+    <textarea id="im-text" placeholder="type a message and hit Enter"></textarea>
+    <div class="actions">
+      <button class="ghost" onclick="closeModal()">Close</button>
+      <button onclick="imSend()">Send</button>
+    </div>
+  `);
+  // pull history
+  try {
+    const r = await api('GET', '/api/dm/with/'+encodeURIComponent(u.email));
+    renderImThread(r.messages || []);
+  } catch(e){
+    document.getElementById('im-thread').innerHTML = `<span class="muted">${esc(e.message)}</span>`;
+  }
+  // wire Enter
+  const ta = document.getElementById('im-text');
+  if (ta) ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.imSend(); }
+  });
+}
+function renderImThread(msgs){
+  const el = document.getElementById('im-thread');
+  if (!el) return;
+  if (!msgs.length) { el.innerHTML = '<span class="muted">No history. Start the conversation.</span>'; return; }
+  const meEmail = state.me ? state.me.email.toLowerCase() : '';
+  el.innerHTML = msgs.map(m => {
+    const mine = (m.from||'').toLowerCase() === meEmail;
+    return `<div class="dm-msg${mine?' mine':''}"><b>${esc(mine ? 'me' : (m.fromName||'them'))}:</b> ${esc(m.text||'')}</div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+window.imSend = async function(){
+  const t = (document.getElementById('im-text').value || '').trim();
+  if (!t) return;
+  try {
+    await api('POST', '/api/dm/with/'+encodeURIComponent(state.profile.email), { text: t });
+    document.getElementById('im-text').value = '';
+    const r = await api('GET', '/api/dm/with/'+encodeURIComponent(state.profile.email));
+    renderImThread(r.messages || []);
+  } catch(e){ alert("Couldn't send: "+e.message); }
+};
+
+/* --- Block user (STUB  -  no /api/users/block exists) --- */
+function blockUser(){
+  const u = state.profile;
+  if (!confirm('Block '+u.name+'? They won\'t be able to message or comment on you.')) return;
+  // STUB: server has no /api/users/block endpoint. Stash locally.
+  try {
+    const key = 'os.blocks';
+    let blocks = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!blocks.includes(u.email)) blocks.push(u.email);
+    localStorage.setItem(key, JSON.stringify(blocks));
+  } catch(_){}
+  toast('Blocked locally. (server-side block coming soon)');
+}
+
+/* --- Add to Group: pick a group I'm in, then POST /api/groups/:id/members --- */
+async function openGroupPickerModal(){
+  openModal('Add '+(state.profile.name||'')+' to a Group', `
+    <div>Pick one of your groups:</div>
+    <div class="group-list" id="grp-list">loading...</div>
+    <div class="actions">
+      <button class="ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+  try {
+    // Server doesn't have a "my groups" list endpoint; we'll inspect inbox
+    const inbox = await api('GET', '/api/inbox');
+    const list = (inbox && inbox.groups) || (inbox && inbox.groupThreads) || [];
+    if (!list.length) {
+      document.getElementById('grp-list').innerHTML =
+        '<div class="gi muted">You aren\'t in any groups yet.</div>';
+      return;
+    }
+    document.getElementById('grp-list').innerHTML = list.map(g => `
+      <div class="gi" data-gid="${esc(g.id||g.groupId||'')}">
+        <b>${esc(g.name || 'group')}</b>
+        <span class="muted">(${esc((g.members||[]).length||g.memberCount||0)} members)</span>
+      </div>
+    `).join('');
+    document.querySelectorAll('#grp-list .gi[data-gid]').forEach(d => {
+      d.addEventListener('click', () => addToGroup(d.getAttribute('data-gid')));
+    });
+  } catch(e){
+    document.getElementById('grp-list').innerHTML =
+      '<div class="gi muted">Couldn\'t load your groups: '+esc(e.message)+'</div>';
+  }
+}
+async function addToGroup(gid){
+  if (!gid) return;
+  try {
+    await api('POST', '/api/groups/'+encodeURIComponent(gid)+'/members', { email: state.profile.email });
+    closeModal();
+    toast('Added to group.');
+  } catch(e){
+    alert("Couldn't add: "+e.message);
+  }
+}
+
+/* --- Rank user (STUB  -  localStorage, no server route) --- */
+function openRankModal(){
+  let cur = 0;
+  try {
+    const ranks = JSON.parse(localStorage.getItem('os.ranks') || '{}');
+    cur = ranks[state.profile.handle] || 0;
+  } catch(_){}
+  openModal('Rank '+(state.profile.name||''), `
+    <div>How do they rate?</div>
+    <div class="star-row" id="rank-stars">
+      <span data-n="1">★</span><span data-n="2">★</span><span data-n="3">★</span><span data-n="4">★</span><span data-n="5">★</span>
+    </div>
+    <div class="muted" id="rank-cur">Current: ${cur||'unrated'}</div>
+    <div class="actions">
+      <button class="ghost" onclick="closeModal()">Close</button>
+    </div>
+  `);
+  const stars = document.querySelectorAll('#rank-stars span');
+  function paint(n){ stars.forEach(s => s.classList.toggle('on', Number(s.dataset.n) <= n)); }
+  paint(cur);
+  stars.forEach(s => {
+    s.addEventListener('mouseenter', () => paint(Number(s.dataset.n)));
+    s.addEventListener('mouseleave', () => paint(cur));
+    s.addEventListener('click', () => {
+      cur = Number(s.dataset.n);
+      try {
+        const ranks = JSON.parse(localStorage.getItem('os.ranks') || '{}');
+        ranks[state.profile.handle] = cur;
+        localStorage.setItem('os.ranks', JSON.stringify(ranks));
+      } catch(_){}
+      document.getElementById('rank-cur').textContent = 'Saved: '+cur+' / 5';
+      paint(cur);
+      // STUB: no /api/rank endpoint exists; rank stored client-side only.
+    });
+  });
+}
+
+/* =========================================================
+   COMMENT COMPOSER
+   ========================================================= */
+async function postComment(){
+  const txt = (document.getElementById('comment-text').value || '').trim();
+  const anon = !!(document.getElementById('comment-anon') && document.getElementById('comment-anon').checked);
+  if (!txt) return;
+  try {
+    const item = await api('POST',
+      '/api/users/profile/'+encodeURIComponent(state.profile.email.toLowerCase())+'/board',
+      { text: txt, anon }
+    );
+    state.comments = [item].concat(state.comments);
+    // re-render just the comments widget body to keep things fast
+    const widget = document.querySelector('#content-root .comments-widget .body');
+    if (widget) {
+      widget.innerHTML = renderCommentList() + (state.me ? renderCommentComposer() : '');
+      // re-bind
+      const btn = document.getElementById('comment-post');
+      if (btn) btn.addEventListener('click', postComment);
+      document.querySelectorAll('[data-del]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          deleteComment(a.getAttribute('data-del'));
+        });
+      });
+    }
+    toast('Comment posted.');
+  } catch(e){
+    alert("Couldn't post: "+e.message);
+  }
+}
+
+async function deleteComment(id){
+  if (!confirm('Delete this comment?')) return;
+  try {
+    await api('DELETE', '/api/users/profile/'+encodeURIComponent(state.profile.email.toLowerCase())+'/board/'+encodeURIComponent(id));
+    state.comments = state.comments.filter(c => c.id !== id);
+    const widget = document.querySelector('#content-root .comments-widget .body');
+    if (widget) {
+      widget.innerHTML = renderCommentList() + (state.me ? renderCommentComposer() : '');
+      const btn = document.getElementById('comment-post');
+      if (btn) btn.addEventListener('click', postComment);
+      document.querySelectorAll('[data-del]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          deleteComment(a.getAttribute('data-del'));
+        });
+      });
+    }
+  } catch(e){
+    alert("Couldn't delete: "+e.message);
+  }
+}
+
+/* =========================================================
+   TOP 8 PICKER
+   ========================================================= */
+async function openTop8Picker(){
+  if (!state.isOwner) return;
+  // Need full friend list; whoami includes `friends` (emails)
+  const friends = (state.me && state.me.friends) || [];
+  if (!friends.length) {
+    alert("You don't have any friends yet to pick from.");
+    return;
+  }
+  // Resolve names via /api/u/:handle or directory  -  quick & dirty: just list emails
+  const current = new Set((state.profile.top8||[]).map(f => (f.email||f).toLowerCase()));
+  openModal('Edit Top 8', `
+    <div>Pick up to 8 friends to feature on your profile:</div>
+    <div class="group-list" id="t8-list" style="max-height:260px;">
+      ${ friends.map(em => `
+        <div class="gi">
+          <label style="cursor:pointer;display:block;">
+            <input type="checkbox" value="${esc(em)}" ${current.has((em||'').toLowerCase())?'checked':''} />
+            ${esc(em)}
+          </label>
+        </div>
+      `).join('') }
+    </div>
+    <div class="actions">
+      <button class="ghost" onclick="closeModal()">Cancel</button>
+      <button onclick="saveTop8()">Save</button>
+    </div>
+  `);
+}
+window.saveTop8 = async function(){
+  const picks = Array.from(document.querySelectorAll('#t8-list input:checked'))
+    .map(i => i.value).slice(0,8);
+  try {
+    await api('POST', '/api/users/me', { top8: picks });
+    closeModal();
+    toast('Top 8 saved. Reloading...');
+    setTimeout(()=>location.reload(), 500);
+  } catch(e){ alert("Couldn't save: "+e.message); }
+};
+
+/* =========================================================
+   SONG / MUSIC
+   ========================================================= */
+async function saveSong(){
+  const url = (document.getElementById('song-url-input').value || '').trim();
+  try {
+    await api('POST', '/api/users/me', { songUrl: url });
+    toast('Song saved. Reloading...');
+    setTimeout(()=>location.reload(), 500);
+  } catch(e){ alert(e.message); }
+}
+async function clearSong(){
+  try {
+    await api('POST', '/api/users/me', { songUrl: '' });
+    toast('Song cleared.');
+    setTimeout(()=>location.reload(), 500);
+  } catch(e){ alert(e.message); }
+}
+
+/* =========================================================
+   MODAL helpers
+   ========================================================= */
+function openModal(title, html){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-back').classList.add('on');
+}
+function closeModal(){
+  document.getElementById('modal-back').classList.remove('on');
+  document.getElementById('modal-body').innerHTML = '';
+}
+window.closeModal = closeModal;
+document.getElementById('modal-back').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-back') closeModal();
+});
+
+/* tiny toast */
+let toastTimer = null;
+function toast(msg){
+  let t = document.getElementById('os-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'os-toast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#000;color:#fff;padding:6px 12px;font-size:11px;z-index:9999;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = 'block';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.style.display = 'none', 2200);
+}
+
+/* sign out */
+document.getElementById('signout-link').addEventListener('click', async (e) => {
+  e.preventDefault();
+  try { await api('POST', '/api/auth/logout', {}); } catch(_){}
+  try {
+    localStorage.removeItem('os.token');
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('token');
+  } catch(_){}
+  location.href = '/';
+});
+
+/* search bar  -  punt to home page search */
+function doSearch(){
+  const q = (document.getElementById('topsearch').value || '').trim();
+  if (q) location.href = '/?q=' + encodeURIComponent(q);
+}
+window.doSearch = doSearch;
+
+/* =========================================================
+   GO
+   ========================================================= */
+boot().then(() => {
+  // After first render, re-hydrate extended profile values
+  if (state.profile) {
+    hydrateExtended();
+    // Re-render only the basic-info + details widgets to surface localStorage values
+    if (state.profile && !state.notFound) render();
+  }
+}).catch(err => {
+  console.error(err);
+  renderNotFound('Boot failed: '+esc(err.message));
+});
+</script>
+<script>
+(function(){ var t = localStorage.getItem("oldstreets-token") || sessionStorage.getItem("oldstreets-token"); if(!t) return;
+  fetch("/api/whoami", { headers: { "X-User-Token": t } }).then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); }).then(function(r){
+    if(!r.ok) return; var u = r.data && r.data.user; if(!u) return;
+    if(u.mustSpendInitialInvites === true && location.pathname !== "/gate.html") { location.replace("/gate.html"); }
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Groups · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">Groups</h1></div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">small private group chats · your starter crew is locked forever</span></div></div>
+
+  <div class="cols flip">
+    <div class="col col-left">
+      <div class="widget">
+        <div class="widget-title green"><span>+ Create Group</span></div>
+        <div class="widget-body">
+          <div class="form-row"><input id="new-name" type="text" maxlength="60" placeholder="group name"/></div>
+          <button class="btn wide" id="new-go">Create</button>
+        </div>
+      </div>
+      <div class="widget">
+        <div class="widget-title"><span>My Groups</span><span class="wt-right"><a href="#" id="refresh">refresh</a></span></div>
+        <div class="widget-body none" id="group-list"><div class="empty">loading…</div></div>
+      </div>
+    </div>
+    <div class="col col-center">
+      <div class="widget">
+        <div class="widget-title" id="active-head"><span>Pick a group on the left.</span></div>
+        <div class="widget-body" id="msgs" style="min-height:320px; max-height:60vh; overflow-y:auto;"><div class="empty">no group selected.</div></div>
+        <div class="widget-body" id="composer" style="display:none; border-top:1px solid var(--msp-rule); background:var(--msp-tint-2);">
+          <textarea id="msg-text" style="width:100%; height:50px; resize:vertical;" placeholder="say something…"></textarea>
+          <div class="row-flex" style="justify-content:flex-end; margin-top:6px;"><button class="btn" id="msg-send">Send</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function timeAgo(ts){ if(!ts) return ''; const s=Math.floor((Date.now()-ts)/1000); if(s<60) return s+'s'; if(s<3600) return Math.floor(s/60)+'m'; if(s<86400) return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+  async function api(path, opts){ opts=opts||{}; opts.headers=Object.assign({'Content-Type':'application/json','X-User-Token':TOKEN}, opts.headers||{}); const r=await fetch(path,opts); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||j.message||'http '+r.status); return j; }
+
+  let CURRENT = null, groups = [];
+  async function loadGroups(){
+    try { const data = await api('/api/groups'); groups = data.groups || data || []; render(); }
+    catch { $('group-list').innerHTML = '<div class="empty">could not load.</div>'; }
+  }
+  function render(){
+    if (!groups.length) { $('group-list').innerHTML = '<div class="empty">no groups yet. create one above.</div>'; return; }
+    $('group-list').innerHTML = groups.map(g => `
+      <div class="os-row${CURRENT && CURRENT.id===g.id?' active':''}" data-id="${esc(g.id)}" style="cursor:pointer;">
+        <div class="avatar" style="width:32px; height:32px; font-size:12px;">${esc((g.name||'?').slice(0,2).toUpperCase())}</div>
+        <div class="body">
+          <div class="name">${esc(g.name||'group')}${g.locked?' 🔒':''}</div>
+          <div class="ts">${(g.members||[]).length} members</div>
+        </div>
+      </div>`).join('');
+    document.querySelectorAll('#group-list .os-row').forEach(r => r.addEventListener('click', () => openGroup(r.dataset.id)));
+  }
+  async function openGroup(id){
+    CURRENT = groups.find(g => g.id===id); if (!CURRENT) return;
+    render();
+    $('active-head').innerHTML = `<span><b>${esc(CURRENT.name)}${CURRENT.locked?' 🔒':''}</b></span><span class="wt-right">${(CURRENT.members||[]).length} members</span>`;
+    $('msgs').innerHTML = '<div class="empty">loading…</div>';
+    $('composer').style.display = '';
+    try {
+      const data = await api('/api/groups/' + encodeURIComponent(id));
+      const g = data.group || data;
+      const msgs = g.messages || [];
+      if (!msgs.length) { $('msgs').innerHTML = '<div class="empty">no messages yet. say hi.</div>'; return; }
+      $('msgs').innerHTML = msgs.map(m => {
+        if (m.system || m.from === 'system' || m.from === '__system__') {
+          return `<div style="padding:6px 8px; margin:4px 0; background:#fff7c2; border:1px solid #d4b243; font-size:11px; font-style:italic; color:#666;">${esc(m.text)}</div>`;
+        }
+        return `<div style="padding:4px 0; border-bottom:1px dotted var(--msp-rule-l); font-size:11px;">
+          <b style="color:var(--msp-blue-d);">${esc(m.fromName||m.from||'?')}</b>
+          <span style="margin-left:4px;">${esc(m.text||'')}</span>
+          <span style="color:#888; font-size:10px; margin-left:6px;">${esc(timeAgo(m.createdAt))} ago</span>
+        </div>`;
+      }).join('');
+      $('msgs').scrollTop = $('msgs').scrollHeight;
+    } catch (e) { $('msgs').innerHTML = '<div class="empty">'+esc(e.message)+'</div>'; }
+  }
+  $('msg-send').addEventListener('click', async () => {
+    if (!CURRENT) return;
+    const t = $('msg-text').value.trim(); if (!t) return;
+    $('msg-send').disabled = true;
+    try { await api('/api/groups/'+encodeURIComponent(CURRENT.id)+'/message', { method:'POST', body: JSON.stringify({ text: t }) }); $('msg-text').value=''; openGroup(CURRENT.id); }
+    catch (e) { alert(e.message); }
+    finally { $('msg-send').disabled = false; }
+  });
+  $('msg-text').addEventListener('keydown', e => { if (e.key==='Enter' && (e.metaKey||e.ctrlKey)) { e.preventDefault(); $('msg-send').click(); } });
+  $('new-go').addEventListener('click', async () => {
+    const n = $('new-name').value.trim(); if (!n) return;
+    try { await api('/api/groups', { method:'POST', body: JSON.stringify({ name: n }) }); $('new-name').value=''; loadGroups(); }
+    catch (e) { alert(e.message); }
+  });
+  $('refresh').addEventListener('click', e => { e.preventDefault(); loadGroups(); });
+  loadGroups();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin · Paths</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/chrome.css">
+<script src="/chrome.js?v=20260514a" defer></script>
+<style>
+  html, body { overflow-y: auto !important; height: auto !important; }
+  body { padding-bottom: 40px; }
+  .adm-page { max-width: 1080px; margin: 12px auto; padding: 0 10px; }
+  .adm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; padding: 10px; }
+  .stat { background: var(--msp-tint-2); border: 1px solid var(--msp-rule); padding: 8px 10px; }
+  .stat b { font-size: 18px; color: var(--msp-blue-d); display: block; }
+  .stat span { font-size: 10px; color: var(--msp-mute); text-transform: uppercase; letter-spacing: 0.04em; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px dotted var(--msp-rule-l); font-size: 12px; }
+  .row:last-child { border-bottom: 0; }
+  .row .nm { flex: 1; font-weight: 700; }
+  .row .meta { color: var(--msp-mute); font-size: 10px; }
+  .row button { padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: inherit; }
+  .btn-approve { background: #1a4f1a; color: #fff; border: 1px solid #0d3a0d; }
+  .btn-reject { background: #eee; color: #a73838; border: 1px solid #ccc; }
+  .btn-view { background: var(--msp-blue); color: #fff; border: 1px solid var(--msp-blue-d); }
+  .broadcast textarea { width: 100%; box-sizing: border-box; font-family: inherit; font-size: 12px; padding: 6px; border: 1px solid var(--msp-rule); }
+  .broadcast button { margin-top: 6px; padding: 6px 12px; background: var(--msp-blue); color: #fff; border: 1px solid var(--msp-blue-d); cursor: pointer; }
+  .nope { padding: 40px; text-align: center; }
+  .nope h1 { color: var(--msp-red); margin: 0 0 8px; }
+  table.invites { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  table.invites th, table.invites td { padding: 5px 8px; border-bottom: 1px dotted var(--msp-rule-l); text-align: left; }
+  table.invites th { background: var(--msp-tint-2); font-weight: 700; }
+  table.invites td a { color: var(--msp-blue-d); font-weight: 700; }
+  .act-row { display: flex; gap: 8px; padding: 5px 10px; border-bottom: 1px dotted var(--msp-rule-l); font-size: 12px; }
+  .act-row .ts { color: var(--msp-mute); font-size: 10px; min-width: 70px; }
+  .act-row .kind { font-size: 9px; padding: 1px 5px; background: var(--msp-tint-2); border: 1px solid var(--msp-rule-l); border-radius: 1px; min-width: 50px; text-align: center; }
+  .modal-back {
+    position: fixed; inset: 0; background: rgba(8,12,24,0.6); z-index: 9999;
+    display: flex; align-items: flex-start; justify-content: center; padding: 30px 10px; overflow-y: auto;
+  }
+  .modal-card { background: #fff; max-width: 720px; width: 100%; border: 1px solid var(--msp-blue-d); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .modal-card .head { background: var(--msp-blue); color: #fff; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
+  .modal-card .head a { color: #fff; font-size: 11px; }
+  .modal-card .body { padding: 0; max-height: 70vh; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<div class="adm-page">
+
+  <div class="hello-bar"><h1 class="hello-h1">⚙ Admin Dashboard</h1></div>
+
+  <div id="bouncer" class="widget" style="display:none;">
+    <div class="widget-body nope">
+      <h1>404 · not found</h1>
+      <p style="color: var(--msp-mute); font-size: 11px;">this URL does not exist for your account.</p>
+    </div>
+  </div>
+
+  <div id="admin-app" style="display:none;">
+
+    <div class="widget">
+      <div class="widget-title"><span>📊 Live stats</span><span class="wt-right"><a href="#" id="refresh-stats">refresh</a></span></div>
+      <div class="widget-body">
+        <div class="adm-grid">
+          <div class="stat"><b id="s-total">—</b><span>total users</span></div>
+          <div class="stat"><b id="s-active">—</b><span>active</span></div>
+          <div class="stat"><b id="s-waitlist">—</b><span>waitlist</span></div>
+          <div class="stat"><b id="s-banned">—</b><span>banned</span></div>
+          <div class="stat"><b id="s-admins">—</b><span>admins</span></div>
+          <div class="stat"><b id="s-online">—</b><span>online now</span></div>
+          <div class="stat"><b id="s-newtoday">—</b><span>new today</span></div>
+          <div class="stat"><b id="s-newweek">—</b><span>new this week</span></div>
+          <div class="stat"><b id="s-posts">—</b><span>posts total</span></div>
+          <div class="stat"><b id="s-posts-today">—</b><span>posts today</span></div>
+          <div class="stat"><b id="s-dms">—</b><span>chats sent</span></div>
+          <div class="stat"><b id="s-views">—</b><span>profile views</span></div>
+          <div class="stat"><b id="s-frpending">—</b><span>friend req pending</span></div>
+          <div class="stat"><b id="s-invsent">—</b><span>invites sent</span></div>
+          <div class="stat"><b id="s-invclaimed">—</b><span>invites claimed</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title"><span>🟢 Online right now</span><span class="wt-right" id="online-ct"></span></div>
+      <div class="widget-body" id="online-list-body">
+        <div style="padding:10px; color: var(--msp-mute); font-style: italic;">loading…</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title"><span>⏳ Waitlist</span><span class="wt-right">auto-approves 1-5h after signup</span></div>
+      <div class="widget-body" id="wl-body">
+        <div style="padding:10px; color: var(--msp-mute); font-style: italic;">loading…</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title"><span>🌳 Invite tracker</span><span class="wt-right"><span id="inv-ct" style="font-size:10px;color:#eef;"></span></span></div>
+      <div class="widget-body" id="inv-body" style="max-height: 360px; overflow-y: auto; padding: 0;">
+        <div style="padding:10px; color: var(--msp-mute); font-style: italic;">loading…</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title"><span>👥 Members</span><span class="wt-right">click "log" to see their activity</span></div>
+      <div class="widget-body" id="members-body" style="max-height: 480px; overflow-y: auto; padding: 0;">
+        <div style="padding:10px; color: var(--msp-mute); font-style: italic;">loading…</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title"><span>📣 Broadcast notification</span></div>
+      <div class="widget-body broadcast">
+        <p style="font-size:11px; color:var(--msp-mute); margin:0 0 6px; padding: 6px 10px 0;">sends a push notif to every active member.</p>
+        <div style="padding: 0 10px 10px;">
+          <textarea id="bcast" rows="3" placeholder="message…"></textarea>
+          <button id="bcast-send">Send to everyone</button>
+          <span id="bcast-status" style="margin-left:8px; font-size:11px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title"><span>🚧 Pause site</span></div>
+      <div class="widget-body">
+        <p style="font-size:11px; color:var(--msp-mute); margin:0 0 6px; padding: 6px 10px 0;">show a holding page to all non-admin users.</p>
+        <div style="display:flex; gap:6px; align-items:center; padding: 0 10px 10px;">
+          <button id="pause-on">Pause</button>
+          <button id="pause-off">Resume</button>
+          <span id="pause-status" style="font-size:11px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-title"><span>🔧 Quick actions</span></div>
+      <div class="widget-body" style="display:flex; flex-direction:column; gap:4px; padding: 8px 10px;">
+        <a href="/api/admin/waitlist" target="_blank">↗ raw waitlist JSON</a>
+        <a href="/api/admin/invite-tree" target="_blank">↗ raw invite tree JSON</a>
+        <a href="/api/admin/stats" target="_blank">↗ raw stats JSON</a>
+        <a href="/members.html">↗ members directory</a>
+        <a href="/" >↗ home</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(async function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token') || '';
+  const $ = id => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function ago(ts){ if(!ts) return 'never'; const s=Math.floor((Date.now()-ts)/1000); if(s<60)return s+'s ago'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+
+  if (!TOKEN) { $('bouncer').style.display=''; return; }
+  let me;
+  try {
+    const r = await fetch('/api/whoami', { headers: { 'X-User-Token': TOKEN } });
+    if (!r.ok) { $('bouncer').style.display=''; return; }
+    const j = await r.json();
+    me = j.user || j;
+  } catch { $('bouncer').style.display=''; return; }
+  const h = (me.handle || '').toLowerCase();
+  const e = (me.email || '').toLowerCase();
+  const isOrion = me.isAdmin && (h === 'orionjones' || h === 'orion' || e === 'orionjones99@gmail.com' || me.name === 'orion jones');
+  if (!isOrion) { $('bouncer').style.display=''; return; }
+  $('admin-app').style.display = '';
+
+  async function api(path, opts) {
+    opts = opts || {};
+    const headers = Object.assign({ 'Content-Type': 'application/json', 'X-User-Token': TOKEN }, opts.headers || {});
+    const r = await fetch(path, { method: opts.method || 'GET', headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    const text = await r.text();
+    let j; try { j = text ? JSON.parse(text) : {}; } catch { j = { _raw: text }; }
+    if (!r.ok) throw new Error(j.error || ('http ' + r.status));
+    return j;
+  }
+
+  async function loadOnlineList() {
+    try {
+      const d = await api('/api/online');
+      const list = d.users || [];
+      $('online-ct').textContent = list.length + ' online';
+      $('online-list-body').innerHTML = list.length ? list.map(u => `<div class="row">
+        <span style="display:inline-block;width:10px;height:10px;background:#1a9b1a;border-radius:50%;"></span>
+        <span class="nm">${u.handle ? `<a href="/u/${esc(u.handle)}">${esc(u.name)}</a>` : esc(u.name)}</span>
+        <span class="meta">${esc(u.activity || 'online')}${u.activityKind ? ' · '+esc(u.activityKind) : ''} · ${ago(u.activityAt)}</span>
+      </div>`).join('') : '<div style="padding:10px; color:var(--msp-mute); font-style:italic;">nobody online right now.</div>';
+    } catch (err) { $('online-list-body').innerHTML = '<div style="padding:10px;color:var(--msp-red);">'+esc(err.message)+'</div>'; }
+  }
+
+  async function loadStats() {
+    try {
+      const s = await api('/api/admin/stats');
+      $('s-total').textContent = s.users.total;
+      $('s-active').textContent = s.users.active;
+      $('s-waitlist').textContent = s.users.waitlist;
+      $('s-banned').textContent = s.users.banned;
+      $('s-admins').textContent = s.users.admins;
+      $('s-newtoday').textContent = s.users.newToday;
+      $('s-newweek').textContent = s.users.newThisWeek;
+      $('s-online').textContent = s.online.uniqueNow;
+      $('s-posts').textContent = s.posts.total;
+      $('s-posts-today').textContent = s.posts.today;
+      $('s-dms').textContent = s.dms.total;
+      $('s-views').textContent = s.profileViews.total;
+      $('s-frpending').textContent = s.friendRequests.pending;
+      $('s-invsent').textContent = s.invites.sent;
+      $('s-invclaimed').textContent = s.invites.claimed;
+    } catch (err) { console.warn(err); }
+  }
+
+  async function loadWaitlist() {
+    try {
+      const wl = await api('/api/admin/waitlist');
+      const list = wl.waitlist || [];
+      if (!list.length) {
+        $('wl-body').innerHTML = '<div style="padding:10px; color:var(--msp-mute); font-style:italic;">empty. (anyone who joins auto-approves in 1–5h.)</div>';
+        return;
+      }
+      $('wl-body').innerHTML = list.map(u => `<div class="row" data-id="${esc(u.id)}">
+        <span class="nm">${esc(u.name)}</span>
+        <span class="meta">${esc(u.schoolName||'')}${u.gradYear ? ' · '+esc(u.gradYear) : ''} · ${ago(u.waitlistedAt)}${u.vouched ? ' · ✓ vouched' : ''}</span>
+        <button class="btn-approve" data-act="approve">✓ let in</button>
+        <button class="btn-reject" data-act="reject">✗ reject</button>
+      </div>`).join('');
+      $('wl-body').querySelectorAll('button').forEach(b => {
+        b.addEventListener('click', async () => {
+          const row = b.closest('.row');
+          const id = row.dataset.id;
+          const act = b.dataset.act;
+          b.disabled = true; b.textContent = '…';
+          try {
+            await api('/api/admin/waitlist/' + act, { method: 'POST', body: { userId: id } });
+            row.remove();
+            loadStats();
+          } catch (err) { b.disabled = false; b.textContent = act; alert(err.message); }
+        });
+      });
+    } catch (err) { $('wl-body').innerHTML = '<div style="padding:10px; color:var(--msp-red);">'+esc(err.message)+'</div>'; }
+  }
+
+  async function loadInviteTree() {
+    try {
+      const d = await api('/api/admin/invite-tree');
+      const list = d.users || [];
+      const totSent = list.reduce((s,u)=>s+u.invitesSent,0);
+      const totClaim = list.reduce((s,u)=>s+u.invitesClaimed,0);
+      $('inv-ct').textContent = totSent + ' sent · ' + totClaim + ' claimed';
+      $('inv-body').innerHTML = `<table class="invites">
+        <tr><th>User</th><th>Status</th><th>Joined</th><th>Sent</th><th>Claimed</th><th>Invited by</th></tr>
+        ${list.map(u => `<tr>
+          <td>${u.handle ? `<a href="/u/${esc(u.handle)}">${esc(u.name)}</a>` : esc(u.name)} <span style="color:#888;">@${esc(u.handle||'-')}</span></td>
+          <td>${esc(u.status)}</td>
+          <td>${ago(u.createdAt)}</td>
+          <td>${u.invitesSent}</td>
+          <td>${u.invitesClaimed}</td>
+          <td>${u.invitedBy ? `<a href="/u/${esc(u.invitedBy.handle||'')}">${esc(u.invitedBy.name)}</a>` : '<span style="color:#aaa;">—</span>'}</td>
+        </tr>`).join('')}
+      </table>`;
+    } catch (err) { $('inv-body').innerHTML = '<div style="padding:10px; color:var(--msp-red);">'+esc(err.message)+'</div>'; }
+  }
+
+  async function loadMembers() {
+    try {
+      const d = await api('/api/members?limit=500');
+      const list = d.members || [];
+      $('members-body').innerHTML = list.map(u => `<div class="row" data-handle="${esc(u.handle||'')}">
+        <span class="nm">${u.handle ? `<a href="/u/${esc(u.handle)}">${esc(u.name)}</a>` : esc(u.name)}</span>
+        <span class="meta">${u.online ? '🟢 online · ' : ''}${u.isAdmin ? '👑 admin · ' : ''}@${esc(u.handle||'-')} · seen ${ago(u.lastSeen)}</span>
+        <button class="btn-view" data-act="log">📋 log</button>
+      </div>`).join('');
+      $('members-body').querySelectorAll('button[data-act="log"]').forEach(b => {
+        b.addEventListener('click', () => openActivityModal(b.closest('.row').dataset.handle));
+      });
+    } catch (err) { $('members-body').innerHTML = '<div style="padding:10px; color:var(--msp-red);">'+esc(err.message)+'</div>'; }
+  }
+
+  async function openActivityModal(handle) {
+    if (!handle) return;
+    let d;
+    try { d = await api('/api/admin/user/' + encodeURIComponent(handle) + '/activity'); }
+    catch (err) { alert(err.message); return; }
+    const u = d.user;
+    const acts = d.activity || [];
+    const c = d.counts || {};
+    const kindBadge = (k) => `<span class="kind">${esc(k||'-')}</span>`;
+    const back = document.createElement('div');
+    back.className = 'modal-back';
+    back.innerHTML = `<div class="modal-card">
+      <div class="head">
+        <span>📋 ${esc(u.name)} <small style="font-weight:normal; opacity:0.85;">@${esc(u.handle||'-')} · ${esc(u.status)}${u.isAdmin ? ' · admin' : ''}</small></span>
+        <a href="#" id="m-close">close ✕</a>
+      </div>
+      <div class="body">
+        <div style="padding:10px 12px; background:var(--msp-tint-2); border-bottom:1px solid var(--msp-rule-l); font-size:11px;">
+          <b>${c.posts||0}</b> posts ·
+          <b>${c.comments||0}</b> comments ·
+          <b>${c.dmsSent||0}</b> chats sent ·
+          <b>${c.dmsReceived||0}</b> chats received ·
+          <b>${c.profileViews||0}</b> profiles viewed ·
+          <b>${c.friends||0}</b> friends ·
+          <b>${c.invitedCount||0}</b>/<b>${c.invitedCount + (c.pendingInvites||0)}</b> invites claimed
+        </div>
+        ${acts.length ? acts.map(a => `<div class="act-row">
+          <span class="ts">${ago(a.ts)}</span>
+          ${kindBadge(a.kind)}
+          <span style="flex:1;">${esc(a.label||'')}</span>
+        </div>`).join('') : '<div style="padding:30px; text-align:center; color:var(--msp-mute);">no activity recorded yet.</div>'}
+      </div>
+    </div>`;
+    back.addEventListener('click', (e) => { if (e.target === back) back.remove(); });
+    document.body.appendChild(back);
+    document.getElementById('m-close').addEventListener('click', (e) => { e.preventDefault(); back.remove(); });
+  }
+
+  $('refresh-stats').addEventListener('click', e => { e.preventDefault(); loadStats(); loadWaitlist(); loadInviteTree(); loadMembers(); loadOnlineList(); });
+
+  $('bcast-send').addEventListener('click', async () => {
+    const text = $('bcast').value.trim();
+    if (!text) return;
+    const btn = $('bcast-send'); btn.disabled = true; btn.textContent = 'sending…';
+    try {
+      await api('/api/admin/broadcast', { method: 'POST', body: { text } });
+      $('bcast-status').textContent = '✓ sent';
+      $('bcast').value = '';
+    } catch (err) { $('bcast-status').textContent = '✗ ' + err.message; }
+    btn.disabled = false; btn.textContent = 'Send to everyone';
+  });
+
+  $('pause-on').addEventListener('click', async () => {
+    try { await api('/api/admin/pause', { method: 'POST', body: { paused: true, message: 'we\'ll be right back.' } }); $('pause-status').textContent = '⏸ paused'; }
+    catch (err) { $('pause-status').textContent = '✗ ' + err.message; }
+  });
+  $('pause-off').addEventListener('click', async () => {
+    try { await api('/api/admin/pause', { method: 'POST', body: { paused: false } }); $('pause-status').textContent = '▶ live'; }
+    catch (err) { $('pause-status').textContent = '✗ ' + err.message; }
+  });
+
+  loadStats(); loadWaitlist(); loadInviteTree(); loadMembers(); loadOnlineList();
+  setInterval(loadStats, 30000);
+  setInterval(loadWaitlist, 60000);
+  setInterval(loadOnlineList, 15000);
+})();
+</script>
+</body>
+</html>

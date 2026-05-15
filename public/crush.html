@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Letters · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">💌 Letters</h1></div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">anonymous letters · end-to-end private · <b>not even admin can read them</b></span></div></div>
+
+  <div class="cols two">
+    <div class="col col-center">
+      <div class="widget">
+        <div class="widget-title red"><span>Write an anonymous letter</span></div>
+        <div class="widget-body">
+          <p><b>This is fully anonymous.</b> The recipient is never told who sent the letter. Paths staff cannot read your letter — only the recipient sees its contents. There is no log, no audit, no admin access.</p>
+          <div class="form-row">
+            <label>To (@handle or name)</label>
+            <input id="l-to" type="text" placeholder="@orion or 'orion jones'"/>
+            <div id="l-suggest" style="background:#fff; border:1px solid var(--msp-rule); border-top:0; max-height:150px; overflow-y:auto; display:none;"></div>
+          </div>
+          <div class="form-row">
+            <label>Letter</label>
+            <textarea id="l-body" maxlength="2000" style="min-height:140px;" placeholder="say what you need to say. nobody knows it's you."></textarea>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:6px;">
+            <button class="btn" id="l-send">Send anonymously</button>
+          </div>
+          <div id="l-err" style="color:var(--msp-red); margin-top:6px; font-size:11px;"></div>
+          <div id="l-ok" style="color:var(--msp-green); margin-top:6px; font-size:11px; font-weight:700;"></div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title" style="background:#cc3388; border-bottom-color:#8a1a55;"><span>💘 Crush by phone</span></div>
+        <div class="widget-body">
+          <p><b>They don't have an account yet?</b> Drop their phone number. We text them anonymously — they never learn it's you. If they sign up, you both get a 💖 match notification.</p>
+          <div class="row-flex" style="gap:6px; flex-wrap:wrap;">
+            <input id="cph-phone" type="tel" value="+1 " style="flex:1; min-width:180px; padding:6px 8px; border:1px solid var(--msp-rule); font:13px inherit;"/>
+            <button class="btn" id="cph-send">Send anonymous text</button>
+          </div>
+          <div id="cph-err" style="color:var(--msp-red); margin-top:6px; font-size:11px;"></div>
+          <div id="cph-ok" style="color:var(--msp-green); margin-top:6px; font-size:11px; font-weight:700;"></div>
+          <div class="muted" style="margin-top:8px; font-size:10px;">8 per day · they get a random "someone has a crush on you" SMS · only revealed if they sign up + add you back.</div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title"><span>My Inbox</span><span class="wt-right"><a href="#" id="refresh">refresh</a></span></div>
+        <div class="widget-body none" id="inbox"><div class="empty">loading…</div></div>
+      </div>
+    </div>
+
+    <div class="col col-right">
+      <div class="widget">
+        <div class="widget-title"><span>The rules</span></div>
+        <div class="widget-body">
+          <ul style="padding-left:18px; margin:0;">
+            <li>the recipient never learns who you are</li>
+            <li>admin cannot read your letter</li>
+            <li>no audit trail — only the inbox owner sees it</li>
+            <li>letters are kept for 90 days then auto-purged</li>
+            <li>be kind — letters get reported for abuse, you'll lose access</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function initials(n){ const p=(n||'').trim().split(/\s+/).slice(0,2); return p.map(x=>x[0]||'').join('').toUpperCase()||'?'; }
+  function timeAgo(ts){ if(!ts) return ''; const s=Math.floor((Date.now()-ts)/1000); if(s<60) return s+'s ago'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+  async function api(path, opts){ opts=opts||{}; opts.headers=Object.assign({'Content-Type':'application/json','X-User-Token':TOKEN}, opts.headers||{}); const r=await fetch(path,opts); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||j.message||'http '+r.status); return j; }
+
+  $('l-to').addEventListener('input', async () => {
+    const q = $('l-to').value.trim().replace(/^@/,'');
+    if (q.length < 2) { $('l-suggest').style.display='none'; return; }
+    try {
+      const data = await api('/api/search?scope=people&q=' + encodeURIComponent(q));
+      const list = (data.results || []).slice(0,8);
+      if (!list.length) { $('l-suggest').style.display='none'; return; }
+      $('l-suggest').innerHTML = list.map(u => `
+        <div class="os-row" data-email="${esc(u.email)}" data-name="${esc(u.name)}" data-handle="${esc(u.handle||'')}" style="cursor:pointer;">
+          <div class="avatar" style="width:28px; height:28px; font-size:11px;">${esc(initials(u.name))}</div>
+          <div class="body"><div class="name">${esc(u.name)}</div><div class="handle">@${esc(u.handle||'')}</div></div>
+        </div>`).join('');
+      $('l-suggest').style.display = '';
+      $('l-suggest').querySelectorAll('.os-row').forEach(r => r.addEventListener('click', () => {
+        $('l-to').value = '@' + (r.dataset.handle || r.dataset.email);
+        $('l-to').dataset.email = r.dataset.email; $('l-to').dataset.name = r.dataset.name;
+        $('l-suggest').style.display='none';
+      }));
+    } catch {}
+  });
+
+  $('l-send').addEventListener('click', async () => {
+    $('l-err').textContent = ''; $('l-ok').textContent = '';
+    const email = $('l-to').dataset.email;
+    const body = $('l-body').value.trim();
+    if (!email) { $('l-err').textContent = 'pick a recipient from suggestions'; return; }
+    if (!body) { $('l-err').textContent = 'write something first'; return; }
+    $('l-send').disabled = true;
+    try {
+      await api('/api/letters', { method:'POST', body: JSON.stringify({ toEmail: email, message: body }) });
+      $('l-body').value = ''; $('l-to').value = '';
+      delete $('l-to').dataset.email; delete $('l-to').dataset.name;
+      $('l-ok').textContent = 'sent anonymously. they\'ll never know it was you.';
+      loadInbox();
+    } catch (e) { $('l-err').textContent = e.message; }
+    finally { $('l-send').disabled = false; }
+  });
+
+  async function loadInbox(){
+    try {
+      const data = await api('/api/letters/inbox');
+      const list = data.letters || [];
+      if (!list.length) { $('inbox').innerHTML = '<div class="empty">no letters yet.</div>'; return; }
+      $('inbox').innerHTML = list.map(l => `
+        <div style="padding:10px 12px; border-bottom:1px solid var(--msp-rule-l);">
+          <div style="font-size:11px; color:var(--msp-mute); margin-bottom:4px;">📨 from <b>anonymous</b> · ${esc(timeAgo(l.createdAt))}</div>
+          <div style="font-size:12.5px; white-space:pre-wrap; line-height:1.55;">${esc(l.message||'')}</div>
+        </div>`).join('');
+    } catch { $('inbox').innerHTML = '<div class="empty">could not load.</div>'; }
+  }
+  $('refresh').addEventListener('click', e => { e.preventDefault(); loadInbox(); });
+
+  // Phone-input formatting + crush-by-phone send
+  (function(){
+    const i = $('cph-phone'); const P='+1 ';
+    function dig(){ let d=i.value.replace(/\D/g,''); if (d.startsWith('1')) d=d.slice(1); return d.slice(0,10); }
+    function fm(d){ if (!d) return P; if (d.length<=3) return P+'('+d; if (d.length<=6) return P+'('+d.slice(0,3)+') '+d.slice(3); return P+'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6); }
+    i.addEventListener('focus',()=>{ if(!i.value.startsWith(P)) i.value=P; });
+    i.addEventListener('input',()=>{ i.value = fm(dig()); });
+  })();
+  $('cph-send').addEventListener('click', async () => {
+    $('cph-err').textContent = ''; $('cph-ok').textContent = '';
+    const phone = $('cph-phone').value.trim();
+    if (!phone || phone === '+1') { $('cph-err').textContent = 'enter a phone'; return; }
+    $('cph-send').disabled = true;
+    try {
+      const r = await api('/api/crush/by-phone', { method:'POST', body: JSON.stringify({ phone }) });
+      $('cph-ok').textContent = r.message || 'sent anonymously.';
+      $('cph-phone').value = '+1 ';
+    } catch (e) { $('cph-err').textContent = e.message; }
+    finally { $('cph-send').disabled = false; }
+  });
+
+  loadInbox();
+})();
+</script>
+</body>
+</html>

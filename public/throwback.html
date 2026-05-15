@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Throwback · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">⏪ Throwback</h1></div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">your posts from this day in past months</span></div></div>
+  <div class="widget">
+    <div class="widget-title"><span>This Day, Earlier</span><span class="wt-right"><a href="#" id="refresh">refresh</a></span></div>
+    <div class="widget-body none" id="list"><div class="empty">loading…</div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  async function api(path){ const r = await fetch(path, { headers: { 'X-User-Token': TOKEN } }); return r.json().catch(()=>({})); }
+  async function load(){
+    try {
+      const data = await api('/api/throwback');
+      const list = data.posts || [];
+      if (!list.length) { $('list').innerHTML = '<div class="empty">no throwbacks yet — site is too young.</div>'; return; }
+      $('list').innerHTML = list.map(p => {
+        const handle = p.authorHandle || (p.authorEmail||'').split('@')[0];
+        const age = Math.floor((Date.now() - p.createdAt) / 86400000);
+        return `<div style="padding:10px 12px; border-bottom:1px solid var(--msp-rule-l);">
+          <div style="font-size:11px; color:var(--msp-mute); margin-bottom:4px;">${age} days ago · <a href="/u/${esc(handle)}">${esc(p.author||'?')}</a></div>
+          <div style="font-size:12px;">${esc((p.content||p.caption||'').slice(0,400))}</div>
+        </div>`;
+      }).join('');
+    } catch { $('list').innerHTML = '<div class="empty">could not load.</div>'; }
+  }
+  $('refresh').addEventListener('click', e => { e.preventDefault(); load(); });
+  load();
+})();
+</script>
+</body>
+</html>

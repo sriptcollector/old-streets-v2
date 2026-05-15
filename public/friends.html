@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Friends · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">Friends</h1></div>
+
+  <div class="os-tabs">
+    <a class="os-tab active" data-tab="all">My Friends <span id="ct-all"></span></a>
+    <a class="os-tab" data-tab="requests">Requests <span id="ct-req"></span></a>
+    <a class="os-tab" data-tab="suggested">Suggested <span id="ct-sug"></span></a>
+    <a class="os-tab" data-tab="find">Find People</a>
+  </div>
+
+  <div id="pane-all">
+    <div class="widget">
+      <div class="widget-title"><span>All Friends</span><span class="wt-right"><a href="#" id="refresh-friends">refresh</a></span></div>
+      <div class="widget-body">
+        <div id="friends-grid" class="friend-grid"><div class="empty" style="grid-column:1/-1;">loading…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pane-requests" style="display:none;">
+    <div class="widget">
+      <div class="widget-title red"><span>Incoming Requests</span></div>
+      <div class="widget-body none" id="requests-in"><div class="empty">none right now.</div></div>
+    </div>
+    <div class="widget">
+      <div class="widget-title"><span>Sent</span></div>
+      <div class="widget-body none" id="requests-sent"><div class="empty">none.</div></div>
+    </div>
+  </div>
+
+  <div id="pane-suggested" style="display:none;">
+    <div class="widget">
+      <div class="widget-title"><span>People you might know</span></div>
+      <div class="widget-body">
+        <div id="suggested-grid" class="friend-grid">
+          <div class="empty" style="grid-column:1/-1;">loading…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pane-find" style="display:none;">
+    <div class="widget">
+      <div class="widget-title"><span>Search People</span></div>
+      <div class="widget-body">
+        <div class="row-flex" style="margin-bottom:8px; position:relative;">
+          <input id="find-q" type="text" style="flex:1;" placeholder="@handle or name…" autocomplete="off"/>
+          <button class="btn" id="find-go">Search</button>
+          <div id="find-ac" style="position:absolute; top:100%; left:0; right:60px; background:#fff; border:1px solid var(--msp-rule); display:none; max-height:240px; overflow-y:auto; z-index:50; box-shadow:0 4px 14px rgba(0,0,0,0.15);"></div>
+        </div>
+        <div id="find-results" class="friend-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function initials(n){ const p=(n||'').trim().split(/\s+/).slice(0,2); return p.map(x=>x[0]||'').join('').toUpperCase()||'?'; }
+  async function api(path, opts){ opts=opts||{}; opts.headers=Object.assign({'Content-Type':'application/json','X-User-Token':TOKEN}, opts.headers||{}); const r=await fetch(path,opts); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||j.message||'http '+r.status); return j; }
+  function card(u){ const h = u.handle || (u.email||'').split('@')[0]; return `<a class="friend-card" href="/u/${esc(h)}" style="text-decoration:none;">
+    <div class="avatar">${u.avatar ? `<img src="${esc(u.avatar)}"/>` : esc(initials(u.name))}</div>
+    <span class="nm">${esc(u.name||'unknown')}</span>
+    <div class="hd">@${esc(h)}</div>
+  </a>`; }
+
+  document.querySelectorAll('.os-tab').forEach(t => t.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.os-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    ['all','requests','suggested','find'].forEach(n => $('pane-'+n).style.display = (t.dataset.tab===n) ? '' : 'none');
+    if (t.dataset.tab === 'suggested') loadSuggested();
+  }));
+
+  async function loadSuggested() {
+    try {
+      const me = await api('/api/whoami').catch(() => null);
+      const myEmailLc = (me && me.user && me.user.email || '').toLowerCase();
+      const myFriends = new Set(((me && me.user && me.user.friends) || []).map(e => (e||'').toLowerCase()));
+      const data = await api('/api/members?limit=200');
+      const list = (data.members || [])
+        .filter(u => (u.email || '').toLowerCase() !== myEmailLc)
+        .filter(u => !myFriends.has((u.email||'').toLowerCase()))
+        .slice(0, 30);
+      $('ct-sug').textContent = list.length ? '('+list.length+')' : '';
+      if (!list.length) {
+        $('suggested-grid').innerHTML = '<div class="empty" style="grid-column:1/-1;">no suggestions right now.</div>';
+        return;
+      }
+      $('suggested-grid').innerHTML = list.map(u => {
+        const h = u.handle || (u.email||'').split('@')[0];
+        return `<div class="friend-card" style="position:relative;">
+          <a href="/u/${esc(h)}" style="text-decoration:none;color:inherit;display:block;">
+            <div class="avatar">${u.avatar ? `<img src="${esc(u.avatar)}"/>` : esc(initials(u.name))}</div>
+            <span class="nm">${esc(u.name||'unknown')}</span>
+            <div class="hd">@${esc(h)}${u.online ? ' · 🟢' : ''}</div>
+          </a>
+          <button class="btn add-sug" data-email="${esc(u.email||'')}" style="margin-top:4px; font-size:10px; padding:3px 8px; width:100%;">+ add friend</button>
+        </div>`;
+      }).join('');
+      $('suggested-grid').querySelectorAll('.add-sug').forEach(b => {
+        b.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          b.disabled = true; b.textContent = '…';
+          try {
+            await api('/api/friend-requests/send', { method:'POST', body: JSON.stringify({ toEmail: b.dataset.email }) });
+            b.textContent = '· requested';
+          } catch (err) { b.disabled = false; b.textContent = '✗ ' + err.message; }
+        });
+      });
+    } catch (err) { $('suggested-grid').innerHTML = '<div class="empty">'+esc(err.message)+'</div>'; }
+  }
+
+  async function loadFriends(){
+    try {
+      const list = await api('/api/friends');
+      const friends = Array.isArray(list) ? list : (list.friends || []);
+      $('ct-all').textContent = friends.length ? '('+friends.length+')' : '';
+      $('friends-grid').innerHTML = friends.length ? friends.map(card).join('') : '<div class="empty" style="grid-column:1/-1;">no friends yet. find some people above.</div>';
+    } catch { $('friends-grid').innerHTML = '<div class="empty" style="grid-column:1/-1;">could not load.</div>'; }
+  }
+  async function loadRequests(){
+    try {
+      const [pIn, pSent] = await Promise.all([api('/api/friend-requests/pending').catch(()=>[]), api('/api/friend-requests/sent').catch(()=>[])]);
+      const incoming = Array.isArray(pIn) ? pIn : (pIn.requests||[]);
+      const sent = Array.isArray(pSent) ? pSent : (pSent.requests||[]);
+      $('ct-req').textContent = incoming.length ? '('+incoming.length+')' : '';
+      $('requests-in').innerHTML = incoming.length ? incoming.map(r => {
+        const h = r.fromHandle ? esc(r.fromHandle) : '';
+        const link = h ? `/u/${h}` : '#';
+        return `
+        <div class="os-row" style="background:#fff7c2;">
+          <a href="${link}" class="avatar" style="text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:center;">${r.fromAvatar ? `<img src="${esc(r.fromAvatar)}" style="width:100%;height:100%;object-fit:cover;"/>` : esc(initials(r.fromName))}</a>
+          <div class="body">
+            <div class="name"><a href="${link}" style="font-weight:700;color:#003399;">${esc(r.fromName||r.from||'?')}</a></div>
+            <div class="ts">wants to be friends</div>
+          </div>
+          <button class="btn success" data-act="accept" data-id="${esc(r.id||r.from)}">✓ accept</button>
+          <button class="btn alt" data-act="reject" data-id="${esc(r.id||r.from)}">✗ deny</button>
+        </div>`;
+      }).join('') : '<div class="empty">none right now.</div>';
+      $('requests-sent').innerHTML = sent.length ? sent.map(r => {
+        const h = r.toHandle ? esc(r.toHandle) : '';
+        const link = h ? `/u/${h}` : '#';
+        return `
+        <div class="os-row">
+          <a href="${link}" class="avatar" style="text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:center;">${r.toAvatar ? `<img src="${esc(r.toAvatar)}" style="width:100%;height:100%;object-fit:cover;"/>` : esc(initials(r.toName||r.to))}</a>
+          <div class="body">
+            <div class="name"><a href="${link}" style="font-weight:700;color:#003399;">${esc(r.toName||r.to||'?')}</a></div>
+            <div class="ts">pending — they haven't replied yet</div>
+          </div>
+        </div>`;
+      }).join('') : '<div class="empty">none.</div>';
+      $('requests-in').querySelectorAll('button[data-act]').forEach(b => b.addEventListener('click', async () => {
+        try { await api('/api/friend-requests/' + encodeURIComponent(b.dataset.id) + '/' + b.dataset.act, { method:'POST' }); loadRequests(); loadFriends(); }
+        catch (e) { alert(e.message); }
+      }));
+    } catch {}
+  }
+  $('refresh-friends').addEventListener('click', e => { e.preventDefault(); loadFriends(); });
+  $('find-go').addEventListener('click', searchPeople);
+  $('find-q').addEventListener('keydown', e => { if (e.key==='Enter') searchPeople(); });
+  async function searchPeople(){
+    const q = $('find-q').value.trim().replace(/^@/,'');
+    if (!q) return;
+    $('find-results').innerHTML = '<div class="empty" style="grid-column:1/-1;">searching…</div>';
+    try {
+      const data = await api('/api/search?scope=people&q=' + encodeURIComponent(q));
+      const list = data.results || [];
+      $('find-results').innerHTML = list.length ? list.map(card).join('') : '<div class="empty" style="grid-column:1/-1;">no matches.</div>';
+    } catch (e) { $('find-results').innerHTML = '<div class="empty">'+esc(e.message)+'</div>'; }
+  }
+  loadFriends(); loadRequests();
+
+  // ----- Live autocomplete on the find input -----
+  const acBox = $('find-ac');
+  let acTimer = null;
+  $('find-q').addEventListener('input', () => {
+    const q = $('find-q').value.trim().replace(/^@/, '');
+    if (acTimer) clearTimeout(acTimer);
+    if (q.length < 2) { acBox.style.display = 'none'; return; }
+    acTimer = setTimeout(async () => {
+      try {
+        const data = await api('/api/search?scope=people&q=' + encodeURIComponent(q));
+        const list = (data.results || []).slice(0, 8);
+        if (!list.length) { acBox.style.display = 'none'; return; }
+        acBox.innerHTML = list.map(u => {
+          const h = u.handle || (u.email||'').split('@')[0];
+          return `<div class="ac-row" data-handle="${esc(h)}" data-email="${esc(u.email||'')}" data-name="${esc(u.name||'')}" style="display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-bottom:1px dotted #eee;">
+            ${u.avatar ? `<img src="${esc(u.avatar)}" style="width:28px;height:28px;object-fit:cover;border:1px solid #bbb;"/>` : `<div style="width:28px;height:28px;background:#3b5998;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;">${esc(initials(u.name))}</div>`}
+            <div style="flex:1;font-size:12px;"><b>${esc(u.name||'?')}</b> <span style="color:#888;">@${esc(h)}</span></div>
+            <button class="btn ac-add" data-email="${esc(u.email||'')}" style="font-size:10px;padding:3px 8px;">+ add</button>
+          </div>`;
+        }).join('');
+        acBox.style.display = 'block';
+        acBox.querySelectorAll('.ac-row').forEach(row => {
+          row.addEventListener('click', (e) => {
+            if (e.target.classList.contains('ac-add')) return;
+            location.href = '/u/' + encodeURIComponent(row.dataset.handle);
+          });
+        });
+        acBox.querySelectorAll('.ac-add').forEach(b => {
+          b.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            b.disabled = true; b.textContent = '…';
+            try {
+              await api('/api/friend-requests/send', { method:'POST', body: JSON.stringify({ toEmail: b.dataset.email }) });
+              b.textContent = '✓ sent';
+              setTimeout(() => { acBox.style.display = 'none'; loadRequests(); }, 600);
+            } catch (err) { b.textContent = '✗ ' + (err.message||'failed'); }
+          });
+        });
+      } catch { acBox.style.display = 'none'; }
+    }, 220);
+  });
+  document.addEventListener('click', (e) => { if (!acBox.contains(e.target) && e.target.id !== 'find-q') acBox.style.display = 'none'; });
+})();
+</script>
+</body>
+</html>

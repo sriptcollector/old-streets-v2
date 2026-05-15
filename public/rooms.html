@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Rooms · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">🎥 Live Rooms</h1></div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">jump into any room. video on. school name shows above your head.</span></div></div>
+
+  <div class="os-tabs">
+    <a class="os-tab active" data-tab="community">🏫 My School Only <span id="ct-community" class="muted" style="font-size:10px;"></span></a>
+    <a class="os-tab" data-tab="oldmegle" href="/oldmegle.html" style="margin-left:auto; background:#ff6600; color:#fff;">🎲 OLDMEGLE — random match →</a>
+  </div>
+
+  <div class="cols two">
+    <div class="col col-center">
+      <div class="widget">
+        <div class="widget-title green" id="rooms-title"><span>🏫 Your school — private rooms</span></div>
+        <div class="widget-body">
+          <div class="row-flex" style="margin-bottom:8px;">
+            <input id="room-name" type="text" maxlength="60" placeholder="room name (e.g. friday night gossip)" style="flex:1;"/>
+            <button class="btn" id="btn-create">+ Create Room</button>
+          </div>
+          <div class="muted" style="font-size:11px;">Only people from your school can see + join. No cross-school rooms.</div>
+        </div>
+      </div>
+      <div class="widget">
+        <div class="widget-title"><span id="list-title">Live now</span><span class="wt-right"><a href="#" id="refresh">refresh</a></span></div>
+        <div class="widget-body none" id="rooms-list"><div class="empty">loading…</div></div>
+      </div>
+      <div class="widget" id="active-room" style="display:none;">
+        <div class="widget-title red"><span id="active-room-title">In room</span><span class="wt-right"><a href="#" id="btn-leave">leave room</a></span></div>
+        <div class="widget-body none" style="padding:0;">
+          <div id="jitsi-container" style="width:100%; height:560px; background:#000;"></div>
+          <div id="jitsi-fallback" style="padding:10px; display:none; text-align:center; background:#fff4f4; border-top:1px solid var(--msp-rule-l);">
+            <p style="margin:0 0 6px;">Video isn't loading inline. <a href="#" id="jitsi-open-tab"><b>Open in new tab</b></a></p>
+            <p style="margin:0; color:var(--msp-mute); font-size:11px;">(some networks block embedded video)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <div class="widget">
+        <div class="widget-title"><span>How it works</span></div>
+        <div class="widget-body">
+          <p>Rooms here are <b>private to your school</b>. No one from another school can see or join.</p>
+          <p><b>Oldmegle</b> = random 1-on-1 video match within your school only.</p>
+          <p class="muted">Video runs through Jitsi (free, encrypted). We never see your camera or mic.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function timeAgo(ts){ if(!ts) return ''; const s=Math.floor((Date.now()-ts)/1000); if(s<60) return s+'s'; if(s<3600) return Math.floor(s/60)+'m'; return Math.floor(s/3600)+'h'; }
+  async function api(path, opts){ opts=opts||{}; opts.headers=Object.assign({'Content-Type':'application/json','X-User-Token':TOKEN}, opts.headers||{}); const r=await fetch(path,opts); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||j.message||'http '+r.status); return j; }
+
+  let scope = 'community'; // hard school isolation — community only
+  let me = null;
+  let canCreate = false;
+  api('/api/whoami').then(r => { me = r.user; checkCreateLock(); }).catch(() => {});
+
+  async function checkCreateLock(){
+    try {
+      canCreate = true; // referrals removed — anyone active can create rooms
+      const btn = document.getElementById('btn-create');
+      if (false) {
+        btn.disabled = true;
+        btn.textContent = `🔒 invites sent to create`;
+        btn.style.opacity = '0.6';
+        btn.title = 'Creating rooms unlocks the moment you send your 3rd phone-invite. You can still tap any existing room to join.';
+      }
+    } catch {}
+  }
+
+  document.querySelectorAll('.os-tab').forEach(t => {
+    if (t.getAttribute('href')) return; // oldmegle is a real link, let it navigate
+    t.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.os-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      scope = t.dataset.tab;
+      $('rooms-title').firstElementChild.textContent = scope === 'community'
+        ? '🏫 ' + ((me && me.schoolName) || 'My School') + ' — community rooms'
+        : '🌎 Globe — rooms from every school';
+      $('list-title').textContent = scope === 'community' ? 'Live now · my school' : 'Live now · nationwide';
+      loadRooms();
+    });
+  });
+
+  async function loadRooms(){
+    try {
+      const r = await api('/api/rooms/live?scope=' + scope);
+      const list = r.rooms || [];
+      if (!list.length) {
+        $('rooms-list').innerHTML = '<div class="empty">no live rooms in this scope. <a href="#" onclick="document.getElementById(\'room-name\').focus();return false;">start one</a></div>';
+        return;
+      }
+      $('rooms-list').innerHTML = list.map(rm => `
+        <div class="os-row" style="cursor:pointer;" data-id="${esc(rm.id)}" data-room="${esc(rm.jitsiRoom)}" data-name="${esc(rm.name)}">
+          <div style="display:inline-block; width:7px; height:7px; background:#cc0000; border-radius:50%; margin-top:8px; animation:pulse 1.2s ease-in-out infinite;"></div>
+          <div class="body">
+            <div class="name">${esc(rm.name)}</div>
+            <div class="ts">${rm.memberCount} in · ${rm.schoolName ? rm.schoolName + ' · ' : ''}by ${esc(rm.createdByName)}${rm.scope==='community'?' 🏫':' 🌎'}</div>
+          </div>
+        </div>
+      `).join('');
+      document.querySelectorAll('#rooms-list .os-row').forEach(row => {
+        row.addEventListener('click', () => joinRoom(row.dataset.id, row.dataset.room, row.dataset.name));
+      });
+    } catch (e) { $('rooms-list').innerHTML = '<div class="empty">'+esc(e.message)+'</div>'; }
+  }
+
+  let _jitsiApi = null;
+  function loadJitsiScript(){
+    return new Promise((resolve, reject) => {
+      if (window.JitsiMeetExternalAPI) return resolve();
+      const s = document.createElement('script');
+      s.src = 'https://meet.jit.si/external_api.js';
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('jitsi-script-failed'));
+      document.head.appendChild(s);
+    });
+  }
+  async function joinRoom(id, jitsiRoom, name){
+    try { await api(`/api/rooms/${encodeURIComponent(id)}/join`, { method:'POST' }); } catch {}
+    const display = (me && me.name ? me.name : 'someone') + ' · ' + (me && me.schoolName ? me.schoolName : 'school');
+    $('active-room').style.display = '';
+    $('active-room-title').innerHTML = `<span>📺 ${esc(name)}</span>`;
+    $('active-room').scrollIntoView({ behavior: 'smooth' });
+    window._activeRoomId = id;
+    const fallbackUrl = `https://meet.jit.si/${encodeURIComponent(jitsiRoom)}#userInfo.displayName=%22${encodeURIComponent(display)}%22`;
+    const showFallback = () => {
+      $('jitsi-container').innerHTML = '';
+      $('jitsi-fallback').style.display = '';
+      const a = $('jitsi-open-tab'); if (a) { a.href = fallbackUrl; a.target = '_blank'; a.rel = 'noopener'; }
+    };
+    try {
+      await loadJitsiScript();
+      if (_jitsiApi) { try { _jitsiApi.dispose(); } catch {} _jitsiApi = null; }
+      $('jitsi-container').innerHTML = '';
+      $('jitsi-fallback').style.display = 'none';
+      _jitsiApi = new window.JitsiMeetExternalAPI('meet.jit.si', {
+        roomName: jitsiRoom,
+        parentNode: $('jitsi-container'),
+        width: '100%', height: 560,
+        userInfo: { displayName: display },
+        configOverwrite: { prejoinPageEnabled: false, startWithAudioMuted: false, startWithVideoMuted: false, disableDeepLinking: true },
+        interfaceConfigOverwrite: { MOBILE_APP_PROMO: false, SHOW_JITSI_WATERMARK: false }
+      });
+      _jitsiApi.addEventListener('readyToClose', () => { try { _jitsiApi.dispose(); } catch {} _jitsiApi = null; });
+      // If embed gets blocked, container ends up empty after 5s — show fallback link.
+      setTimeout(() => {
+        const c = $('jitsi-container');
+        if (!c || !c.querySelector('iframe')) showFallback();
+      }, 5000);
+    } catch (e) {
+      console.warn('[jitsi]', e.message);
+      showFallback();
+    }
+  }
+
+  $('btn-leave').addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (window._activeRoomId) { try { await api(`/api/rooms/${encodeURIComponent(window._activeRoomId)}/leave`, { method:'POST' }); } catch {} }
+    if (_jitsiApi) { try { _jitsiApi.dispose(); } catch {} _jitsiApi = null; }
+    $('jitsi-container').innerHTML = '';
+    $('jitsi-fallback').style.display = 'none';
+    $('active-room').style.display = 'none';
+    window._activeRoomId = null;
+    loadRooms();
+  });
+
+  $('btn-create').addEventListener('click', async () => {
+    const name = ($('room-name')||{}).value.trim();
+    if (!name) { $('room-name').focus(); return; }
+    try {
+      const r = await api('/api/rooms', { method:'POST', body: JSON.stringify({ name, scope }) });
+      $('room-name').value = '';
+      loadRooms();
+      // auto-join the room you just made
+      setTimeout(() => joinRoom(r.room.id, r.room.jitsiRoom, r.room.name), 300);
+    } catch (e) { alert(e.message); }
+  });
+  $('refresh').addEventListener('click', e => { e.preventDefault(); loadRooms(); });
+  loadRooms();
+  setInterval(loadRooms, 15000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+node_modules/
+data/
+*.tgz
+*.bak
+*.bak.*
+.DS_Store
+.env
+.env.*
+*.log
+fly.toml.local

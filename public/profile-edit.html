@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Edit Profile · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar">
+    <h1 class="hello-h1">Edit Profile</h1>
+    <span id="acct-school-switcher" style="display:none; margin-left:14px; font-size:11px;">
+      <label style="font-weight:700; color:#5b6f9a; text-transform:uppercase; letter-spacing:0.05em;">School view:</label>
+      <select id="acct-school-select" style="margin-left:6px; padding:4px 8px; font-size:12px; font-weight:700; border:1px solid var(--msp-rule); background:#fff; cursor:pointer;">
+        <option value="all">All schools</option>
+        <option value="new-roads">Ancient Paths</option>
+        <option value="beverly-hills">Beverly Hills High</option>
+        <option value="crossroads">Crossroads</option>
+      </select>
+    </span>
+    <span class="url-mono" id="save-status"></span>
+  </div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">powered by oj · changes save per section</span></div></div>
+
+  <div class="os-tabs">
+    <a class="os-tab active" data-tab="basics">Basics</a>
+    <a class="os-tab" data-tab="about">About Me</a>
+    <a class="os-tab" data-tab="customize">Customize</a>
+    <a class="os-tab" data-tab="account">Account</a>
+  </div>
+
+  <!-- BASICS -->
+  <div data-pane="basics">
+    <div class="widget">
+      <div class="widget-title green"><span>Basics</span><span class="wt-right" id="st-basics"></span></div>
+      <div class="widget-body">
+        <div class="form-row"><label>Name</label><input id="f-name" type="text" maxlength="60"/></div>
+        <div class="form-row"><label>Handle (@)</label><input id="f-handle" type="text" maxlength="20"/><span class="muted" id="handle-hint" style="font-size:10px;"></span></div>
+        <div class="form-row"><label>Headline</label><input id="f-headline" type="text" maxlength="100"/></div>
+        <div class="form-row"><label>Pronouns</label><input id="f-pronouns" type="text" maxlength="40"/></div>
+        <div class="form-row"><label>Avatar URL</label><input id="f-avatar" type="text" maxlength="500" placeholder="https://..."/></div>
+        <div class="form-row"><label>Mood (emoji + label)</label><input id="f-mood" type="text" maxlength="60"/></div>
+        <button class="btn" id="save-basics">Save Basics</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div data-pane="about" style="display:none;">
+    <div class="widget">
+      <div class="widget-title green"><span>About Me</span><span class="wt-right" id="st-about"></span></div>
+      <div class="widget-body">
+        <div class="form-row"><label>About</label><textarea id="f-about" maxlength="2000" style="min-height:120px;"></textarea></div>
+        <div class="form-row"><label>Who I'd like to meet</label><textarea id="f-whoMeet" maxlength="800" style="min-height:80px;"></textarea></div>
+        <div class="form-row"><label>Interests</label><textarea id="f-interests" maxlength="1000" style="min-height:80px;"></textarea></div>
+        <div class="form-row"><label>Heroes</label><textarea id="f-heroes" maxlength="600" style="min-height:60px;"></textarea></div>
+        <button class="btn" id="save-about">Save About</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMIZE (now includes AI Vibe as a section) -->
+  <div data-pane="customize" style="display:none;">
+
+    <!-- AI VIBE — copy-paste flow -->
+    <div class="widget">
+      <div class="widget-title orange"><span>✨ AI Vibe</span><span class="wt-right">use any AI you trust</span></div>
+      <div class="widget-body">
+        <p><b>Make your profile however you want.</b> Paths lets you embed real CSS + HTML directly. Use any AI (ChatGPT, Claude, Gemini — your choice) to generate the look you want.</p>
+
+        <p style="margin-top:10px;"><b>Step 1.</b> Copy this prompt and paste it into your AI:</p>
+        <div style="position:relative;">
+          <textarea id="ai-prompt-template" readonly style="width:100%; min-height:130px; font-family:monospace; font-size:11px; background:#fff7c2; border:1px solid #d4b243; padding:8px 9px;"></textarea>
+          <button class="btn" id="copy-prompt" style="position:absolute; top:8px; right:8px;">📋 copy prompt</button>
+        </div>
+        <p class="muted" style="margin-top:6px;">tip: customize the prompt by replacing <code>[YOUR VIBE]</code> with what you actually want.</p>
+
+        <p style="margin-top:16px;"><b>Step 2.</b> Paste the AI's response (the whole reply — code blocks and all) below:</p>
+        <div class="form-row">
+          <textarea id="ai-paste" maxlength="40000" style="width:100%; min-height:180px; font-family:monospace; font-size:11px;" placeholder="paste the entire AI response here. I'll auto-extract the CSS and HTML and load them into the boxes below."></textarea>
+        </div>
+        <div class="row-flex">
+          <button class="btn success" id="apply-ai">Apply →</button>
+          <span class="muted" id="ai-feedback" style="margin-left:10px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- The actual editable Custom CSS + HTML fields -->
+    <div class="widget">
+      <div class="widget-title green"><span>Custom CSS / HTML (free-edit)</span><span class="wt-right" id="st-cust"></span></div>
+      <div class="widget-body">
+        <p>edit by hand if you like. selectors are auto-scoped to <code>.profile-custom-frame</code>. external images are allowed from major hosts (imgur, giphy, tenor, postimg, ibb, discord, unsplash, pexels, twitter, pinterest, wikia). scripts and on-handlers are stripped.</p>
+        <div class="form-row"><label>Custom CSS</label><textarea id="f-css" maxlength="30000" style="min-height:200px; font-family:monospace; font-size:11px;" placeholder="/* .profile-custom-frame .name { color: hotpink; text-shadow: 0 0 8px hotpink; } */"></textarea></div>
+        <div class="form-row"><label>Custom HTML</label><textarea id="f-html" maxlength="8000" style="min-height:120px; font-family:monospace; font-size:11px;" placeholder='<div class="sparkle">★ ★ ★</div>'></textarea></div>
+        <div class="row-flex">
+          <button class="btn" id="save-cust">Save Customize</button>
+          <a href="#" class="btn alt" id="view-profile">View My Profile →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+  <div data-pane="account" style="display:none;">
+    <div class="widget">
+      <div class="widget-title red"><span>Account</span></div>
+      <div class="widget-body">
+        <p>phone: <b id="me-phone">—</b></p>
+        <p>handle: <b id="me-handle">—</b></p>
+        <p>status: <b id="me-status">—</b></p>
+        <p>referrals: <b id="me-refs">—</b></p>
+        <button class="btn alt" id="logout-btn">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  async function api(path, opts){ opts=opts||{}; opts.headers=Object.assign({'Content-Type':'application/json','X-User-Token':TOKEN}, opts.headers||{}); const r=await fetch(path,opts); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||j.message||'http '+r.status); return j; }
+
+  let me = null;
+
+  // The prompt the user copies into their own AI
+  const PROMPT_TEMPLATE = `I'm customizing my profile on Paths, a MySpace-style social site. Generate custom CSS (and optional HTML) that makes my profile look like: [YOUR VIBE]
+
+REQUIREMENTS:
+- All CSS selectors must be prefixed with .profile-custom-frame (e.g. .profile-custom-frame .name { ... })
+- Aim for 80-300 lines of CSS — be specific and committed to the vibe
+- Use system fonts (Trebuchet MS, Verdana, Georgia, Courier New, Comic Sans MS, Impact, etc.) OR Google Fonts via @import url(https://fonts.googleapis.com/...)
+- Animations, gradients, text-shadows, blinking, glow, scanlines, marquees — all welcome
+- External images OK from: imgur.com, postimg.cc, ibb.co, giphy.com, tenor.com, unsplash.com, pexels.com, pinimg.com (use https URLs)
+- Do NOT include <script> tags or on-event handlers — they'll be stripped
+
+OUTPUT FORMAT — exactly this, nothing else:
+\\\`\\\`\\\`css
+/* the CSS, scoped to .profile-custom-frame */
+\\\`\\\`\\\`
+
+Optional second block for decorative HTML widgets:
+\\\`\\\`\\\`html
+<!-- e.g. <div class="sparkle">★</div> -->
+\\\`\\\`\\\`
+
+[YOUR VIBE]: replace this line with what you actually want. examples: "y2k pastel chrome with sparkles and a heart cursor", "geocities 1998 — green-on-black, blinking marquee, dotted borders, under-construction gif", "minecraft dirt blocks pixel font", "early-2000s anime fansite with falling cherry blossoms", "vaporwave neon grid with palm trees"`;
+
+  $('ai-prompt-template').value = PROMPT_TEMPLATE;
+
+  document.querySelectorAll('.os-tab').forEach(t => t.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.os-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('[data-pane]').forEach(p => p.style.display = (p.dataset.pane === t.dataset.tab) ? '' : 'none');
+  }));
+
+  $('copy-prompt').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(PROMPT_TEMPLATE); $('copy-prompt').textContent = '✓ copied'; setTimeout(()=>$('copy-prompt').textContent='📋 copy prompt', 1800); }
+    catch { $('ai-prompt-template').select(); document.execCommand('copy'); $('copy-prompt').textContent = '✓ copied'; setTimeout(()=>$('copy-prompt').textContent='📋 copy prompt', 1800); }
+  });
+
+  // Extract CSS + HTML from a pasted AI response (handles ``` fences and <style>)
+  function extractFromPaste(raw) {
+    if (!raw) return { css: '', html: '' };
+    let css = '', html = '';
+    const cssFence = raw.match(/```(?:css)?\s*([\s\S]+?)```/i);
+    if (cssFence) {
+      css = cssFence[1].trim();
+      const after = raw.slice(cssFence.index + cssFence[0].length);
+      const htmlFence = after.match(/```(?:html)?\s*([\s\S]+?)```/i);
+      if (htmlFence) html = htmlFence[1].trim();
+    } else {
+      const styleTag = raw.match(/<style[^>]*>([\s\S]+?)<\/style>/i);
+      if (styleTag) { css = styleTag[1].trim(); html = raw.replace(styleTag[0], '').trim(); }
+      else css = raw.trim();
+    }
+    return { css, html };
+  }
+  $('apply-ai').addEventListener('click', async () => {
+    const raw = $('ai-paste').value || '';
+    const { css, html } = extractFromPaste(raw);
+    if (!css && !html) { $('ai-feedback').innerHTML = '<span style="color:var(--msp-red);">no CSS or HTML found in that paste</span>'; return; }
+    $('f-css').value = css;
+    $('f-html').value = html;
+    $('ai-feedback').innerHTML = '✓ loaded — review below, then click <b>Save Customize</b>';
+    // auto-save in one click — feels magical
+    try {
+      await api('/api/profile/customize-save', { method:'POST', body: JSON.stringify({ css, html }) });
+      $('ai-feedback').innerHTML = `<span style="color:var(--msp-green);">✓ applied + saved.</span> <a href="${me && me.handle ? '/u/'+encodeURIComponent(me.handle) : '#'}">view profile →</a>`;
+    } catch (e) {
+      $('ai-feedback').innerHTML = '<span style="color:var(--msp-red);">save failed: ' + esc(e.message) + '</span>';
+    }
+  });
+
+  async function load(){
+    try {
+      const r = await api('/api/whoami');
+      me = r.user || r;
+      // Admin-only school context switcher in the header.
+      if (me.isAdmin) {
+        const wrap = document.getElementById('acct-school-switcher');
+        const sel = document.getElementById('acct-school-select');
+        if (wrap && sel) {
+          wrap.style.display = '';
+          try { sel.value = localStorage.getItem('admin-school-filter') || 'all'; } catch {}
+          sel.addEventListener('change', () => {
+            try { localStorage.setItem('admin-school-filter', sel.value); } catch {}
+            location.reload();
+          });
+        }
+      }
+      $('f-name').value = me.name || '';
+      $('f-handle').value = me.handle || '';
+      $('f-headline').value = me.headline || '';
+      $('f-pronouns').value = me.pronouns || '';
+      $('f-avatar').value = me.avatar || '';
+      $('f-mood').value = me.mood || '';
+      $('f-about').value = me.aboutMe || '';
+      $('f-whoMeet').value = me.whoMeet || '';
+      $('f-interests').value = me.interests || '';
+      $('f-heroes').value = me.heroes || '';
+      $('f-css').value = (me.customProfile && me.customProfile.css) || me.customCss || '';
+      $('f-html').value = (me.customProfile && me.customProfile.html) || me.customHtml || '';
+      $('me-phone').textContent = me.phoneE164 || me.phone || '—';
+      $('me-handle').textContent = me.handle ? '@'+me.handle : '—';
+      $('me-status').textContent = me.status || '—';
+      $('me-refs').textContent = (me.referralBalance || 0) + ' available';
+      $('view-profile').href = me.handle ? '/u/' + encodeURIComponent(me.handle) : '#';
+    } catch (e) {
+      if (String(e.message).toLowerCase().includes('sign in')) return location.replace('/onboard.html');
+      $('save-status').textContent = 'could not load: ' + e.message;
+    }
+  }
+  async function save(label, body, sid){
+    const stEl = $(sid); if (stEl) stEl.textContent = 'saving…';
+    try { const r = await api('/api/users/me', { method:'POST', body: JSON.stringify(body) }); me = r.user || r; if (stEl) stEl.textContent = '✓ saved'; $('save-status').textContent = '✓ '+label+' saved'; setTimeout(()=>{ if(stEl) stEl.textContent=''; $('save-status').textContent=''; }, 2500); }
+    catch (e) { if (stEl) stEl.textContent = '✗ '+e.message; }
+  }
+  $('save-basics').addEventListener('click', () => save('Basics', { name:$('f-name').value, handle:$('f-handle').value, headline:$('f-headline').value, pronouns:$('f-pronouns').value, avatar:$('f-avatar').value, mood:$('f-mood').value }, 'st-basics'));
+  $('save-about').addEventListener('click', () => save('About', { aboutMe:$('f-about').value, whoMeet:$('f-whoMeet').value, interests:$('f-interests').value, heroes:$('f-heroes').value }, 'st-about'));
+  $('save-cust').addEventListener('click', async () => {
+    $('st-cust').textContent = 'saving…';
+    try { await api('/api/profile/customize-save', { method:'POST', body: JSON.stringify({ css: $('f-css').value, html: $('f-html').value }) }); $('st-cust').textContent = '✓ saved'; setTimeout(()=>$('st-cust').textContent='', 2500); }
+    catch (e) { $('st-cust').textContent = '✗ '+e.message; }
+  });
+  $('logout-btn').addEventListener('click', async () => {
+    try { await api('/api/auth/logout', { method:'POST' }); } catch {}
+    try { localStorage.removeItem('oldstreets-token'); sessionStorage.removeItem('oldstreets-token'); } catch {}
+    location.replace('/onboard.html');
+  });
+  load();
+})();
+</script>
+</body>
+</html>

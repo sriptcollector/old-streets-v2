@@ -1,0 +1,19 @@
+{
+  "name": "old-streets",
+  "version": "2.0.0",
+  "description": "private invite-only wall and chat — high school members, two invites each, no school affiliation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "admin": "node admin-local/launch.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@simplewebauthn/server": "^13.3.0",
+    "express": "^4.21.0",
+    "socket.io": "^4.7.5"
+  }
+}

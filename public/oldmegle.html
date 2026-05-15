@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Oldmegle · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">🎲 Oldmegle</h1></div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">random 1-on-1 video with anyone on old streets · their school shows over their head · hit Next to skip</span></div></div>
+
+  <div class="cols two">
+    <div class="col col-center">
+      <div class="widget">
+        <div class="widget-title green"><span>Pick your match pool</span></div>
+        <div class="widget-body">
+          <div class="row-flex" style="gap:8px; flex-wrap:wrap;">
+            <button class="btn" id="btn-globe" style="font-size:14px; padding:10px 18px; flex:1;">🌎 Globe — any school</button>
+            <button class="btn alt" id="btn-community" style="font-size:14px; padding:10px 18px; flex:1;">🏫 My school only</button>
+          </div>
+          <p class="muted" style="margin-top:8px;">Oldmegle is the one cross-school place. Globe = random member from any school. School-only = stays inside your school. Partner's school appears above their head.</p>
+        </div>
+      </div>
+
+      <div class="widget" id="status-widget" style="display:none;">
+        <div class="widget-title orange"><span id="status-title">queuing…</span><span class="wt-right"><a href="#" id="btn-cancel">cancel</a></span></div>
+        <div class="widget-body">
+          <div id="status-body" style="padding:30px 20px; text-align:center; font-size:14px;">
+            <div style="font-size:32px; margin-bottom:8px;">⏳</div>
+            <div id="status-text">looking for a match…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget" id="match-widget" style="display:none;">
+        <div class="widget-title red"><span id="match-title">In a match</span><span class="wt-right"><a href="#" id="btn-next">⏭ next</a></span></div>
+        <div class="widget-body none" style="padding:0;">
+          <div id="jitsi-container" style="width:100%; height:580px; background:#000;"></div>
+          <div id="jitsi-fallback" style="padding:10px; display:none; text-align:center; background:#fff4f4; border-top:1px solid var(--msp-rule-l);">
+            <p style="margin:0 0 6px;">Video isn't loading inline. <a href="#" id="jitsi-open-tab"><b>Open in new tab</b></a></p>
+            <p style="margin:0; color:var(--msp-mute); font-size:11px;">(some networks block embedded video)</p>
+          </div>
+        </div>
+        <div class="widget-body" style="background:var(--msp-tint-2); padding:8px 10px; font-size:11px;">
+          <span id="match-school-pill" style="background:var(--msp-blue); color:#fff; padding:2px 8px; font-weight:700; border-radius:1px;">SCHOOL</span>
+          <span id="match-partner-name" style="margin-left:6px; font-weight:700;">someone</span>
+        </div>
+      </div>
+    </div>
+    <div class="col col-right">
+      <div class="widget">
+        <div class="widget-title"><span>The rules</span></div>
+        <div class="widget-body">
+          <ul style="padding-left:18px; margin:0;">
+            <li>1-on-1 video. random member from old streets.</li>
+            <li>both of you must be active members. no signed-out users.</li>
+            <li>their school appears over their head — same as theirs over yours.</li>
+            <li>hit Next to skip. either of you ending closes the room.</li>
+            <li>video runs through Jitsi, encrypted, free, no server-side recording.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="widget">
+        <div class="widget-title"><span>Live now</span></div>
+        <div class="widget-body" id="online-count" style="font-size:13px; padding:10px 12px;">
+          <b id="oc-num">—</b> members online
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  async function api(path, opts){ opts=opts||{}; opts.headers=Object.assign({'Content-Type':'application/json','X-User-Token':TOKEN}, opts.headers||{}); const r=await fetch(path,opts); const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||j.message||'http '+r.status); return j; }
+
+  let me = null;
+  api('/api/whoami').then(r => { me = r.user; checkUnlock(); }).catch(() => {});
+
+  // K=3 unlock: now keyed on phone-invites SENT (not claimed). The moment
+  // user sends the 3rd phone number, Oldmegle opens — no waiting.
+  async function checkUnlock(){
+    // Referrals removed — Oldmegle is open to all active members.
+    return true;
+  }
+
+  let queuePoll = null;
+  let socket = null;
+
+  // Load socket.io for instant match push
+  (function(){ if (window.io) return wire(); const s=document.createElement('script'); s.src='/socket.io/socket.io.js'; s.onload=wire; document.head.appendChild(s); })();
+  function wire(){
+    try {
+      socket = window.io({ transports:['websocket','polling'] });
+      socket.on('connect', () => socket.emit('auth', { token: TOKEN }));
+      socket.on('oldmegle-match', ({ sessionId, roomName, partnerName, partnerSchool }) => {
+        openMatch(sessionId, roomName, partnerName, partnerSchool);
+      });
+    } catch {}
+  }
+
+  let _jitsiApi = null;
+  function loadJitsiScript(){
+    return new Promise((resolve, reject) => {
+      if (window.JitsiMeetExternalAPI) return resolve();
+      const s = document.createElement('script');
+      s.src = 'https://meet.jit.si/external_api.js';
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('jitsi-script-failed'));
+      document.head.appendChild(s);
+    });
+  }
+  async function openMatch(sessionId, roomName, partnerName, partnerSchool) {
+    $('status-widget').style.display = 'none';
+    $('match-widget').style.display = '';
+    $('match-partner-name').textContent = partnerName || 'someone';
+    $('match-school-pill').textContent = partnerSchool || 'school';
+    const display = (me && me.name ? me.name : 'someone') + ' · ' + (me && me.schoolName ? me.schoolName : 'school');
+    const fallbackUrl = `https://meet.jit.si/${encodeURIComponent(roomName)}#userInfo.displayName=%22${encodeURIComponent(display)}%22`;
+    const showFallback = () => {
+      $('jitsi-container').innerHTML = '';
+      $('jitsi-fallback').style.display = '';
+      const a = $('jitsi-open-tab'); if (a) { a.href = fallbackUrl; a.target = '_blank'; a.rel = 'noopener'; }
+    };
+    try {
+      await loadJitsiScript();
+      if (_jitsiApi) { try { _jitsiApi.dispose(); } catch {} _jitsiApi = null; }
+      $('jitsi-container').innerHTML = '';
+      $('jitsi-fallback').style.display = 'none';
+      _jitsiApi = new window.JitsiMeetExternalAPI('meet.jit.si', {
+        roomName,
+        parentNode: $('jitsi-container'),
+        width: '100%', height: 580,
+        userInfo: { displayName: display },
+        configOverwrite: { prejoinPageEnabled: false, startWithAudioMuted: false, disableDeepLinking: true },
+        interfaceConfigOverwrite: { MOBILE_APP_PROMO: false, SHOW_JITSI_WATERMARK: false }
+      });
+      _jitsiApi.addEventListener('readyToClose', () => { try { _jitsiApi.dispose(); } catch {} _jitsiApi = null; });
+      setTimeout(() => {
+        const c = $('jitsi-container');
+        if (!c || !c.querySelector('iframe')) showFallback();
+      }, 5000);
+    } catch (e) { console.warn('[jitsi]', e.message); showFallback(); }
+    $('match-widget').scrollIntoView({ behavior: 'smooth' });
+    if (queuePoll) { clearInterval(queuePoll); queuePoll = null; }
+  }
+
+  async function startMatch(scope) {
+    $('status-widget').style.display = '';
+    $('match-widget').style.display = 'none';
+    $('status-title').firstElementChild.textContent = scope === 'community'
+      ? 'looking for someone from ' + ((me && me.schoolName) || 'your school') + '…'
+      : 'looking for anyone, nationwide…';
+    $('status-text').textContent = 'searching…';
+    try {
+      const r = await api('/api/oldmegle/match', { method:'POST', body: JSON.stringify({ scope }) });
+      if (r.status === 'matched') {
+        openMatch(r.sessionId, r.roomName, r.partnerName, r.partnerSchool);
+      } else {
+        $('status-text').innerHTML = `you're #${r.queuePosition} in line. we'll match you when someone joins. <b>keep this tab open.</b>`;
+        // Poll every 8s as fallback if socket doesn't deliver
+        if (queuePoll) clearInterval(queuePoll);
+        queuePoll = setInterval(() => api('/api/oldmegle/match', { method:'POST', body: JSON.stringify({ scope }) }).then(r2 => {
+          if (r2.status === 'matched') openMatch(r2.sessionId, r2.roomName, r2.partnerName, r2.partnerSchool);
+        }).catch(()=>{}), 8000);
+      }
+    } catch (e) { $('status-text').textContent = 'error: ' + e.message; }
+  }
+
+  let lastScope = 'globe';
+  $('btn-globe').addEventListener('click', () => { lastScope = 'globe'; startMatch('globe'); });
+  $('btn-community').addEventListener('click', () => { lastScope = 'community'; startMatch('community'); });
+  $('btn-cancel').addEventListener('click', async (e) => {
+    e.preventDefault();
+    try { await api('/api/oldmegle/leave', { method:'POST' }); } catch {}
+    if (queuePoll) { clearInterval(queuePoll); queuePoll = null; }
+    $('status-widget').style.display = 'none';
+  });
+  $('btn-next').addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (_jitsiApi) { try { _jitsiApi.dispose(); } catch {} _jitsiApi = null; }
+    $('jitsi-container').innerHTML = '';
+    $('jitsi-fallback').style.display = 'none';
+    $('match-widget').style.display = 'none';
+    // Re-queue with whichever scope they originally picked.
+    startMatch(lastScope);
+  });
+
+  // Online count
+  api('/api/site-info').then(d => { const o = d.onlineCount || 0; const el = $('oc-num'); if (el) el.textContent = o; }).catch(()=>{});
+})();
+</script>
+</body>
+</html>

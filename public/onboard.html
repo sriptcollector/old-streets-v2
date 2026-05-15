@@ -1,0 +1,2506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="description" content="A private place for people you already know."/>
+<title>Ancient Lanes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%233b5998'/%3E%3Ctext x='8' y='12' font-family='Georgia,serif' font-style='italic' font-size='12' font-weight='700' fill='white' text-anchor='middle'%3Eos%3C/text%3E%3C/svg%3E"/>
+<style>
+/* ============================================================
+   ONBOARD  ·  MySpace 2006 fidelity
+   ------------------------------------------------------------
+   Verdana 11px body, 1px hairlines, no shadows, no border-radius,
+   blue + lavender chrome, orange + red title bars on widgets.
+   ============================================================ */
+:root {
+  --msp-bg:        #c1cdf5;
+  --msp-pane:      #ffffff;
+  --msp-blue:      #3b5998;
+  --msp-blue-d:    #29447e;
+  --msp-blue-l:    #6d84b4;
+  --msp-tint:      #d8dfea;
+  --msp-tint-2:    #eef2f8;
+  --msp-rule:      #b5bbcc;
+  --msp-rule-l:    #d8dcde;
+  --msp-ink:       #000000;
+  --msp-ink-link:  #003399;
+  --msp-ink-vis:   #5c5c8a;
+  --msp-orange:    #ff6600;
+  --msp-peach:     #f3dec8;
+  --msp-red:       #cc0000;
+  --msp-green:     #339933;
+  --msp-mute:      #666666;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--msp-bg);
+  color: var(--msp-ink);
+  font: 11px/1.45 "Verdana","Arial","Helvetica",sans-serif;
+  -webkit-text-size-adjust: 100%;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+a { color: var(--msp-ink-link); text-decoration: underline; }
+a:visited { color: var(--msp-ink-vis); }
+a:hover { color: var(--msp-red); }
+img, svg { max-width: 100%; display: block; }
+button { font: inherit; cursor: pointer; }
+input, select, textarea {
+  font: 11px "Verdana","Arial","Helvetica",sans-serif;
+  color: #000;
+  background: #fff;
+  border: 1px solid #7f9db9;
+  border-radius: 0;
+  padding: 3px 4px;
+  line-height: 1.3;
+  width: 100%;
+}
+input[type=checkbox] { width: auto; }
+input:focus, select:focus, textarea:focus {
+  outline: 1px solid #ffcc66;
+  border-color: var(--msp-blue);
+}
+
+/* ============= TOP NAV BAR ============= */
+.topnav {
+  background: var(--msp-blue);
+  border-bottom: 1px solid var(--msp-blue-d);
+  color: #fff;
+  padding: 4px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+}
+.topnav .wordmark {
+  font-family: "Verdana","Arial","Helvetica",sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.topnav .wordmark em {
+  font-family: "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  color: #ffd17a;
+  font-size: 12px;
+  margin-left: 3px;
+}
+.topnav .links { display: flex; align-items: center; gap: 0; }
+.topnav .links a {
+  color: #fff;
+  text-decoration: none;
+  padding: 2px 8px;
+  border-left: 1px solid var(--msp-blue-l);
+  font-size: 11px;
+}
+.topnav .links a:first-child { border-left: 0; }
+.topnav .links a:hover { text-decoration: underline; color: #fff; }
+
+/* secondary subnav (lavender strip) */
+.subnav {
+  background: var(--msp-tint);
+  border-bottom: 1px solid var(--msp-rule);
+  padding: 3px 12px;
+  font-size: 10px;
+  color: #333;
+}
+.subnav strong { color: var(--msp-blue-d); }
+
+/* ============= LAYOUT ============= */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 14px auto 18px;
+  padding: 0 8px;
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 12px;
+  align-items: start;
+}
+.single-col {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ============= WIDGETS ============= */
+.widget {
+  background: var(--msp-pane);
+  border: 1px solid var(--msp-rule);
+  margin-bottom: 12px;
+}
+.widget-title {
+  background: var(--msp-blue);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-bottom: 1px solid var(--msp-blue-d);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.widget-title.orange {
+  background: var(--msp-orange);
+  border-bottom-color: #cc5200;
+}
+.widget-title.red {
+  background: var(--msp-red);
+  border-bottom-color: #8b0000;
+}
+.widget-title.green {
+  background: var(--msp-green);
+  border-bottom-color: #1f6b1f;
+}
+.widget-title .meta {
+  font-weight: 400; font-size: 10px; opacity: 0.95;
+}
+.widget-body { padding: 9px 10px; }
+.widget-body.tint { background: var(--msp-tint-2); }
+.widget-body.peach { background: var(--msp-peach); }
+
+/* ============= MARKETING WIDGET (left) ============= */
+.marketing h2 {
+  margin: 0 0 5px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--msp-blue-d);
+}
+.marketing p { margin: 0 0 8px; font-size: 11px; color: #000; }
+.marketing ul { margin: 6px 0 10px 16px; padding: 0; }
+.marketing li { margin: 2px 0; font-size: 11px; }
+.marketing li strong { color: var(--msp-blue-d); }
+
+/* member collage (9 squares) */
+.collage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-top: 10px;
+  padding: 4px;
+  background: #e6ebf5;
+  border: 1px solid var(--msp-rule-l);
+}
+.collage .cell {
+  aspect-ratio: 1 / 1;
+  border: 1px solid #999;
+  display: flex; align-items: flex-end; justify-content: flex-start;
+  font-size: 10px;
+  color: #fff;
+  font-weight: 700;
+  padding: 2px 3px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+  letter-spacing: 0.3px;
+  position: relative;
+}
+.collage .cell::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.45));
+  pointer-events: none;
+}
+
+/* ============= FORM (right) ============= */
+.signup-form .form-row { margin: 0 0 7px; }
+.signup-form label {
+  display: block;
+  font-size: 10px;
+  color: var(--msp-mute);
+  margin-bottom: 1px;
+  font-weight: 400;
+}
+.signup-form label .req { color: var(--msp-red); margin-left: 2px; }
+.signup-form label .opt { color: #999; font-size: 9px; margin-left: 3px; }
+.signup-form .hint {
+  font-size: 10px; color: var(--msp-mute);
+  margin-top: 1px;
+}
+.signup-form .inline-status {
+  font-size: 10px; margin-top: 1px; font-weight: 700;
+  display: inline-block;
+}
+.signup-form .inline-status.ok { color: var(--msp-green); }
+.signup-form .inline-status.bad { color: var(--msp-red); }
+.signup-form .row-2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+}
+.signup-form .bday-row {
+  display: grid; grid-template-columns: 64px 64px 80px; gap: 5px;
+}
+.signup-form .citystate-row {
+  display: grid; grid-template-columns: 1fr 90px; gap: 5px;
+}
+
+/* ============= BUTTONS ============= */
+.btn {
+  display: inline-block;
+  background: linear-gradient(180deg, #6d84b4 0%, #3b5998 100%);
+  color: #fff;
+  border: 1px solid var(--msp-blue-d);
+  font: 700 11px "Verdana","Arial",sans-serif;
+  padding: 4px 14px;
+  text-decoration: none;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 0;
+  line-height: 1.3;
+}
+.btn:hover { background: linear-gradient(180deg, #8197c4 0%, #4b69a8 100%); color: #fff; text-decoration: none; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-big {
+  font-size: 13px; padding: 6px 22px;
+  font-weight: 700;
+}
+.btn-block { display: block; width: 100%; }
+.btn-secondary {
+  background: linear-gradient(180deg, #fafafa 0%, #d8dcde 100%);
+  color: var(--msp-blue-d);
+  border: 1px solid #888;
+}
+.btn-secondary:hover { background: linear-gradient(180deg, #fff 0%, #c8d0dc 100%); color: var(--msp-blue-d); }
+.btn-orange {
+  background: linear-gradient(180deg, #ffaa3d 0%, #ff6600 100%);
+  border: 1px solid #b34700;
+  color: #fff;
+}
+.btn-orange:hover { background: linear-gradient(180deg, #ffc36b 0%, #ff8533 100%); color: #fff; }
+
+/* the row of 2 buttons (invite / apply) */
+.dual-cta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+/* ============= FINE PRINT ============= */
+.fineprint {
+  font-size: 10px;
+  color: var(--msp-mute);
+  margin: 10px 4px 0;
+  text-align: center;
+}
+.fineprint a { color: var(--msp-ink-link); }
+
+.center-link {
+  text-align: center;
+  margin: 8px 0 14px;
+  font-size: 11px;
+}
+
+/* ============= ALERTS / RECEIPTS ============= */
+.alert {
+  background: #fff8e1;
+  border: 1px solid #d4b243;
+  color: #5a4912;
+  padding: 6px 9px;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+.alert.ok { background: #e3f4d7; border-color: #5fa235; color: #2c5413; }
+.alert.bad { background: #ffe2dc; border-color: #c4380d; color: #6b1c08; }
+
+/* invite / crush / claim preview banners (the ones that
+   show up at the very top of single-flow screens) */
+.preview-banner {
+  background: #fff4dd;
+  border: 1px solid #d59a3d;
+  padding: 7px 9px;
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+.preview-banner.invite { background: #e6efff; border-color: var(--msp-blue-l); }
+.preview-banner.crush { background: #ffe0ec; border-color: #d83878; }
+.preview-banner.claim { background: #f1e0f1; border-color: #8a3a8c; }
+.preview-banner strong { display: block; margin-bottom: 2px; }
+.preview-banner .quoted {
+  background: #fff; border: 1px solid #ccc;
+  padding: 5px 7px; margin-top: 5px; font-style: italic;
+}
+
+/* ============= TABULAR RECEIPT ============= */
+.receipt-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 11px; margin: 8px 0;
+}
+.receipt-table td {
+  padding: 4px 7px;
+  border-bottom: 1px solid var(--msp-rule-l);
+  vertical-align: top;
+}
+.receipt-table td.lbl {
+  background: var(--msp-tint);
+  color: var(--msp-blue-d);
+  font-weight: 700;
+  width: 110px;
+  text-align: right;
+}
+
+/* ============= STEP / FLOW ============= */
+.step { display: none; }
+.step.active { display: block; }
+
+/* ============= TOAST ============= */
+.toast {
+  position: fixed;
+  left: 50%; transform: translateX(-50%);
+  bottom: 18px;
+  background: #ffffe1;
+  border: 1px solid #888;
+  color: #000;
+  padding: 6px 12px;
+  font-size: 11px;
+  z-index: 999;
+  max-width: 90vw;
+}
+.toast.err { background: #ffe2dc; border-color: var(--msp-red); color: #6b1c08; }
+
+/* ============= MODAL (terms / privacy) ============= */
+.modal-back {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 998;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 18px;
+}
+.modal-back.show { display: flex; }
+.modal-win {
+  background: #fff;
+  border: 1px solid var(--msp-blue-d);
+  width: 100%; max-width: 540px;
+  max-height: 84vh;
+  display: flex; flex-direction: column;
+}
+.modal-title {
+  background: var(--msp-blue);
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 11px; font-weight: 700;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-title button {
+  background: #fff; color: var(--msp-blue-d);
+  border: 1px solid var(--msp-blue-d);
+  width: 18px; height: 18px;
+  padding: 0; font-size: 11px; line-height: 1;
+}
+.modal-body { padding: 12px 14px; overflow-y: auto; font-size: 11px; }
+.modal-body p { margin: 0 0 8px; }
+
+/* ============= FOOTER ============= */
+footer {
+  background: var(--msp-tint);
+  border-top: 1px solid var(--msp-rule);
+  padding: 8px 14px;
+  color: #555;
+  font-size: 10px;
+  text-align: center;
+}
+footer a { color: var(--msp-ink-link); }
+
+/* ============= UTILITIES ============= */
+.muted { color: var(--msp-mute); }
+.center { text-align: center; }
+.mt-4 { margin-top: 4px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mb-0 { margin-bottom: 0; }
+.tiny { font-size: 10px; }
+.mono { font-family: ui-monospace,"Courier New",monospace; font-size: 10px; }
+.signin-fine {
+  text-align: center;
+  font-size: 11px;
+  color: var(--msp-mute);
+  margin: 10px 0 8px;
+}
+.signin-fine a { font-weight: 700; }
+
+/* ============= MOBILE ============= */
+@media (max-width: 700px) {
+  body { font-size: 12px; }
+  .two-col { grid-template-columns: 1fr; }
+  .signup-form .row-2 { grid-template-columns: 1fr; }
+  .signup-form .citystate-row { grid-template-columns: 1fr; }
+  .signup-form .bday-row { grid-template-columns: 1fr 1fr 1fr; }
+  .topnav .wordmark { font-size: 14px; }
+  .btn-big { font-size: 14px; padding: 10px 18px; }
+  .btn { padding: 9px 14px; min-height: 36px; }
+  .signup-form .dual-cta .btn-big { min-height: 48px; }
+  input, select, textarea { font-size: 16px; padding: 7px 6px; min-height: 38px; }
+  .topnav .links a { padding: 6px 10px; }
+  main { padding: 0 6px; }
+  .collage { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============= TOP BLUE NAV (skinny, signed-out) ============= -->
+<header class="topnav">
+  <a class="wordmark" href="/onboard.html">
+    <span id="wordmark-name">Ancient Lanes</span>
+    <em>a place for friends</em>
+  </a>
+  <nav class="links">
+    <a href="#" id="nav-help">Help</a>
+    <a href="#" id="nav-signup">SignUp</a>
+  </nav>
+</header>
+
+<div class="subnav">
+  <strong>You are here:</strong> Home &raquo; <span id="crumb-state">Sign Up</span>
+</div>
+
+<main>
+
+<!-- ============================================================
+     STATE: LANDING  (2-column, marketing + invite/apply)
+     ============================================================ -->
+<section class="step active" id="step-landing">
+  <div class="two-col">
+
+    <!-- ===== LEFT: marketing widget ===== -->
+    <div>
+      <div class="widget">
+        <div class="widget-title">
+          <span>Paths</span>
+          <span class="meta">private · invite only</span>
+        </div>
+        <div class="widget-body marketing">
+          <h2>A niche community for LA kids only.</h2>
+          <p>The circle is very exclusive and very small. We only let people in three at a time — every new member arrives with the people who brought them. Nobody is alone here.</p>
+          <p>No algorithm. No ads. No infinite scroll. Just the people you already know, in a quiet room.</p>
+          <p style="margin-top:14px; padding-top:12px; border-top:1px solid var(--msp-rule-l); font-size:11px; color:var(--msp-mute);">
+            details on what we do and don't do →
+            <a href="#" id="link-privacy-landing-2">Privacy</a> ·
+            <a href="#" id="link-tos-landing-2">Terms</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT: action widget ===== -->
+    <div>
+      <!-- Live "what's happening inside" FOMO ticker -->
+      <div class="widget">
+        <div class="widget-title">
+          <span>👁 right now inside</span>
+        </div>
+        <div class="widget-body" style="font-size:11px; line-height:1.7;">
+          <div><b id="fomo-online">—</b> members online · <b id="fomo-posts">—</b> posts today</div>
+          <div style="margin-top:6px; padding-top:6px; border-top:1px dotted var(--msp-rule-l); color:var(--msp-mute); font-style:italic;" id="fomo-ticker">a friend of yours might already be in there.</div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">
+          <span>Sign In or Apply</span>
+        </div>
+        <div class="widget-body">
+          <!-- Scarcity bar — populated from /api/social-proof gateCount -->
+          <div id="scarcity-bar" style="display:none; background:#fff4d3; border:1px solid #d4b243; padding:6px 9px; font-size:11px; margin-bottom:9px; color:#5a4912;">
+            <strong id="scarcity-spots">—</strong> people waiting to get their two friends in. spots are first-come.
+          </div>
+          <p class="tiny" style="margin:0 0 8px; color:#222;">
+            <b>your friends are already inside.</b> someone already vouched for you. find out who.
+          </p>
+
+          <div class="signup-form">
+            <div class="form-row">
+              <label for="landing-phone">Phone Number<span class="req">*</span></label>
+              <input id="landing-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 (555) 867-5309"/>
+              <div class="hint">US numbers only for now.</div>
+              <div class="inline-status bad" id="landing-phone-err" style="display:none;"></div>
+            </div>
+
+            <div class="dual-cta">
+              <button type="button" class="btn btn-big" id="btn-have-invite">I have an invite <span style="display:block; font-size:10px; font-weight:normal; opacity:0.85;">get in faster →</span></button>
+              <button type="button" class="btn btn-big" id="btn-apply">Join Waitlist <span style="display:block; font-size:10px; font-weight:normal; opacity:0.85;">no invite needed</span></button>
+            </div>
+
+            <p class="fineprint">
+              By continuing you agree to our
+              <a href="#" id="link-tos-landing">Terms</a> and
+              <a href="#" id="link-privacy-landing">Privacy Policy</a>.
+              We text you a 6-digit code. Standard message rates apply.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      </div>
+
+      <div class="signin-fine">
+        Already a member? <a href="#" id="link-go-signin">Sign In</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: SIGNIN-PHONE
+     ============================================================ -->
+<section class="step" id="step-signin-phone">
+  <div class="single-col">
+    <div class="widget">
+      <div class="widget-title">
+        <span>Sign In</span>
+      </div>
+      <div class="widget-body">
+        <p class="tiny muted" style="margin:0 0 8px;">
+          Type your number. We'll text you a 6-digit code.
+        </p>
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="signin-phone">Phone Number<span class="req">*</span></label>
+            <input id="signin-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 (555) 867-5309"/>
+            <div class="inline-status bad" id="signin-phone-err" style="display:none;"></div>
+          </div>
+
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="landing">Back</button>
+            <button type="button" class="btn btn-big" id="btn-signin-send">Send me a code</button>
+          </div>
+
+          <p class="signin-fine mt-8">
+            Forgot your number? <a href="mailto:admin@ancientlanes.app">contact admin</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: SIGNIN-CODE
+     ============================================================ -->
+<section class="step" id="step-signin-code">
+  <div class="single-col">
+    <div class="widget">
+      <div class="widget-title">
+        <span>Verify Code</span>
+      </div>
+      <div class="widget-body">
+        <p class="tiny muted" style="margin:0 0 8px;">
+          Code sent to <strong id="signin-code-echo">your phone</strong>. Expires in 10 minutes.
+        </p>
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="signin-code">6-digit Code<span class="req">*</span></label>
+            <input id="signin-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font-size:16px; letter-spacing:6px; text-align:center;"/>
+            <div class="inline-status bad" id="signin-code-err" style="display:none;"></div>
+          </div>
+
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="signin-phone">Change number</button>
+            <button type="button" class="btn btn-big" id="btn-signin-verify">Verify</button>
+          </div>
+
+          <p class="signin-fine mt-8">
+            Didn't get it? <a href="#" id="link-signin-resend">Resend code</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: INVITE-LANDING  ( ?invite=<token> )
+     ============================================================ -->
+<section class="step" id="step-invite-landing">
+  <div class="single-col">
+    <div id="invite-landing-mount"></div>
+
+    <div class="widget">
+      <div class="widget-title orange">
+        <span>Welcome to <span class="brand-here">Ancient Lanes</span>!</span>
+      </div>
+      <div class="widget-body peach">
+        <h2 style="margin:0 0 6px; font-size:14px; color:var(--msp-blue-d);">
+          <span id="invite-from-name">Someone</span> invited you.
+        </h2>
+        <p style="margin:0 0 8px;">
+          You skip the waitlist. Use your phone number to claim the invite.
+          The same number you'd give to a friend who's running late.
+        </p>
+        <button type="button" class="btn btn-big btn-block" id="btn-invite-continue">Continue</button>
+        <p class="fineprint">
+          Invites expire. If yours has, you can still
+          <a href="#" id="link-invite-fallback-apply">apply to join</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="alert bad" id="invite-bad" style="display:none;">
+      That invite is expired, already used, or not a real one.
+      You can still <a href="#" id="link-invite-bad-apply">apply to join</a>.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: INVITE-PHONE  (claiming invite, phone step)
+     ============================================================ -->
+<section class="step" id="step-invite-phone">
+  <div class="single-col">
+    <div class="preview-banner invite">
+      <strong>Claiming invite from <span id="invite-banner-name">a friend</span>.</strong>
+      <span class="tiny muted">You'll skip the waitlist when you're done.</span>
+    </div>
+    <div class="widget">
+      <div class="widget-title">
+        <span>Sign Up FREE!</span>
+      </div>
+      <div class="widget-body">
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="invite-phone">Phone Number<span class="req">*</span></label>
+            <input id="invite-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 (555) 867-5309"/>
+            <div class="hint">One number, one account. If we recognize you, we sign you in.</div>
+            <div class="inline-status bad" id="invite-phone-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="landing">Back</button>
+            <button type="button" class="btn btn-big" id="btn-invite-send">Send me a code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: INVITE-CODE
+     ============================================================ -->
+<section class="step" id="step-invite-code">
+  <div class="single-col">
+    <div class="preview-banner invite">
+      <strong>Claiming invite from <span id="invite-code-banner-name">a friend</span>.</strong>
+    </div>
+    <div class="widget">
+      <div class="widget-title">
+        <span>Verify Code</span>
+      </div>
+      <div class="widget-body">
+        <p class="tiny muted" style="margin:0 0 8px;">
+          Code sent to <strong id="invite-code-echo">your phone</strong>.
+        </p>
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="invite-code">6-digit Code<span class="req">*</span></label>
+            <input id="invite-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font-size:16px; letter-spacing:6px; text-align:center;"/>
+            <div class="inline-status bad" id="invite-code-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="invite-phone">Change number</button>
+            <button type="button" class="btn btn-big" id="btn-invite-verify">Verify</button>
+          </div>
+          <p class="signin-fine mt-8">
+            Didn't get it? <a href="#" id="link-invite-resend">Resend code</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: APPLY-PHONE  (open pool, no invite)
+     ============================================================ -->
+<section class="step" id="step-apply-phone">
+  <div class="single-col">
+    <div class="preview-banner">
+      <strong>Apply to Join (no invite).</strong>
+      <span class="tiny muted">We let people in slowly, on purpose. A real human reads applications.</span>
+    </div>
+    <div class="widget">
+      <div class="widget-title">
+        <span>Apply to Join</span>
+      </div>
+      <div class="widget-body">
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="apply-phone">Phone Number<span class="req">*</span></label>
+            <input id="apply-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 (555) 867-5309"/>
+            <div class="inline-status bad" id="apply-phone-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="landing">Back</button>
+            <button type="button" class="btn btn-big" id="btn-apply-send">Send me a code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: APPLY-CODE
+     ============================================================ -->
+<section class="step" id="step-apply-code">
+  <div class="single-col">
+    <div class="widget">
+      <div class="widget-title">
+        <span>Verify Code</span>
+      </div>
+      <div class="widget-body">
+        <p class="tiny muted" style="margin:0 0 8px;">
+          Code sent to <strong id="apply-code-echo">your phone</strong>.
+        </p>
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="apply-code">6-digit Code<span class="req">*</span></label>
+            <input id="apply-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font-size:16px; letter-spacing:6px; text-align:center;"/>
+            <div class="inline-status bad" id="apply-code-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="apply-phone">Change number</button>
+            <button type="button" class="btn btn-big" id="btn-apply-verify">Verify</button>
+          </div>
+          <p class="signin-fine mt-8">
+            Didn't get it? <a href="#" id="link-apply-resend">Resend code</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: CLAIM-LANDING  ( ?claim=<token> )
+     ============================================================ -->
+<section class="step" id="step-claim-landing">
+  <div class="single-col">
+    <div class="widget">
+      <div class="widget-title" style="background:#8a3a8c; border-bottom-color:#4d1d4f;">
+        <span>Welcome Back</span>
+      </div>
+      <div class="widget-body" style="background:#f5e6f5;">
+        <h2 style="margin:0 0 6px; font-size:14px; color:#4d1d4f;">
+          Hey, <span id="claim-name">friend</span>.
+        </h2>
+        <p style="margin:0 0 8px;">
+          We still have your profile. Verify your phone number and we'll
+          re-attach it to this account. Your old posts, your old friends,
+          all still in the box where you left them.
+        </p>
+        <button type="button" class="btn btn-big btn-block" id="btn-claim-continue" style="background:linear-gradient(180deg,#a967ab 0%,#7a2d7d 100%); border-color:#4d1d4f;">Continue</button>
+        <p class="fineprint">
+          Not you? <a href="#" id="link-claim-not-me">Sign up fresh instead</a>.
+        </p>
+      </div>
+    </div>
+    <div class="alert bad" id="claim-bad" style="display:none;">
+      This claim link is expired or invalid. Try
+      <a href="#" id="link-claim-bad-apply">applying to join</a> instead.
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: CLAIM-PHONE
+     ============================================================ -->
+<section class="step" id="step-claim-phone">
+  <div class="single-col">
+    <div class="preview-banner claim">
+      <strong>Reclaiming <span id="claim-banner-name">your old profile</span>.</strong>
+    </div>
+    <div class="widget">
+      <div class="widget-title">
+        <span>Verify Your Phone</span>
+      </div>
+      <div class="widget-body">
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="claim-phone">Phone Number<span class="req">*</span></label>
+            <input id="claim-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 (555) 867-5309"/>
+            <div class="inline-status bad" id="claim-phone-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="claim-landing">Back</button>
+            <button type="button" class="btn btn-big" id="btn-claim-send">Send me a code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: CLAIM-CODE
+     ============================================================ -->
+<section class="step" id="step-claim-code">
+  <div class="single-col">
+    <div class="preview-banner claim">
+      <strong>Reclaiming <span id="claim-code-banner-name">your old profile</span>.</strong>
+    </div>
+    <div class="widget">
+      <div class="widget-title">
+        <span>Verify Code</span>
+      </div>
+      <div class="widget-body">
+        <p class="tiny muted" style="margin:0 0 8px;">
+          Code sent to <strong id="claim-code-echo">your phone</strong>.
+        </p>
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="claim-code">6-digit Code<span class="req">*</span></label>
+            <input id="claim-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font-size:16px; letter-spacing:6px; text-align:center;"/>
+            <div class="inline-status bad" id="claim-code-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="claim-phone">Change number</button>
+            <button type="button" class="btn btn-big" id="btn-claim-verify">Verify &amp; Reclaim</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: CRUSH-LANDING  ( ?crush=<token> )
+     ============================================================ -->
+<section class="step" id="step-crush-landing">
+  <div class="single-col">
+    <div class="preview-banner crush">
+      <strong>Someone has a thing for you.</strong>
+      <span class="tiny muted">A member used a crush slot on your number. They stay anonymous until you both sign up.</span>
+      <div class="quoted" id="crush-preview-text">[ message preview unavailable ]</div>
+    </div>
+    <div class="widget">
+      <div class="widget-title">
+        <span>Read it. (Sign Up FREE!)</span>
+      </div>
+      <div class="widget-body">
+        <p style="margin:0 0 8px;">
+          To read the rest and reply, you need an account. It takes a minute.
+        </p>
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="crush-phone">Phone Number<span class="req">*</span></label>
+            <input id="crush-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+1 (555) 867-5309"/>
+            <div class="inline-status bad" id="crush-phone-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="landing">Back</button>
+            <button type="button" class="btn btn-big" id="btn-crush-send">Send me a code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: CRUSH-CODE
+     ============================================================ -->
+<section class="step" id="step-crush-code">
+  <div class="single-col">
+    <div class="preview-banner crush">
+      <strong>One step to read it.</strong>
+    </div>
+    <div class="widget">
+      <div class="widget-title">
+        <span>Verify Code</span>
+      </div>
+      <div class="widget-body">
+        <p class="tiny muted" style="margin:0 0 8px;">
+          Code sent to <strong id="crush-code-echo">your phone</strong>.
+        </p>
+        <div class="signup-form">
+          <div class="form-row">
+            <label for="crush-code">6-digit Code<span class="req">*</span></label>
+            <input id="crush-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font-size:16px; letter-spacing:6px; text-align:center;"/>
+            <div class="inline-status bad" id="crush-code-err" style="display:none;"></div>
+          </div>
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" data-back="crush-landing">Change number</button>
+            <button type="button" class="btn btn-big" id="btn-crush-verify">Verify</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: SIGNUP-FORM  (after verify — building account)
+     ============================================================ -->
+<section class="step" id="step-signup-form">
+  <div class="single-col">
+    <div id="signup-context-banner"></div>
+
+    <div class="widget">
+      <div class="widget-title">
+        <span>Last Step.</span>
+      </div>
+      <div class="widget-body">
+        <p class="tiny muted" style="margin:0 0 10px;">
+          Tell us your name. Pick a handle. The rest is optional.
+        </p>
+
+        <div class="signup-form">
+
+          <div class="form-row">
+            <label for="su-name">Name<span class="req">*</span></label>
+            <input id="su-name" type="text" autocomplete="name" maxlength="40" placeholder="Your real name"/>
+            <div class="hint">First + last. Up to 40 characters.</div>
+            <div class="inline-status bad" id="su-name-err" style="display:none;"></div>
+          </div>
+
+          <div class="form-row">
+            <label for="su-handle">@ Handle<span class="req">*</span></label>
+            <input id="su-handle" type="text" autocomplete="off" maxlength="20" placeholder="yourhandle" style="text-transform:lowercase;"/>
+            <div class="hint">3 to 20 characters. lowercase, numbers, underscores.</div>
+            <div class="inline-status" id="su-handle-status" style="display:none;"></div>
+          </div>
+
+          <div class="form-row">
+            <label for="su-phone-readonly">Phone<span class="req">*</span></label>
+            <input id="su-phone-readonly" type="text" readonly value=""/>
+            <div class="hint">Verified. This is now your sign-in.</div>
+          </div>
+
+          <div class="form-row">
+            <label>Birthday <span class="opt">(optional)</span></label>
+            <div class="bday-row">
+              <select id="su-bmonth">
+                <option value="">Month</option>
+                <option value="01">Jan</option><option value="02">Feb</option>
+                <option value="03">Mar</option><option value="04">Apr</option>
+                <option value="05">May</option><option value="06">Jun</option>
+                <option value="07">Jul</option><option value="08">Aug</option>
+                <option value="09">Sep</option><option value="10">Oct</option>
+                <option value="11">Nov</option><option value="12">Dec</option>
+              </select>
+              <select id="su-bday-day">
+                <option value="">Day</option>
+              </select>
+              <select id="su-byear">
+                <option value="">Year</option>
+              </select>
+            </div>
+            <div class="hint">Only used to show your age on your profile (if you choose).</div>
+          </div>
+
+          <div class="form-row">
+            <label for="su-school">School<span class="req">*</span></label>
+            <select id="su-school">
+              <option value="">— pick your school —</option>
+              <optgroup label="Westside LA">
+                <option value="beverly-hills">Beverly Hills High</option>
+                <option value="harvard-westlake">Harvard-Westlake</option>
+                <option value="brentwood">Brentwood</option>
+                <option value="archer">Archer</option>
+                <option value="marlborough">Marlborough</option>
+                <option value="new-roads">Ancient Paths</option>
+                <option value="windward">Windward</option>
+                <option value="crossroads">Crossroads</option>
+                <option value="palisades">Palisades Charter</option>
+                <option value="venice">Venice High</option>
+                <option value="santa-monica">Santa Monica High</option>
+                <option value="culver">Culver City High</option>
+              </optgroup>
+              <optgroup label="Hancock Park / Mid-City">
+                <option value="loyola">Loyola</option>
+                <option value="marymount">Marymount</option>
+                <option value="immaculate-heart">Immaculate Heart</option>
+                <option value="campbell-hall">Campbell Hall</option>
+                <option value="buckley">Buckley</option>
+                <option value="oakwood">Oakwood</option>
+              </optgroup>
+              <optgroup label="Valley">
+                <option value="vasa">VASA / Valley</option>
+                <option value="notre-dame">Notre Dame</option>
+                <option value="harvard-school">Harvard Boys</option>
+                <option value="sherman-oaks">Sherman Oaks Charter</option>
+              </optgroup>
+              <optgroup label="Pasadena / East">
+                <option value="poly">Polytechnic</option>
+                <option value="westridge">Westridge</option>
+                <option value="flintridge-prep">Flintridge Prep</option>
+                <option value="chandler">Chandler</option>
+              </optgroup>
+              <optgroup label="South Bay / OC">
+                <option value="palos-verdes">Palos Verdes</option>
+                <option value="chadwick">Chadwick</option>
+                <option value="vistamar">Vistamar</option>
+              </optgroup>
+              <option value="other">Other LA school</option>
+            </select>
+            <div class="hint">your school determines your starter group. you can only see people from your school + their direct invites.</div>
+            <div class="inline-status bad" id="su-school-err" style="display:none;"></div>
+          </div>
+
+          <div class="form-row">
+            <label>City / State <span class="opt">(optional)</span></label>
+            <div class="citystate-row">
+              <input id="su-city" type="text" maxlength="60" placeholder="City"/>
+              <select id="su-state">
+                <option value="">State</option>
+                <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+                <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+                <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+                <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+                <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+                <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+                <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+                <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+                <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+                <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+                <option>WI</option><option>WY</option><option>DC</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="su-about">About Me in 1 sentence <span class="opt">(optional)</span></label>
+            <textarea id="su-about" rows="2" maxlength="200" placeholder="I'm the friend who always picks the restaurant."></textarea>
+            <div class="hint"><span id="su-about-count">200</span> characters left.</div>
+          </div>
+
+          <div class="form-row">
+            <label style="display:flex; align-items:flex-start; gap:6px; font-size:11px; color:#000;">
+              <input type="checkbox" id="su-tos" style="margin-top:2px;"/>
+              <span style="font-weight:400;">
+                I'm at least 13, I've read the
+                <a href="#" id="link-tos-modal">Terms of Service</a>
+                and <a href="#" id="link-privacy-modal">Privacy Policy</a>,
+                and I agree.
+              </span>
+            </label>
+          </div>
+
+          <div class="inline-status bad" id="su-submit-err" style="display:none; margin-bottom:6px;"></div>
+
+          <div class="dual-cta">
+            <button type="button" class="btn btn-secondary btn-big" id="btn-su-back">Back</button>
+            <button type="button" class="btn btn-big" id="btn-su-submit">Submit Application</button>
+          </div>
+
+          <p class="fineprint">
+            We never sell your data. We never run third-party trackers.
+            If we ever shut down, we email you the contents of your account.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: WAITLIST  (application pending)
+     ============================================================ -->
+<section class="step" id="step-waitlist">
+  <div class="single-col">
+    <div class="widget">
+      <div class="widget-title">
+        <span>Application Received.</span>
+      </div>
+      <div class="widget-body peach">
+        <h2 style="margin:0 0 8px; font-size:14px; color:var(--msp-blue-d);">
+          Thanks, <span id="wl-name">friend</span>.
+        </h2>
+
+        <div id="wl-vouched" style="display:none;">
+          <p style="margin:0 0 8px;">
+            <strong><span id="wl-voucher">Your inviter</span></strong> vouched for you.
+            You'll get in faster than the open queue.
+          </p>
+        </div>
+
+        <div id="wl-open" style="display:none;">
+          <p style="margin:0 0 8px;">
+            We let people in slowly, on purpose. A real human reads each
+            application. Watch for a text from us.
+          </p>
+        </div>
+
+        <table class="receipt-table">
+          <tr>
+            <td class="lbl">@handle</td>
+            <td>@<span id="wl-handle">—</span></td>
+          </tr>
+          <tr>
+            <td class="lbl">phone</td>
+            <td class="mono"><span id="wl-phone">—</span></td>
+          </tr>
+          <tr>
+            <td class="lbl">position</td>
+            <td>#<span id="wl-position">—</span> in line</td>
+          </tr>
+          <tr id="wl-vouched-row" style="display:none;">
+            <td class="lbl">status</td>
+            <td style="color: var(--msp-green); font-weight: 700;">Vouched (fast lane)</td>
+          </tr>
+        </table>
+
+        <p style="font-size:11.5px; line-height:1.55; color:#222; margin:10px 0 6px;">
+          <b>Once you invite 2 people, you're on the official waitlist</b> and you'll receive a text with our decision on your admission.
+        </p>
+
+        <div class="dual-cta">
+          <button type="button" class="btn btn-secondary btn-big" id="btn-wl-refresh">Refresh status</button>
+          <button type="button" class="btn btn-big" id="btn-wl-signout">Sign Out</button>
+        </div>
+
+        <p class="fineprint">
+          Bookmark this page. When we approve you, this same link drops you in.
+        </p>
+      </div>
+    </div>
+
+    <!-- SHARE-TO-JUMP-LINE: every click bumps you up. Every signup bumps you more. -->
+    <div class="widget" style="margin-top:14px;">
+      <div class="widget-title" style="background:#3b5998; color:#fff;">
+        <span>🚀 Move up the line</span>
+      </div>
+      <div class="widget-body">
+        <p style="margin:0 0 8px; font-size:11.5px;">
+          Share your personal link. <b>Every click bumps you up. Every signup bumps you up way more.</b> The more people use your link, the faster you get in.
+        </p>
+        <div class="row-flex" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+          <input id="wls-url" type="text" readonly value="loading…" style="flex:1; min-width:220px; padding:6px 8px; border:1px solid var(--msp-rule); font:12px monospace; background:#fff7c2;"/>
+          <button type="button" class="btn" id="wls-copy">📋 copy link</button>
+          <button type="button" class="btn btn-secondary" id="wls-sms">📱 text it</button>
+        </div>
+        <div style="display:flex; gap:18px; font-size:11px; padding:6px 0;">
+          <div><b id="wls-clicks" style="color:var(--msp-blue-d); font-size:16px;">0</b><div style="color:#666;">clicks</div></div>
+          <div><b id="wls-signups" style="color:var(--msp-green); font-size:16px;">0</b><div style="color:#666;">signups via you</div></div>
+          <div><b id="wls-up" style="color:var(--msp-orange); font-size:16px;">0</b><div style="color:#666;">spots moved up</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPEED UP THE LINE — pre-claim 2 invites and skip the wait -->
+    <div class="widget" style="margin-top:14px;">
+      <div class="widget-title" style="background:#ff6600; color:#fff;">
+        <span>🔥 Skip the Line (required to speed it up)</span>
+      </div>
+      <div class="widget-body" style="background:#fff7e6;">
+        <p style="margin:0 0 10px; font-size:11.5px; color:#222;">
+          The waitlist is long and growing fast. The way to jump ahead is to
+          spend <strong>your two valuable invites</strong> right now — two phone
+          numbers OR two shareable links. The moment we mint them, you're
+          <strong>active</strong> and the site opens up.
+        </p>
+        <p style="margin:0 0 12px; font-size:11px; color:#666;">
+          You only get these two starting referrals. Spend them carefully.
+        </p>
+
+        <!-- Tabs: phone numbers vs shareable links -->
+        <div style="display:flex; gap:0; margin-bottom:10px; border-bottom:1px solid #ccd0d5;">
+          <button type="button" id="su-tab-phone" class="su-tab active" style="background:#3b5998;color:#fff;border:1px solid #29447e;border-bottom:0;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer;">📱 by phone number</button>
+          <button type="button" id="su-tab-link" class="su-tab" style="background:#eef2f8;color:#003399;border:1px solid #ccd0d5;border-bottom:0;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer;">🔗 shareable links</button>
+        </div>
+
+        <!-- PHONE MODE -->
+        <div id="su-mode-phone">
+          <div style="margin-bottom:10px;">
+            <label style="display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:#29447e; margin-bottom:4px;">Friend #1 — phone</label>
+            <input id="su-phone-1" type="tel" inputmode="tel" placeholder="+1 (310) 555 1234" value="+1 " style="width:100%; padding:7px 9px; border:1px solid #b5bbcc; font:13px Verdana,Arial,sans-serif;"/>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:#29447e; margin-bottom:4px;">Friend #2 — phone</label>
+            <input id="su-phone-2" type="tel" inputmode="tel" placeholder="+1 (310) 555 1234" value="+1 " style="width:100%; padding:7px 9px; border:1px solid #b5bbcc; font:13px Verdana,Arial,sans-serif;"/>
+          </div>
+          <button type="button" id="btn-su-go" class="btn btn-big" style="width:100%;">Mint Invites + Skip the Line →</button>
+        </div>
+
+        <!-- LINK MODE -->
+        <div id="su-mode-link" style="display:none;">
+          <p style="margin:0 0 10px; font-size:11px; color:#222;">
+            We'll mint two open-link invites you can share anywhere (iMessage,
+            Instagram DM, Discord, group chat). Whoever opens the link first
+            claims it. Once minted, you're active immediately.
+          </p>
+          <button type="button" id="btn-su-link-go" class="btn btn-big" style="width:100%;">Mint 2 Shareable Links + Skip the Line →</button>
+        </div>
+
+        <div class="error" id="su-err" style="display:none; margin-top:8px;"></div>
+
+        <!-- RESULT: shows the 2 minted invite URLs with copy/SMS buttons -->
+        <div id="su-result" style="display:none; margin-top:14px; padding:12px; background:#e3f3df; border:1px solid #339933;">
+          <div style="font-weight:700; color:#1f5a1f; margin-bottom:8px; font-size:12px;">✓ You're in. Here are your two invites:</div>
+          <div id="su-result-list"></div>
+          <button type="button" class="btn btn-big" id="btn-su-enter" style="width:100%; margin-top:10px;">Enter Paths →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATE: WELCOME  (active, just got in)
+     ============================================================ -->
+<section class="step" id="step-welcome">
+  <div class="single-col">
+    <div class="widget">
+      <div class="widget-title green">
+        <span>You're In!</span>
+      </div>
+      <div class="widget-body" style="background:#f1faea;">
+        <h2 style="margin:0 0 8px; font-size:16px; color:var(--msp-green); text-align:center;">
+          <span id="welcome-name">friend</span>, you're in. Welcome to <span class="brand-here">Ancient Lanes</span>.
+        </h2>
+        <p style="text-align:center; margin:0 0 12px;">
+          The directory is small on purpose. Be kind, be real, and pick up the phone.
+        </p>
+        <div class="center">
+          <a class="btn btn-big" href="/" id="btn-welcome-enter">Enter Paths</a>
+        </div>
+        <p class="fineprint">
+          You have 2 invite keys waiting. Use them carefully.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>
+    &copy; <span id="year">2026</span> <span class="brand-here">Ancient Lanes</span> &nbsp;|&nbsp;
+    <a href="#" id="footer-tos">Terms</a> &nbsp;|&nbsp;
+    <a href="#" id="footer-privacy">Privacy</a> &nbsp;|&nbsp;
+    <a href="mailto:admin@ancientlanes.app">Contact</a>
+  </div>
+  <div class="tiny muted mt-4">
+    A private directory for people you already know. No ads, no trackers.
+  </div>
+</footer>
+
+<!-- ============= TOS / PRIVACY MODAL ============= -->
+<div class="modal-back" id="legal-modal">
+  <div class="modal-win">
+    <div class="modal-title">
+      <span id="legal-modal-title">Terms of Service</span>
+      <button type="button" id="legal-close">x</button>
+    </div>
+    <div class="modal-body" id="legal-modal-body">
+      <!-- filled in by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===========================================================
+     STATE
+     =========================================================== */
+  const state = {
+    step: 'landing',
+    intent: 'signup',           // 'signup' | 'signin' | 'invite' | 'apply' | 'claim' | 'crush'
+    phone: '',                  // E.164
+    verifyTicket: '',
+    inviteToken: '',
+    crushToken: '',
+    claimToken: '',
+    invitePreview: null,
+    crushPreview: null,
+    claimPreview: null,
+    brandToday: 'Ancient Lanes',
+    brandTomorrow: '',
+    activeUser: null,
+    onlineCount: 0
+  };
+
+  /* ===========================================================
+     DOM HELPERS
+     =========================================================== */
+  const $ = (s, root) => (root || document).querySelector(s);
+  const $$ = (s, root) => Array.from((root || document).querySelectorAll(s));
+
+  function show(stepName) {
+    $$('.step').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById('step-' + stepName);
+    if (el) el.classList.add('active');
+    state.step = stepName;
+    const crumbMap = {
+      'landing': 'Sign Up',
+      'signin-phone': 'Sign In',
+      'signin-code': 'Sign In > Verify',
+      'invite-landing': 'Invite',
+      'invite-phone': 'Invite > Phone',
+      'invite-code': 'Invite > Verify',
+      'apply-phone': 'Apply > Phone',
+      'apply-code': 'Apply > Verify',
+      'claim-landing': 'Reclaim',
+      'claim-phone': 'Reclaim > Phone',
+      'claim-code': 'Reclaim > Verify',
+      'crush-landing': 'Crush',
+      'crush-code': 'Crush > Verify',
+      'signup-form': 'Last Step',
+      'waitlist': 'Application',
+      'welcome': 'Welcome'
+    };
+    const crumb = document.getElementById('crumb-state');
+    if (crumb) crumb.textContent = crumbMap[stepName] || stepName;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text == null ? '' : String(text);
+  }
+  function showInline(id, msg, kind) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg || '';
+    el.className = 'inline-status ' + (kind === 'ok' ? 'ok' : 'bad');
+    el.style.display = msg ? 'inline-block' : 'none';
+  }
+  function toast(msg, isErr) {
+    const t = document.createElement('div');
+    t.className = 'toast' + (isErr ? ' err' : '');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+  function escHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* ===========================================================
+     PHONE INPUT  (auto +1, format, caret-lock)
+     attaches to every input[type=tel]
+     =========================================================== */
+  function attachPhoneInput(input){
+    if(!input) return;
+    const PREFIX = '+1 ';
+    function digits(){
+      let d = input.value.replace(/\D/g, '');
+      if(d.startsWith('1')) d = d.slice(1);
+      return d.slice(0, 10);
+    }
+    function fmt(d){
+      if(!d) return PREFIX;
+      if(d.length <= 3) return PREFIX + '(' + d;
+      if(d.length <= 6) return PREFIX + '(' + d.slice(0,3) + ') ' + d.slice(3);
+      return PREFIX + '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6);
+    }
+    function end(){
+      const n = input.value.length;
+      try { input.setSelectionRange(n, n); } catch(_) {}
+    }
+    function clamp(){
+      if((input.selectionStart || 0) < PREFIX.length){
+        try { input.setSelectionRange(PREFIX.length, Math.max(PREFIX.length, input.selectionEnd || PREFIX.length)); } catch(_) {}
+      }
+    }
+    if(!input.value.startsWith(PREFIX)) input.value = PREFIX;
+    input.addEventListener('focus', () => {
+      if(!input.value.startsWith(PREFIX)) input.value = PREFIX;
+      setTimeout(end, 0);
+    });
+    input.addEventListener('click', () => setTimeout(clamp, 0));
+    input.addEventListener('keyup', clamp);
+    input.addEventListener('select', clamp);
+    input.addEventListener('mouseup', () => setTimeout(clamp, 0));
+    input.addEventListener('input', () => {
+      input.value = fmt(digits());
+      end();
+    });
+    input.addEventListener('keydown', (e) => {
+      const p = input.selectionStart || 0;
+      if((e.key === 'Backspace' || e.key === 'Delete') && p <= PREFIX.length) e.preventDefault();
+      if(e.key === 'ArrowLeft' && p <= PREFIX.length) e.preventDefault();
+      if(e.key === 'Home'){ e.preventDefault(); try { input.setSelectionRange(PREFIX.length, PREFIX.length); } catch(_) {} }
+    });
+  }
+
+  /* ===========================================================
+     PHONE NORMALIZE (any -> E.164 US)
+     =========================================================== */
+  function phoneToE164(raw){
+    let p = (raw || '').replace(/[^\d+]/g, '');
+    if (!p) return '';
+    if (p.startsWith('+')) return p;
+    if (p.length === 10) return '+1' + p;
+    if (p.length === 11 && p.startsWith('1')) return '+' + p;
+    return '+' + p;
+  }
+  function phoneIsValid(e164){
+    return /^\+1\d{10}$/.test(e164);
+  }
+  function prettyPhone(e164){
+    if (!e164) return '';
+    const m = e164.match(/^\+1(\d{3})(\d{3})(\d{4})$/);
+    if (!m) return e164;
+    return '+1 (' + m[1] + ') ' + m[2] + '-' + m[3];
+  }
+
+  /* ===========================================================
+     API
+     =========================================================== */
+  async function api(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    const tok = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+    if (tok) opts.headers['X-User-Token'] = tok;
+    if (opts.body && typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
+    const res = await fetch(path, opts);
+    let data = {};
+    try { data = await res.json(); } catch(_) {}
+    if (!res.ok) {
+      const err = new Error(data.error || data.message || ('HTTP ' + res.status));
+      err.data = data;
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  function storeToken(token, remember){
+    if (!token) return;
+    if (remember) localStorage.setItem('oldstreets-token', token);
+    else sessionStorage.setItem('oldstreets-token', token);
+  }
+  function clearToken(){
+    localStorage.removeItem('oldstreets-token');
+    sessionStorage.removeItem('oldstreets-token');
+  }
+
+  /* ===========================================================
+     URL PARAMS
+     =========================================================== */
+  function parseQuery(){
+    const q = new URLSearchParams(location.search);
+    state.inviteToken = q.get('invite') || '';
+    state.crushToken = q.get('crush') || '';
+    state.claimToken = q.get('claim') || '';
+    state.lockedSchool = q.get('school') || '';
+    // If the URL came with a ?school=<slug>, pre-select + lock the school
+    // dropdown so the user can't change it. Used for school-specific
+    // launch links: /onboard.html?school=beverly-hills, etc.
+    if (state.lockedSchool) {
+      setTimeout(() => {
+        const sel = document.getElementById('su-school');
+        if (sel) {
+          for (const opt of sel.options) {
+            if (opt.value === state.lockedSchool) {
+              sel.value = state.lockedSchool;
+              sel.disabled = true;
+              sel.title = 'School is locked from the signup link';
+              // Show a banner so the user understands
+              const banner = document.createElement('div');
+              banner.style.cssText = 'margin-top:6px; padding:5px 8px; background:#e3f3df; border:1px solid #339933; font-size:11px; color:#1f5a1f;';
+              banner.innerHTML = '✓ signing up for <b>' + opt.textContent + '</b>';
+              sel.parentElement.appendChild(banner);
+              break;
+            }
+          }
+        }
+      }, 50);
+    }
+  }
+
+  /* ===========================================================
+     BRAND / SITE INFO
+     =========================================================== */
+  async function loadBrand(){
+    // Signed-out public always sees "Paths" — the rotating wordmark is
+    // a members-only easter egg, so the front door stays consistent for
+    // first-time visitors, link previews, and word-of-mouth.
+    const brand = 'Paths';
+    state.brandToday = brand;
+    setText('wordmark-name', brand);
+    setText('hero-brand', brand);
+    $$('.brand-here').forEach(el => el.textContent = brand);
+    document.title = 'Paths';
+    try {
+      const info = await api('/api/site-info');
+      state.brandTomorrow = info.brandTomorrow || '';
+      state.onlineCount = info.onlineCount || 0;
+    } catch(_) { /* offline ok */ }
+  }
+
+  /* ===========================================================
+     PREVIEWS  (invite / crush / claim)
+     =========================================================== */
+  async function loadInvitePreview(){
+    if (!state.inviteToken) return;
+    try {
+      const r = await api('/api/auth/invite-info?token=' + encodeURIComponent(state.inviteToken));
+      state.invitePreview = r;
+      setText('invite-from-name', r.fromName || 'A member');
+      setText('invite-banner-name', r.fromName || 'a friend');
+      setText('invite-code-banner-name', r.fromName || 'a friend');
+    } catch(e){
+      state.invitePreview = null;
+      const bad = document.getElementById('invite-bad');
+      if (bad) bad.style.display = 'block';
+    }
+  }
+  async function loadCrushPreview(){
+    if (!state.crushToken) return;
+    try {
+      const r = await api('/api/crush/external/' + encodeURIComponent(state.crushToken));
+      state.crushPreview = r;
+      const msg = r.message || '[ this message will load when you sign in ]';
+      const teaser = msg.length > 80 ? msg.slice(0, 80) + '...' : msg;
+      const el = document.getElementById('crush-preview-text');
+      if (el) el.textContent = '"' + teaser + '"';
+    } catch(_) {
+      const el = document.getElementById('crush-preview-text');
+      if (el) el.textContent = '[ message preview expired ]';
+    }
+  }
+  async function loadClaimPreview(){
+    if (!state.claimToken) return;
+    try {
+      const r = await api('/api/auth/claim/info?token=' + encodeURIComponent(state.claimToken));
+      state.claimPreview = r;
+      setText('claim-name', r.name || 'friend');
+      setText('claim-banner-name', r.name ? (r.name + "'s old profile") : 'your old profile');
+      setText('claim-code-banner-name', r.name ? (r.name + "'s old profile") : 'your old profile');
+    } catch(_) {
+      state.claimPreview = null;
+      const bad = document.getElementById('claim-bad');
+      if (bad) bad.style.display = 'block';
+    }
+  }
+
+  /* ===========================================================
+     COLLAGE  (9 placeholder member squares, CSS-only)
+     =========================================================== */
+  function renderCollage(){
+    const mount = document.getElementById('collage-grid');
+    if (!mount) return;
+    const inits = ['WD','MK','JL','TR','SP','BV','AC','RH','EN'];
+    const palette = [
+      '#3b5998','#ff6600','#cc0066','#339933','#8a3a8c',
+      '#bf6b00','#0066aa','#996633','#557788'
+    ];
+    let html = '';
+    for (let i = 0; i < 9; i++){
+      const bg = palette[i % palette.length];
+      html += '<div class="cell" style="background:' + bg + ';">' + inits[i] + '</div>';
+    }
+    mount.innerHTML = html;
+  }
+
+  /* ===========================================================
+     CONTEXT BANNER (top of signup-form)
+     =========================================================== */
+  function renderSignupContextBanner(){
+    const mount = document.getElementById('signup-context-banner');
+    if (!mount) return;
+    if (state.inviteToken && state.invitePreview){
+      mount.innerHTML = '<div class="preview-banner invite"><strong>You were invited by ' +
+        escHtml(state.invitePreview.fromName || 'a member') + '.</strong>' +
+        '<span class="tiny muted">You skip the waitlist.</span></div>';
+    } else if (state.crushToken){
+      mount.innerHTML = '<div class="preview-banner crush"><strong>Someone has a thing for you.</strong>' +
+        '<span class="tiny muted">Once you finish signing up, their message lands in your inbox.</span></div>';
+    } else {
+      mount.innerHTML = '<div class="preview-banner"><strong>Applying to join.</strong>' +
+        '<span class="tiny muted">An admin reads applications. We text you when it\'s your turn.</span></div>';
+    }
+  }
+
+  /* ===========================================================
+     BIRTHDAY DROPDOWNS  (populate)
+     =========================================================== */
+  function populateBirthday(){
+    const dDay = document.getElementById('su-bday-day');
+    const dYr = document.getElementById('su-byear');
+    if (dDay && dDay.options.length <= 1){
+      for (let i = 1; i <= 31; i++){
+        const o = document.createElement('option');
+        o.value = (i < 10 ? '0' : '') + i;
+        o.textContent = i;
+        dDay.appendChild(o);
+      }
+    }
+    if (dYr && dYr.options.length <= 1){
+      const now = new Date().getFullYear();
+      for (let y = now - 13; y >= now - 95; y--){
+        const o = document.createElement('option');
+        o.value = String(y);
+        o.textContent = String(y);
+        dYr.appendChild(o);
+      }
+    }
+  }
+
+  /* ===========================================================
+     ABOUT-ME CHAR COUNT
+     =========================================================== */
+  function bindAboutCounter(){
+    const ta = document.getElementById('su-about');
+    const out = document.getElementById('su-about-count');
+    if (!ta || !out) return;
+    const refresh = () => { out.textContent = String(200 - (ta.value || '').length); };
+    ta.addEventListener('input', refresh);
+    refresh();
+  }
+
+  /* ===========================================================
+     HANDLE LIVE CHECK (debounced 250ms)
+     =========================================================== */
+  let handleTimer = null;
+  let handleSeq = 0;
+  function bindHandleCheck(){
+    const input = document.getElementById('su-handle');
+    if (!input) return;
+    input.addEventListener('input', () => {
+      const raw = (input.value || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+      if (raw !== input.value) input.value = raw;
+      if (handleTimer) clearTimeout(handleTimer);
+      if (!raw){
+        showInline('su-handle-status', '', 'bad');
+        return;
+      }
+      if (raw.length < 3){
+        showInline('su-handle-status', 'too short. 3+ characters.', 'bad');
+        return;
+      }
+      showInline('su-handle-status', 'checking...', 'ok');
+      const seq = ++handleSeq;
+      handleTimer = setTimeout(async () => {
+        try {
+          const r = await api('/api/handle/check?h=' + encodeURIComponent(raw));
+          if (seq !== handleSeq) return;
+          if (r.available) showInline('su-handle-status', '@' + raw + ' is available.', 'ok');
+          else showInline('su-handle-status', '@' + raw + ' is taken. try another.', 'bad');
+        } catch(e){
+          if (seq !== handleSeq) return;
+          showInline('su-handle-status', e.message || 'could not check', 'bad');
+        }
+      }, 250);
+    });
+  }
+
+  /* ===========================================================
+     PHONE SUBMIT (shared helper)
+     =========================================================== */
+  async function sendCodeFor(inputId, errId, btn, nextStep){
+    showInline(errId, '');
+    const e164 = phoneToE164($('#' + inputId).value);
+    if (!phoneIsValid(e164)){
+      showInline(errId, 'Enter a valid US phone number.', 'bad');
+      return false;
+    }
+    state.phone = e164;
+    if (btn){ btn.disabled = true; btn.textContent = 'sending...'; }
+    try {
+      await api('/api/auth/phone/start', { method: 'POST', body: { phone: e164 } });
+      const echoMap = {
+        'signin-code': 'signin-code-echo',
+        'invite-code': 'invite-code-echo',
+        'apply-code': 'apply-code-echo',
+        'claim-code': 'claim-code-echo',
+        'crush-code': 'crush-code-echo'
+      };
+      if (echoMap[nextStep]) setText(echoMap[nextStep], prettyPhone(e164));
+      show(nextStep);
+      return true;
+    } catch(e){
+      showInline(errId, e.message || 'could not send code', 'bad');
+      return false;
+    } finally {
+      if (btn){ btn.disabled = false; btn.textContent = 'Send me a code'; }
+    }
+  }
+
+  /* ===========================================================
+     CODE VERIFY (shared helper)
+     -----------------------------------------------------------
+     Returns the parsed response so caller can route.
+     =========================================================== */
+  async function verifyCode(inputId, errId, btn){
+    showInline(errId, '');
+    const code = ($('#' + inputId).value || '').trim().replace(/\D/g, '');
+    if (!code){ showInline(errId, 'Enter the 6 digits we texted you.', 'bad'); return null; }
+    if (btn){ btn.disabled = true; btn.textContent = 'checking...'; }
+    try {
+      const r = await api('/api/auth/phone/check', {
+        method: 'POST',
+        body: { phone: state.phone, code }
+      });
+      return r;
+    } catch(e){
+      showInline(errId, e.message || 'bad code', 'bad');
+      return null;
+    } finally {
+      if (btn){ btn.disabled = false; btn.textContent = 'Verify'; }
+    }
+  }
+
+  /* ===========================================================
+     ROUTE AFTER VERIFY
+     -----------------------------------------------------------
+     - existing active user      -> set token + redirect /
+     - existing waitlist user    -> set token + render waitlist
+     - new (verifyTicket only)   -> show signup-form
+     - claim flow                -> POST claim/finish, redirect /
+     =========================================================== */
+  async function routeAfterVerify(verifyResponse, errId){
+    const r = verifyResponse;
+    // Existing active account: token immediately useful.
+    if (r.existingAccount && r.token){
+      storeToken(r.token, true);
+      // Check status: active vs waitlist
+      try {
+        const who = await api('/api/whoami');
+        if (who && who.user && who.user.status === 'active'){
+          location.href = '/';
+          return;
+        }
+        if (who && who.user){
+          renderWaitlist(who.user);
+          show('waitlist');
+          return;
+        }
+      } catch(_) {}
+      location.href = '/';
+      return;
+    }
+    // Claim flow
+    if (state.claimToken && r.verifyTicket){
+      try {
+        const cr = await api('/api/auth/claim/finish', {
+          method: 'POST',
+          body: { verifyTicket: r.verifyTicket, claimToken: state.claimToken }
+        });
+        if (cr.token){
+          storeToken(cr.token, true);
+          toast('welcome back. one second.');
+          setTimeout(() => { location.href = '/'; }, 500);
+          return;
+        }
+      } catch(e){
+        showInline(errId, e.message || 'could not reclaim', 'bad');
+        return;
+      }
+    }
+    // New user — verify ticket -> signup-form
+    state.verifyTicket = r.verifyTicket || '';
+    const phoneOut = document.getElementById('su-phone-readonly');
+    if (phoneOut) phoneOut.value = prettyPhone(r.phoneE164 || state.phone);
+    renderSignupContextBanner();
+    show('signup-form');
+  }
+
+  /* ===========================================================
+     SIGNUP SUBMIT (final form)
+     =========================================================== */
+  async function submitSignup(){
+    showInline('su-submit-err', '');
+    const name = ($('#su-name').value || '').trim();
+    const handle = ($('#su-handle').value || '').trim().toLowerCase();
+    const school = ($('#su-school').value || '').trim();
+    const schoolLabel = (document.getElementById('su-school').selectedOptions[0] || {}).textContent || '';
+    const aboutMe = ($('#su-about').value || '').trim();
+    const city = ($('#su-city').value || '').trim();
+    const stUS = ($('#su-state').value || '').trim();
+    const bMonth = $('#su-bmonth').value;
+    const bDay = $('#su-bday-day').value;
+    const bYear = $('#su-byear').value;
+    const tos = $('#su-tos').checked;
+
+    if (!name) return showInline('su-submit-err', 'Name is required.', 'bad');
+    if (name.length > 40) return showInline('su-submit-err', 'Name too long (40 max).', 'bad');
+    if (!handle || handle.length < 3) return showInline('su-submit-err', 'Pick a handle (3+ chars).', 'bad');
+    if (!school) { showInline('su-school-err', 'Pick your school — it decides your starter group.', 'bad'); return showInline('su-submit-err', 'School is required.', 'bad'); }
+    if (!tos) return showInline('su-submit-err', 'You must agree to the terms.', 'bad');
+    if (!state.verifyTicket) return showInline('su-submit-err', 'Your code expired. Restart from phone step.', 'bad');
+
+    const body = {
+      verifyTicket: state.verifyTicket,
+      name,
+      handle,
+      school,
+      schoolLabel,
+      tosAgreed: true
+    };
+    if (state.inviteToken) body.inviteToken = state.inviteToken;
+    if (state.crushToken) body.crushToken = state.crushToken;
+    if (aboutMe) body.headline = aboutMe;
+    if (city) body.city = city;
+    if (stUS) body.state = stUS;
+    if (bMonth && bDay && bYear) body.birthday = bYear + '-' + bMonth + '-' + bDay;
+
+    const btn = document.getElementById('btn-su-submit');
+    btn.disabled = true; btn.textContent = 'submitting...';
+    try {
+      const r = await api('/api/auth/signup', { method: 'POST', body });
+      if (r.token) storeToken(r.token, true);
+      state.activeUser = r.user || null;
+      if (r.user && r.user.status === 'active'){
+        renderWelcome(r.user);
+        show('welcome');
+      } else {
+        renderWaitlist(r.user || { name, handle, phoneE164: state.phone });
+        show('waitlist');
+      }
+    } catch(e){
+      showInline('su-submit-err', e.message || 'signup failed', 'bad');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Submit Application';
+    }
+  }
+
+  /* ===========================================================
+     RENDER WAITLIST + WELCOME
+     =========================================================== */
+  function renderWaitlist(user){
+    setText('wl-name', user.name || 'friend');
+    setText('wl-handle', user.handle || '—');
+    setText('wl-phone', prettyPhone(user.phoneE164 || state.phone));
+    setText('wl-position', user.waitlistPosition || '—');
+    const vouched = !!(user.invitedBy || state.inviteToken);
+    document.getElementById('wl-vouched').style.display = vouched ? 'block' : 'none';
+    document.getElementById('wl-vouched-row').style.display = vouched ? '' : 'none';
+    document.getElementById('wl-open').style.display = vouched ? 'none' : 'block';
+    if (vouched){
+      const voucher = (state.invitePreview && state.invitePreview.fromName) ||
+                      user.invitedByName || 'Your inviter';
+      setText('wl-voucher', voucher);
+    }
+    // Load the share-to-jump-line stats (delayed so the user record is up to date).
+    setTimeout(loadWaitlistShare, 250);
+  }
+  function renderWelcome(user){
+    setText('welcome-name', user.name || 'friend');
+  }
+
+  // Load the user's share-to-jump-line stats and wire up copy/sms buttons.
+  async function loadWaitlistShare(){
+    try {
+      const r = await api('/api/me/waitlist-share');
+      if (!r || !r.url) return;
+      const $i = document.getElementById('wls-url');
+      const $c = document.getElementById('wls-clicks');
+      const $s = document.getElementById('wls-signups');
+      const $u = document.getElementById('wls-up');
+      if ($i) $i.value = r.url;
+      if ($c) $c.textContent = r.clicks || 0;
+      if ($s) $s.textContent = r.signups || 0;
+      if ($u) $u.textContent = r.spotsMovedUp || 0;
+      const $copy = document.getElementById('wls-copy');
+      if ($copy && !$copy._wired) {
+        $copy._wired = true;
+        $copy.addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(r.url); $copy.textContent = '✓ copied'; setTimeout(() => $copy.textContent = '📋 copy link', 1800); }
+          catch { document.getElementById('wls-url').select(); document.execCommand('copy'); $copy.textContent = '✓ copied'; setTimeout(() => $copy.textContent = '📋 copy link', 1800); }
+        });
+      }
+      const $sms = document.getElementById('wls-sms');
+      if ($sms && !$sms._wired) {
+        $sms._wired = true;
+        $sms.addEventListener('click', () => {
+          location.href = 'sms:?&body=' + encodeURIComponent(r.smsBody || ('move me up on old streets: ' + r.url));
+        });
+      }
+    } catch {}
+  }
+
+  /* ===========================================================
+     WAITLIST: refresh + signout
+     =========================================================== */
+  async function refreshWaitlist(){
+    const btn = document.getElementById('btn-wl-refresh');
+    btn.disabled = true; btn.textContent = 'checking...';
+    try {
+      const who = await api('/api/whoami');
+      if (who && who.user){
+        if (who.user.status === 'active'){
+          toast('you\'re in. one moment.');
+          setTimeout(() => { location.href = '/'; }, 500);
+          return;
+        }
+        renderWaitlist(who.user);
+        toast('still in line. position #' + (who.user.waitlistPosition || '—') + '.');
+      }
+    } catch(e){
+      toast(e.message || 'could not refresh', true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Refresh status';
+    }
+  }
+  async function signOut(){
+    try { await api('/api/auth/logout', { method: 'POST' }); } catch(_) {}
+    clearToken();
+    location.href = '/onboard.html';
+  }
+
+  /* ===========================================================
+     LEGAL MODAL
+     =========================================================== */
+  function openLegal(kind){
+    const title = kind === 'privacy' ? 'Privacy Policy' : 'Terms of Service';
+    setText('legal-modal-title', title);
+    const body = document.getElementById('legal-modal-body');
+    if (!body) return;
+    if (kind === 'privacy'){
+      body.innerHTML =
+        '<p style="font-weight:700; color:var(--msp-blue-d); margin-bottom:6px;">What we don\'t do.</p>' +
+        '<ul style="padding-left:18px; margin:0 0 14px;">' +
+          '<li>We don\'t sell your data. No third-party trackers.</li>' +
+          '<li>We don\'t recommend strangers to you. Your network is yours.</li>' +
+          '<li>We don\'t ask for your school, your job, or your face. You can add those later if you want.</li>' +
+          '<li>We don\'t run ads against your conversations.</li>' +
+          '<li>We don\'t index this site to search engines.</li>' +
+        '</ul>' +
+        '<p><strong>1. What we collect.</strong> Your phone number, the name you give us, your handle, and anything you choose to post. That\'s it.</p>' +
+        '<p><strong>2. What we do not collect.</strong> No location, no contacts, no advertising IDs. We do not run third-party trackers.</p>' +
+        '<p><strong>3. Who sees your stuff.</strong> Members of this directory. Not the public web.</p>' +
+        '<p><strong>4. Texts.</strong> We text you a 6-digit code to sign in. We text you when an admin approves your application. Standard message rates apply.</p>' +
+        '<p><strong>5. Deletion.</strong> Hit "leave" in settings, and your account turns into a memory page. We keep a backup so a future you can come back.</p>' +
+        '<p><strong>6. Contact.</strong> admin@oldstreets.org</p>';
+    } else {
+      body.innerHTML =
+        '<p><strong>0. 18+ only.</strong> You must be 18 years of age or older to create an account or use Streets. By checking the agreement box you represent and warrant that you are at least 18 years old. Accounts found to belong to minors will be terminated without notice and data deleted.</p>' +
+        '<p><strong>1. One real person per account.</strong> One account per phone number. No alts, no impersonation, no scraping, no automation. Sharing credentials is prohibited.</p>' +
+        '<p><strong>2. Profile photo (camera capture).</strong> A live in-browser selfie is required to activate your account. By proceeding you grant Streets a non-exclusive, royalty-free license to host and display that image as your profile picture solely within Streets while your account exists. Camera access is requested in your browser at capture time; you may revoke at any time via your browser settings. Photos are not used for facial recognition, advertising, or sold to third parties. Deleting your account removes the stored image.</p>' +
+        '<p><strong>3. Content you post.</strong> You retain ownership of what you post. You grant Streets a worldwide, non-exclusive, royalty-free license to host, store, display, and transmit your content for the purpose of operating the service. You are solely responsible for your posts, DMs, photos, and any other content you submit.</p>' +
+        '<p><strong>4. Acceptable use.</strong> No illegal content, no harassment, no doxxing, no threats, no sexual content involving minors (zero tolerance — reported to NCMEC and law enforcement), no IP infringement, no spam, no malware, no impersonation, no commercial solicitation without prior written approval. Violations result in immediate termination and may be referred to authorities.</p>' +
+        '<p><strong>5. Live video (Rooms / Oldmegle).</strong> Calls are routed through Jitsi Meet. Streets does not record calls server-side, but participants may capture or screenshot. Don\'t share anything you wouldn\'t want preserved. Pairing in Oldmegle is at-your-own-risk; exit the call at any time.</p>' +
+        '<p><strong>6. Privacy.</strong> We collect: phone number, name, handle, the profile selfie, content you post, and basic device/IP metadata for security and fraud prevention. We do NOT sell data, run third-party ad trackers, or index your content to public search. Full Privacy Policy linked separately.</p>' +
+        '<p><strong>7. Texts and notifications.</strong> By signing up with a phone number you consent to receive SMS for: verification codes, approval messages, friend-invite responses, and operational alerts. Standard message and data rates apply. Reply STOP to opt out of non-essential SMS (verification SMS may still send).</p>' +
+        '<p><strong>8. Account recovery.</strong> Your phone number is your key. Loss of phone means slow, manual recovery. We make no guarantee of recoverability if you lose access to the verified number.</p>' +
+        '<p><strong>9. Account termination.</strong> You may delete your account at any time via settings; remaining content may persist for up to 30 days in encrypted backups before purge. We may terminate accounts that violate these terms.</p>' +
+        '<p><strong>10. Disclaimers.</strong> The service is provided "AS IS" without warranties of any kind. To the maximum extent permitted by law, Streets, its operators, and contributors disclaim all liability for indirect, incidental, or consequential damages.</p>' +
+        '<p><strong>11. Indemnification.</strong> You agree to indemnify and hold harmless the operators of Streets from any claim arising out of your use of the service, your content, or your violation of these terms.</p>' +
+        '<p><strong>12. Governing law.</strong> These terms are governed by the laws of the State of California, USA, without regard to conflict-of-law principles. Any dispute is subject to the exclusive jurisdiction of the state and federal courts located in Los Angeles County, California.</p>' +
+        '<p><strong>13. Changes.</strong> We may update these terms. Material changes will be re-prompted in-app; continued use after such update constitutes acceptance.</p>' +
+        '<p><strong>14. Contact.</strong> Reach the operator via the Contact link in the site footer.</p>' +
+        '<p style="margin-top:14px; color:var(--msp-mute); font-style:italic;">By clicking "I agree" you affirm you have read and accepted the above and you are 18 years or older.</p>';
+    }
+    document.getElementById('legal-modal').classList.add('show');
+  }
+  function closeLegal(){
+    document.getElementById('legal-modal').classList.remove('show');
+  }
+
+  /* ===========================================================
+     AUTO-LOGIN
+     -----------------------------------------------------------
+     On boot, if we have a token in storage and whoami returns
+     `active`, redirect to /. If `waitlist`, render the receipt.
+     =========================================================== */
+  async function tryAutoLogin(){
+    const tok = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+    if (!tok) return false;
+    try {
+      const who = await api('/api/whoami');
+      if (who && who.user){
+        if (who.user.status === 'active'){
+          location.replace('/');
+          return true;
+        }
+        if (who.user.status === 'waitlist'){
+          renderWaitlist(who.user);
+          show('waitlist');
+          return true;
+        }
+      }
+    } catch(_) { /* bad token, ignore */ }
+    return false;
+  }
+
+  /* ===========================================================
+     EVENT WIRING
+     =========================================================== */
+  function wire(){
+
+    // Top nav
+    const navHelp = document.getElementById('nav-help');
+    if (navHelp) navHelp.addEventListener('click', (e) => { e.preventDefault(); openLegal('terms'); });
+    const navSignup = document.getElementById('nav-signup');
+    if (navSignup) navSignup.addEventListener('click', (e) => { e.preventDefault(); show('landing'); });
+
+    // Landing -> have invite (if token already set, go to invite-phone; else go to signin-phone)
+    const btnInvite = document.getElementById('btn-have-invite');
+    if (btnInvite) btnInvite.addEventListener('click', () => {
+      // copy phone forward if already typed
+      const p = $('#landing-phone').value;
+      if (state.inviteToken){
+        if (p) $('#invite-phone').value = p;
+        state.intent = 'invite';
+        show('invite-phone');
+      } else {
+        if (p) $('#signin-phone').value = p;
+        // user clicked "I have an invite" but no token in URL — treat as signin-with-invite flow:
+        // they probably came here directly. Send them through signin (existing) OR if no account
+        // exists, they'll be promoted to apply.
+        state.intent = 'signin';
+        show('signin-phone');
+        toast('No invite link in URL — paste the link your friend sent, or sign in below.', false);
+      }
+    });
+
+    const btnApply = document.getElementById('btn-apply');
+    if (btnApply) btnApply.addEventListener('click', () => {
+      const p = $('#landing-phone').value;
+      if (p) $('#apply-phone').value = p;
+      state.intent = 'apply';
+      show('apply-phone');
+    });
+
+    const linkSignin = document.getElementById('link-go-signin');
+    if (linkSignin) linkSignin.addEventListener('click', (e) => {
+      e.preventDefault();
+      const p = $('#landing-phone').value;
+      if (p) $('#signin-phone').value = p;
+      state.intent = 'signin';
+      show('signin-phone');
+    });
+
+    // landing legal
+    ['link-tos-landing','footer-tos'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', (e) => { e.preventDefault(); openLegal('terms'); });
+    });
+    ['link-privacy-landing','footer-privacy'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', (e) => { e.preventDefault(); openLegal('privacy'); });
+    });
+
+    // Back buttons (data-back="<step>")
+    $$('[data-back]').forEach(btn => {
+      btn.addEventListener('click', () => show(btn.getAttribute('data-back')));
+    });
+
+    /* ----- SIGNIN flow ----- */
+    const btnSigninSend = document.getElementById('btn-signin-send');
+    if (btnSigninSend) btnSigninSend.addEventListener('click', () => {
+      sendCodeFor('signin-phone', 'signin-phone-err', btnSigninSend, 'signin-code');
+    });
+    $('#signin-phone').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnSigninSend.click();
+    });
+    const linkSigninResend = document.getElementById('link-signin-resend');
+    if (linkSigninResend) linkSigninResend.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!state.phone) return show('signin-phone');
+      try {
+        await api('/api/auth/phone/start', { method: 'POST', body: { phone: state.phone } });
+        toast('new code sent.');
+      } catch(err){ toast(err.message || 'resend failed', true); }
+    });
+    const btnSigninVerify = document.getElementById('btn-signin-verify');
+    if (btnSigninVerify) btnSigninVerify.addEventListener('click', async () => {
+      const r = await verifyCode('signin-code', 'signin-code-err', btnSigninVerify);
+      if (!r) return;
+      await routeAfterVerify(r, 'signin-code-err');
+    });
+    $('#signin-code').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnSigninVerify.click();
+    });
+
+    /* ----- INVITE flow ----- */
+    const btnInviteContinue = document.getElementById('btn-invite-continue');
+    if (btnInviteContinue) btnInviteContinue.addEventListener('click', () => {
+      state.intent = 'invite';
+      show('invite-phone');
+    });
+    const linkInviteFallback = document.getElementById('link-invite-fallback-apply');
+    if (linkInviteFallback) linkInviteFallback.addEventListener('click', (e) => {
+      e.preventDefault();
+      state.intent = 'apply';
+      show('apply-phone');
+    });
+    const linkInviteBadApply = document.getElementById('link-invite-bad-apply');
+    if (linkInviteBadApply) linkInviteBadApply.addEventListener('click', (e) => {
+      e.preventDefault();
+      state.intent = 'apply';
+      show('apply-phone');
+    });
+    const btnInviteSend = document.getElementById('btn-invite-send');
+    if (btnInviteSend) btnInviteSend.addEventListener('click', () => {
+      sendCodeFor('invite-phone', 'invite-phone-err', btnInviteSend, 'invite-code');
+    });
+    $('#invite-phone').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnInviteSend.click();
+    });
+    const btnInviteVerify = document.getElementById('btn-invite-verify');
+    if (btnInviteVerify) btnInviteVerify.addEventListener('click', async () => {
+      const r = await verifyCode('invite-code', 'invite-code-err', btnInviteVerify);
+      if (!r) return;
+      await routeAfterVerify(r, 'invite-code-err');
+    });
+    $('#invite-code').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnInviteVerify.click();
+    });
+    const linkInviteResend = document.getElementById('link-invite-resend');
+    if (linkInviteResend) linkInviteResend.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!state.phone) return show('invite-phone');
+      try {
+        await api('/api/auth/phone/start', { method: 'POST', body: { phone: state.phone } });
+        toast('new code sent.');
+      } catch(err){ toast(err.message || 'resend failed', true); }
+    });
+
+    /* ----- APPLY flow ----- */
+    const btnApplySend = document.getElementById('btn-apply-send');
+    if (btnApplySend) btnApplySend.addEventListener('click', () => {
+      sendCodeFor('apply-phone', 'apply-phone-err', btnApplySend, 'apply-code');
+    });
+    $('#apply-phone').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnApplySend.click();
+    });
+    const btnApplyVerify = document.getElementById('btn-apply-verify');
+    if (btnApplyVerify) btnApplyVerify.addEventListener('click', async () => {
+      const r = await verifyCode('apply-code', 'apply-code-err', btnApplyVerify);
+      if (!r) return;
+      await routeAfterVerify(r, 'apply-code-err');
+    });
+    $('#apply-code').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnApplyVerify.click();
+    });
+    const linkApplyResend = document.getElementById('link-apply-resend');
+    if (linkApplyResend) linkApplyResend.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!state.phone) return show('apply-phone');
+      try {
+        await api('/api/auth/phone/start', { method: 'POST', body: { phone: state.phone } });
+        toast('new code sent.');
+      } catch(err){ toast(err.message || 'resend failed', true); }
+    });
+
+    /* ----- CLAIM flow ----- */
+    const btnClaimContinue = document.getElementById('btn-claim-continue');
+    if (btnClaimContinue) btnClaimContinue.addEventListener('click', () => {
+      state.intent = 'claim';
+      show('claim-phone');
+    });
+    const linkClaimNotMe = document.getElementById('link-claim-not-me');
+    if (linkClaimNotMe) linkClaimNotMe.addEventListener('click', (e) => {
+      e.preventDefault();
+      state.claimToken = '';
+      show('landing');
+    });
+    const linkClaimBadApply = document.getElementById('link-claim-bad-apply');
+    if (linkClaimBadApply) linkClaimBadApply.addEventListener('click', (e) => {
+      e.preventDefault();
+      state.claimToken = '';
+      show('apply-phone');
+    });
+    const btnClaimSend = document.getElementById('btn-claim-send');
+    if (btnClaimSend) btnClaimSend.addEventListener('click', () => {
+      sendCodeFor('claim-phone', 'claim-phone-err', btnClaimSend, 'claim-code');
+    });
+    $('#claim-phone').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnClaimSend.click();
+    });
+    const btnClaimVerify = document.getElementById('btn-claim-verify');
+    if (btnClaimVerify) btnClaimVerify.addEventListener('click', async () => {
+      const r = await verifyCode('claim-code', 'claim-code-err', btnClaimVerify);
+      if (!r) return;
+      await routeAfterVerify(r, 'claim-code-err');
+    });
+    $('#claim-code').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnClaimVerify.click();
+    });
+
+    /* ----- CRUSH flow ----- */
+    const btnCrushSend = document.getElementById('btn-crush-send');
+    if (btnCrushSend) btnCrushSend.addEventListener('click', () => {
+      sendCodeFor('crush-phone', 'crush-phone-err', btnCrushSend, 'crush-code');
+    });
+    $('#crush-phone').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') btnCrushSend.click();
+    });
+    const btnCrushVerify = document.getElementById('btn-crush-verify');
+    if (btnCrushVerify) btnCrushVerify.addEventListener('click', async () => {
+      const r = await verifyCode('crush-code', 'crush-code-err', btnCrushVerify);
+      if (!r) return;
+      await routeAfterVerify(r, 'crush-code-err');
+    });
+
+    /* ----- SIGNUP FORM ----- */
+    const btnSuBack = document.getElementById('btn-su-back');
+    if (btnSuBack) btnSuBack.addEventListener('click', () => {
+      // go back to whichever code step we came from
+      const map = {
+        'invite': 'invite-code',
+        'apply': 'apply-code',
+        'claim': 'claim-code',
+        'crush': 'crush-code',
+        'signin': 'signin-code'
+      };
+      show(map[state.intent] || 'apply-code');
+    });
+    const btnSuSubmit = document.getElementById('btn-su-submit');
+    if (btnSuSubmit) btnSuSubmit.addEventListener('click', submitSignup);
+
+    /* ----- Legal modal ----- */
+    const linkTosModal = document.getElementById('link-tos-modal');
+    if (linkTosModal) linkTosModal.addEventListener('click', (e) => { e.preventDefault(); openLegal('terms'); });
+    const linkPrivacyModal = document.getElementById('link-privacy-modal');
+    if (linkPrivacyModal) linkPrivacyModal.addEventListener('click', (e) => { e.preventDefault(); openLegal('privacy'); });
+    document.getElementById('legal-close').addEventListener('click', closeLegal);
+    document.getElementById('legal-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'legal-modal') closeLegal();
+    });
+
+    /* ----- Waitlist ----- */
+    const btnRefresh = document.getElementById('btn-wl-refresh');
+    if (btnRefresh) btnRefresh.addEventListener('click', refreshWaitlist);
+    const btnSignout = document.getElementById('btn-wl-signout');
+    if (btnSignout) btnSignout.addEventListener('click', signOut);
+
+    /* ----- Skip-the-line (speedup) ----- */
+    const suTabPhone = document.getElementById('su-tab-phone');
+    const suTabLink  = document.getElementById('su-tab-link');
+    const suModePhone= document.getElementById('su-mode-phone');
+    const suModeLink = document.getElementById('su-mode-link');
+    function showTab(which){
+      if (which === 'phone'){
+        suTabPhone.style.background = '#3b5998'; suTabPhone.style.color = '#fff';
+        suTabLink.style.background  = '#eef2f8'; suTabLink.style.color  = '#003399';
+        suModePhone.style.display = ''; suModeLink.style.display = 'none';
+      } else {
+        suTabLink.style.background  = '#3b5998'; suTabLink.style.color  = '#fff';
+        suTabPhone.style.background = '#eef2f8'; suTabPhone.style.color = '#003399';
+        suModePhone.style.display = 'none'; suModeLink.style.display = '';
+      }
+    }
+    if (suTabPhone) suTabPhone.addEventListener('click', () => showTab('phone'));
+    if (suTabLink)  suTabLink.addEventListener('click',  () => showTab('link'));
+
+    function renderSuResult(invites){
+      const list = document.getElementById('su-result-list');
+      if (!list) return;
+      list.innerHTML = invites.map((inv, i) => {
+        const url = inv.url || (location.origin + '/i/' + inv.token);
+        const isLink = inv.contactType === 'link';
+        const label = isLink ? ('Shareable link #' + (i+1)) : ('Invite for ' + (inv.contact || 'friend'));
+        const smsBtn = isLink ? '' : ('<a href="sms:' + inv.contact + '?&body=' + encodeURIComponent('come thru: ' + url) + '" class="btn btn-secondary" style="font-size:10px;padding:4px 8px;">📱 SMS</a>');
+        return (
+          '<div style="margin-bottom:8px; padding:8px; background:#fff; border:1px solid #99c099;">' +
+            '<div style="font-size:10px; font-weight:700; color:#1f5a1f; margin-bottom:4px;">' + label + '</div>' +
+            '<div style="font-size:10px; color:#333; word-break:break-all; margin-bottom:4px;">' + url + '</div>' +
+            '<div style="display:flex; gap:6px;">' +
+              '<button type="button" class="btn btn-secondary" style="font-size:10px;padding:4px 8px;" onclick="navigator.clipboard.writeText(\'' + url + '\'); this.textContent=\'Copied ✓\';">📋 Copy</button>' +
+              smsBtn +
+            '</div>' +
+          '</div>'
+        );
+      }).join('');
+      document.getElementById('su-result').style.display = '';
+    }
+
+    function suErr(msg){
+      const e = document.getElementById('su-err');
+      if (!e) return;
+      e.textContent = msg; e.style.display = '';
+    }
+    function suClearErr(){ const e = document.getElementById('su-err'); if (e) e.style.display = 'none'; }
+
+    const btnSuGo = document.getElementById('btn-su-go');
+    if (btnSuGo) btnSuGo.addEventListener('click', async () => {
+      suClearErr();
+      const p1 = document.getElementById('su-phone-1').value.trim();
+      const p2 = document.getElementById('su-phone-2').value.trim();
+      if (!p1 || !p2) return suErr('Both phone numbers required.');
+      if (p1 === p2) return suErr('Those are the same number. Need two different friends.');
+      btnSuGo.disabled = true; btnSuGo.textContent = 'Minting…';
+      try {
+        const r = await fetch('/api/me/waitlist/speedup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-User-Token': state.token || '' },
+          body: JSON.stringify({ phone1: p1, phone2: p2 })
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || 'Something broke.');
+        renderSuResult(j.invites || []);
+        if (j.user) { state.user = j.user; persistSession(); }
+      } catch (e) {
+        suErr(e.message);
+        btnSuGo.disabled = false; btnSuGo.textContent = 'Mint Invites + Skip the Line →';
+      }
+    });
+
+    const btnSuLinkGo = document.getElementById('btn-su-link-go');
+    if (btnSuLinkGo) btnSuLinkGo.addEventListener('click', async () => {
+      suClearErr();
+      btnSuLinkGo.disabled = true; btnSuLinkGo.textContent = 'Minting…';
+      try {
+        const r = await fetch('/api/me/waitlist/speedup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-User-Token': state.token || '' },
+          body: JSON.stringify({ linkMode: true })
+        });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || 'Something broke.');
+        renderSuResult(j.invites || []);
+        if (j.user) { state.user = j.user; persistSession(); }
+      } catch (e) {
+        suErr(e.message);
+        btnSuLinkGo.disabled = false; btnSuLinkGo.textContent = 'Mint 2 Shareable Links + Skip the Line →';
+      }
+    });
+
+    const btnSuEnter = document.getElementById('btn-su-enter');
+    if (btnSuEnter) btnSuEnter.addEventListener('click', () => { location.href = '/'; });
+
+    /* ----- Phone inputs ----- */
+    document.querySelectorAll('input[type="tel"]').forEach(attachPhoneInput);
+  }
+
+  /* ===========================================================
+     BOOT
+     =========================================================== */
+  // ============ FOMO TICKER (signed-out landing) ============
+  // Pulls real-ish numbers from /api/site-info plus a rotating "this hour"
+  // feed of low-effort one-liner activity ("@maya posted on the wall",
+  // "@sage just joined", "@theo started a live room"). Pure social pressure.
+  const FOMO_PHRASES = [
+    'someone tagged you on the wall',
+    'a friend of a friend just posted about your school',
+    '3 people from your old chats are inside',
+    'a screenshot of you got dropped 12m ago',
+    'someone you know just started a live room',
+    'your name came up in the group chat',
+    'someone reposted a thing about you',
+    'a crush list has your name on it',
+    'people are asking who you are',
+    'a 9th-grade you would be in by now'
+  ];
+  const FOMO_HANDLES = ['@maya','@sage','@theo','@kai','@eva','@leo','@nina','@aria','@cassie','@jules','@rio','@priya','@devv','@mira','@sam'];
+  const FOMO_VERBS = [
+    'just joined', 'just dropped a post', 'started a live room', 'made a new group',
+    'reacted to 12 posts', 'commented on the wall', 'sent 4 invites', 'changed their mood',
+    'started a thread', 'is on a 14-day streak', 'just went live'
+  ];
+  async function loadFomo(){
+    try {
+      const [sp, si] = await Promise.allSettled([
+        fetch('/api/social-proof').then(r => r.ok ? r.json() : {}),
+        fetch('/api/site-info').then(r => r.ok ? r.json() : {})
+      ]);
+      const spd = sp.status === 'fulfilled' ? (sp.value || {}) : {};
+      const sid = si.status === 'fulfilled' ? (si.value || {}) : {};
+      const members = spd.memberCount || (62 + Math.floor(Math.random()*20));
+      const online = spd.onlineCount || sid.onlineCount || Math.max(4, Math.floor(members * 0.09));
+      const posts = sid.postCount || (members * 3 + Math.floor(Math.random()*60));
+      const fo = document.getElementById('fomo-online');
+      const fp = document.getElementById('fomo-posts');
+      if (fo) fo.textContent = online;
+      if (fp) fp.textContent = posts;
+      // Scarcity bar — show how many people are fighting to get their 2 friends in
+      if (spd.gateCount > 0) {
+        const sb = document.getElementById('scarcity-bar');
+        const ss = document.getElementById('scarcity-spots');
+        if (sb && ss) { ss.textContent = spd.gateCount; sb.style.display = 'block'; }
+      }
+    } catch {
+      const fo = document.getElementById('fomo-online'); if (fo) fo.textContent = '47';
+      const fp = document.getElementById('fomo-posts'); if (fp) fp.textContent = '212';
+    }
+    // Rotate the "right now" phrase
+    const tk = document.getElementById('fomo-ticker');
+    if (tk) {
+      let i = Math.floor(Math.random() * FOMO_PHRASES.length);
+      tk.textContent = FOMO_PHRASES[i];
+      setInterval(() => { i = (i + 1) % FOMO_PHRASES.length; tk.style.opacity = '0'; setTimeout(() => { tk.textContent = FOMO_PHRASES[i]; tk.style.opacity = '1'; }, 250); }, 8000);
+      tk.style.transition = 'opacity 250ms ease-out';
+    }
+    // Rotating live ticker feed
+    const ff = document.getElementById('fomo-feed');
+    if (ff) {
+      function pickItem(){
+        const h = FOMO_HANDLES[Math.floor(Math.random() * FOMO_HANDLES.length)];
+        const v = FOMO_VERBS[Math.floor(Math.random() * FOMO_VERBS.length)];
+        const m = 1 + Math.floor(Math.random() * 48);
+        return `<div style="padding:4px 0; border-bottom:1px dotted var(--msp-rule-l);"><span style="display:inline-block; width:6px; height:6px; background:var(--msp-green); border-radius:50%; margin-right:5px;"></span><b>${h}</b> ${v} <span style="color:#888; font-size:10px;">· ${m}m ago</span></div>`;
+      }
+      ff.innerHTML = Array.from({length: 6}).map(pickItem).join('');
+      setInterval(() => { ff.insertAdjacentHTML('afterbegin', pickItem()); while (ff.children.length > 6) ff.removeChild(ff.lastChild); }, 6000);
+    }
+  }
+
+  function boot(){
+    setText('year', String(new Date().getFullYear()));
+    renderCollage();
+    populateBirthday();
+    bindAboutCounter();
+    bindHandleCheck();
+    wire();
+    parseQuery();
+    loadBrand();
+    loadFomo();
+
+    // route based on URL token
+    (async () => {
+      if (state.crushToken){
+        await loadCrushPreview();
+        show('crush-landing');
+      } else if (state.inviteToken){
+        await loadInvitePreview();
+        if (state.invitePreview) show('invite-landing');
+        else show('invite-landing'); // banner shows the error message
+      } else if (state.claimToken){
+        await loadClaimPreview();
+        show('claim-landing');
+      }
+    })();
+
+    // auto-login (may redirect away from this page)
+    tryAutoLogin();
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+})();
+
+// Tab title ghost cycling for visitors — starts after 30s of being away
+(function osOnboardTabGhost(){
+  const msgs = [
+    'you\'re not in yet.',
+    '👀 someone from your school just joined',
+    'the door only opens from inside',
+    'your friends might already be there',
+    null
+  ];
+  let handle = null, pending = null, idx = 0, base = '';
+  function cycle() {
+    const m = msgs[idx % msgs.length];
+    if (m === null) { document.title = base; clearInterval(handle); handle = null; idx = 0; return; }
+    document.title = m;
+    idx++;
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      base = document.title;
+      pending = setTimeout(() => {
+        if (!document.hidden || handle) return;
+        idx = 0;
+        handle = setInterval(cycle, 4000);
+      }, 30000);
+    } else {
+      clearTimeout(pending);
+      if (handle) { clearInterval(handle); handle = null; idx = 0; }
+      if (base) document.title = base;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

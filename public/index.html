@@ -1,0 +1,4031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Paths</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg" />
+<link rel="apple-touch-icon" href="logo.svg" />
+<!-- Shared chrome — rainbow announcement banner + theme sync + viral hooks.
+     chrome.js skips nav injection on the home page (we already have inline
+     nav) but still runs loadAnnouncements / phantom typing / theme. -->
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+
+<!-- ====================================================================
+     LANDER OLD-URL REDIRECT. If we landed on the deprecated host, send
+     the browser straight to the new home. Runs before any UI work.
+==================================================================== -->
+<script>
+(function(){
+  var OLD = ['oldstreets.app.lander.host'];
+  var NEW_URL = 'https://old-streets.fly.dev';
+  var host = (location.hostname || '').toLowerCase();
+  if (OLD.indexOf(host) === -1) return;
+  location.replace(NEW_URL);
+})();
+</script>
+
+<style>
+/* =============================================================
+   OLD STREETS HOME — MySpace 2009 dashboard clone.
+   Verdana 11px, sharp 1px borders, no shadows, no gradients.
+   Theming via [data-theme] on <html>.
+   ============================================================= */
+
+:root {
+  --msp-bg:       #c1cdf5;
+  --msp-pane:     #ffffff;
+  --msp-blue:     #3b5998;
+  --msp-blue-d:   #29447e;
+  --msp-blue-l:   #6d84b4;
+  --msp-tint:     #d8dfea;
+  --msp-tint-2:   #eef2f8;
+  --msp-rule:     #b5bbcc;
+  --msp-rule-l:   #d8dcde;
+  --msp-ink:      #000000;
+  --msp-ink-link: #003399;
+  --msp-ink-vis:  #5c5c8a;
+  --msp-orange:   #ff6600;
+  --msp-peach:    #f3dec8;
+  --msp-red:      #cc0000;
+  --msp-green:    #339933;
+  --msp-mute:     #666666;
+}
+
+/* Theme presets — applied via <html data-theme="..."> */
+html[data-theme="sunset"]   { --msp-bg: #ffd9a8; --msp-blue: #c75300; --msp-blue-l: #e87a2f; --msp-blue-d: #8c3d00; --msp-tint: #ffe6c6; --msp-ink-link: #8a3500; }
+html[data-theme="hotpink"]  { --msp-bg: #ffc1e3; --msp-blue: #b3005c; --msp-blue-l: #d63b8e; --msp-blue-d: #800040; --msp-tint: #ffd9eb; --msp-ink-link: #800040; }
+html[data-theme="purple"]   { --msp-bg: #d4c1f5; --msp-blue: #5a2c91; --msp-blue-l: #7a52b6; --msp-blue-d: #3d1e66; --msp-tint: #e3d6f0; --msp-ink-link: #3d1e66; }
+html[data-theme="emerald"]  { --msp-bg: #b8e0c4; --msp-blue: #1a6e35; --msp-blue-l: #36945c; --msp-blue-d: #0d4a22; --msp-tint: #cfeed7; --msp-ink-link: #0d4a22; }
+html[data-theme="navy"]     { --msp-bg: #9aacd6; --msp-blue: #1f3b73; --msp-blue-l: #4561a3; --msp-blue-d: #122752; --msp-tint: #c4cfe8; --msp-ink-link: #122752; }
+html[data-theme="ink"]      { --msp-bg: #b8b8b8; --msp-blue: #222; --msp-blue-l: #555; --msp-blue-d: #000; --msp-tint: #cfcfcf; --msp-ink-link: #000; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--msp-bg);
+  color: var(--msp-ink);
+  font-family: "Trebuchet MS", "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
+  min-height: 100vh;
+}
+
+a { color: var(--msp-ink-link); text-decoration: underline; }
+a:visited { color: var(--msp-ink-vis); }
+a:hover { color: var(--msp-red); }
+
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: 11px;
+}
+input[type="text"], input[type="tel"], input[type="search"], textarea, select {
+  border: 1px solid var(--msp-rule);
+  background: #fff;
+  padding: 3px 5px;
+  color: #000;
+}
+input:focus, textarea:focus, select:focus { outline: 1px solid var(--msp-blue); }
+button {
+  border: 1px solid var(--msp-rule);
+  background: #f0f1f5;
+  padding: 2px 9px;
+  cursor: pointer;
+  color: #000;
+}
+button:hover { background: #e2e5ee; }
+button:active { background: #cfd4e0; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* === Top bar (white strip with logo + search) === */
+.top-strip {
+  background: #fff;
+  border-bottom: 1px solid var(--msp-rule);
+  padding: 7px 14px;
+}
+.top-strip-inner {
+  max-width: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-wordmark {
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--msp-blue);
+  letter-spacing: -0.2px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.brand-wordmark:visited { color: var(--msp-blue); }
+.brand-wordmark .brand-dot { color: var(--msp-orange); }
+.top-search {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--msp-rule);
+  background: #fff;
+  min-width: 0;
+}
+.top-search select {
+  border: 0;
+  border-right: 1px solid var(--msp-rule);
+  background: #fff;
+  padding: 3px 4px;
+  font-size: 11px;
+}
+.top-search input {
+  border: 0;
+  flex: 1;
+  padding: 4px 6px;
+  min-width: 0;
+}
+.top-search-btn {
+  border: 0;
+  border-left: 1px solid var(--msp-rule);
+  background: #f0f1f5;
+  padding: 0 12px;
+  font-weight: bold;
+  font-size: 11px;
+}
+.top-pwr {
+  font-size: 9px;
+  color: var(--msp-mute);
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+.top-pwr b { color: #4285f4; }
+
+/* === Blue nav strip === */
+.nav-strip {
+  background: var(--msp-blue);
+  color: #fff;
+  border-bottom: 1px solid var(--msp-blue-d);
+  font-size: 11px;
+}
+.nav-inner {
+  max-width: 100%;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+.nav-left, .nav-right { display: flex; align-items: stretch; }
+.nav-item {
+  position: relative;
+  padding: 6px 11px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  white-space: nowrap;
+  border-right: 1px solid var(--msp-blue-d);
+  cursor: pointer;
+}
+.nav-item:first-child { border-left: 1px solid var(--msp-blue-d); }
+.nav-item:visited { color: #fff; }
+.nav-item:hover { background: var(--msp-blue-d); color: #fff; }
+.nav-item.is-active { background: var(--msp-blue-d); }
+.nav-item .caret { font-size: 9px; opacity: 0.9; margin-left: 2px; }
+.nav-item .nav-badge {
+  display: inline-block;
+  background: var(--msp-red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 0 4px;
+  margin-left: 4px;
+  border-radius: 1px;
+  vertical-align: middle;
+}
+.nav-right .nav-item { border-right: 0; border-left: 1px solid var(--msp-blue-d); }
+
+/* ============ First-run onboarding tour ============ */
+.tour-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+}
+.tour-target-spot {
+  position: fixed; z-index: 9999;
+  border: 3px solid #ff6600;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 14px rgba(255, 102, 0, 0.7);
+  pointer-events: none;
+  border-radius: 2px;
+  animation: tourPulse 1.4s ease-in-out infinite;
+}
+@keyframes tourPulse {
+  0%, 100% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 8px rgba(255, 102, 0, 0.6); }
+  50% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 22px rgba(255, 102, 0, 1); }
+}
+.tour-bubble {
+  position: fixed; z-index: 10000;
+  background: #fff;
+  border: 2px solid var(--msp-blue-d);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+  max-width: 330px;
+  font: 12px/1.45 inherit;
+  color: #222;
+}
+.tour-bubble .head {
+  background: var(--msp-blue);
+  color: #fff;
+  padding: 6px 10px;
+  font-weight: 700;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.tour-bubble .head .step-num {
+  font-size: 10px; opacity: 0.85; font-weight: 400;
+}
+.tour-bubble .body { padding: 11px 13px 12px; }
+.tour-bubble .body h4 { margin: 0 0 6px; font-size: 14px; color: var(--msp-blue-d); }
+.tour-bubble .body p { margin: 0 0 8px; }
+.tour-bubble .actions {
+  display: flex; gap: 6px; justify-content: flex-end;
+  padding: 0 10px 10px;
+}
+.tour-bubble .actions button {
+  background: var(--msp-blue); color: #fff; border: 1px solid var(--msp-blue-d);
+  padding: 5px 14px; font: 700 11px inherit; cursor: pointer;
+}
+.tour-bubble .actions .skip {
+  background: transparent; color: var(--msp-mute); border: 1px solid var(--msp-rule);
+}
+.tour-bubble.no-target { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+/* Drag-and-drop highlight — any element with data-drop-zone gets a dashed
+   blue outline + tint when the user drags a file over it. */
+[data-drop-zone] { transition: outline-color 120ms ease-out, background-color 120ms ease-out; }
+[data-drop-zone].drop-active {
+  outline: 2px dashed var(--msp-blue);
+  outline-offset: 2px;
+  background: rgba(59, 89, 152, 0.06) !important;
+  position: relative;
+}
+[data-drop-zone].drop-active::before {
+  content: 'drop here';
+  position: absolute; inset: 4px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(59, 89, 152, 0.92); color: #fff;
+  font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Activity-stream bell — pulses red when unread, fades quiet when empty */
+.nav-bell { position: relative; padding: 0 12px; }
+.nav-bell .bell-ico { font-size: 13px; filter: saturate(0) brightness(2); opacity: 0.6; }
+.nav-bell.has-unread .bell-ico { filter: none; opacity: 1; animation: bell-shake 1.4s ease-in-out infinite; }
+.nav-bell-badge {
+  position: absolute !important;
+  top: 1px; right: 0px;
+  background: #ff2222 !important;
+  color: #fff;
+  font-size: 9px; font-weight: 700;
+  min-width: 13px; height: 13px;
+  padding: 0 3px !important; margin: 0 !important;
+  border-radius: 7px;
+  line-height: 13px; text-align: center;
+  border: 1.5px solid #29447e;
+  box-shadow: 0 0 0 1px #ff2222, 0 0 6px rgba(255, 34, 34, 0.8);
+  animation: bell-pulse 1.5s ease-in-out infinite;
+}
+@keyframes bell-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 1px #ff2222, 0 0 6px rgba(255, 34, 34, 0.8); }
+  50% { transform: scale(1.15); box-shadow: 0 0 0 1px #ff2222, 0 0 14px rgba(255, 34, 34, 1); }
+}
+@keyframes bell-shake {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(-12deg); }
+  20% { transform: rotate(10deg); }
+  30% { transform: rotate(-8deg); }
+  40% { transform: rotate(6deg); }
+  50% { transform: rotate(0deg); }
+}
+
+/* Dropdowns */
+.nav-drop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid var(--msp-rule);
+  border-top: 0;
+  min-width: 170px;
+  z-index: 80;
+  display: none;
+  font-weight: normal;
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.08);
+}
+.nav-item.open .nav-drop { display: block; }
+.nav-drop a {
+  display: block;
+  padding: 5px 11px;
+  color: var(--msp-ink-link);
+  text-decoration: none;
+  border-bottom: 1px solid var(--msp-rule-l);
+  font-weight: normal;
+}
+.nav-drop a:last-child { border-bottom: 0; }
+.nav-drop a:hover { background: var(--msp-tint); }
+.nav-right .nav-drop { left: auto; right: 0; }
+
+/* Mobile hamburger (hidden on desktop) */
+.nav-hamburger { display: none; }
+
+/* === Main page chrome === */
+.page-wrap {
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 12px 60px;
+}
+
+/* Greeting bar */
+.hello-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.hello-h1 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #000;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+.hello-themes {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.theme-swatch {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 1px solid var(--msp-rule);
+  background:
+    conic-gradient(#ff5050 0 90deg, #50a0ff 90deg 180deg, #ffd54a 180deg 270deg, #66c46c 270deg);
+  vertical-align: middle;
+}
+.url-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+.url-bar .url-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.url-bar .url-mono { color: var(--msp-mute); }
+.url-bar .url-mono b { color: #000; }
+.url-bar .copy-btn {
+  font-size: 10px;
+  padding: 0 6px;
+  border: 1px solid var(--msp-rule);
+  background: #fff;
+}
+.url-bar .clock {
+  color: var(--msp-mute);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* === 3-column body — sidebars stick while center scrolls === */
+.cols {
+  display: grid;
+  grid-template-columns: 180px 1fr 280px;
+  gap: 10px;
+  align-items: start;
+}
+.col { display: flex; flex-direction: column; gap: 8px; }
+@media (min-width: 901px) {
+  .col.col-left, .col.col-right {
+    position: sticky;
+    top: 70px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+  }
+  .col.col-left::-webkit-scrollbar, .col.col-right::-webkit-scrollbar { width: 6px; }
+  .col.col-left::-webkit-scrollbar-thumb, .col.col-right::-webkit-scrollbar-thumb { background: var(--msp-rule-l); }
+}
+
+/* Widgets */
+.widget {
+  background: var(--msp-pane);
+  border: 1px solid var(--msp-rule);
+}
+.widget-title {
+  background: var(--msp-blue-l);
+  color: #fff;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+  border-bottom: 1px solid var(--msp-blue-d);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.widget-title .wt-ico { font-size: 12px; line-height: 1; }
+.widget-title .wt-right { font-weight: normal; font-size: 10px; }
+.widget-title a { color: #fff; text-decoration: underline; }
+.widget-body { padding: 7px 8px; }
+.widget-body.tight { padding: 5px 7px; }
+.widget-body.none { padding: 0; }
+.widget.alerts { border-color: var(--msp-peach); }
+.widget.alerts .widget-title { background: var(--msp-red); border-bottom-color: #7a0000; }
+.widget.alerts .widget-body { background: #fdf4e8; }
+.widget.status .widget-title { background: var(--msp-blue); border-bottom-color: var(--msp-blue-d); }
+.widget.activity-stream .widget-title { background: var(--msp-blue); border-bottom-color: var(--msp-blue-d); }
+.widget.pymk .widget-title { background: var(--msp-blue-l); }
+.widget.online .widget-title { background: var(--msp-blue-l); }
+
+/* Profile thumb widget */
+.profile-thumb {
+  width: 128px;
+  height: 128px;
+  border: 1px solid var(--msp-rule);
+  padding: 3px;
+  background: #fff;
+  margin: 0 auto 6px;
+}
+.profile-thumb .pt-inner {
+  width: 120px;
+  height: 120px;
+  background: var(--msp-blue);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  overflow: hidden;
+}
+.profile-thumb img {
+  width: 120px; height: 120px;
+  display: block;
+  object-fit: cover;
+}
+.profile-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+.profile-handle { text-align: center; color: var(--msp-mute); font-size: 10px; margin-bottom: 6px; }
+.profile-stats {
+  font-size: 10px;
+  color: var(--msp-mute);
+  border-top: 1px solid var(--msp-rule-l);
+  padding-top: 5px;
+  line-height: 1.5;
+}
+.profile-stats b { color: #000; }
+.profile-actions { margin-top: 6px; font-size: 11px; line-height: 1.7; }
+.profile-actions div { border-bottom: 1px dotted var(--msp-rule-l); padding: 1px 0; }
+.profile-actions div:last-child { border-bottom: 0; }
+.profile-actions .pa-label { color: var(--msp-mute); margin-right: 4px; }
+
+.manage-list { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--msp-rule-l); font-size: 11px; line-height: 1.8; }
+.manage-list a { display: block; }
+
+.view-my-row {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--msp-rule-l);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+.view-my-row select { flex: 1; }
+
+/* Alerts items */
+.alert-item {
+  border-bottom: 1px dotted #d5b89a;
+  padding: 5px 0;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.alert-item:last-child { border-bottom: 0; }
+.alert-item .a-type { color: var(--msp-red); font-weight: bold; }
+.alert-item .a-meta { color: var(--msp-mute); font-size: 10px; }
+
+/* My Apps */
+.app-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 0;
+  border-bottom: 1px dotted var(--msp-rule-l);
+}
+.app-row:last-child { border-bottom: 0; }
+.app-row .app-icon {
+  width: 24px; height: 24px;
+  border: 1px solid var(--msp-rule);
+  background: var(--msp-tint);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.app-row a { font-size: 11px; }
+
+/* Status & Mood widget */
+.status-widget .composer { padding: 8px; }
+.status-widget .composer input.status-input {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+.composer-row {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.composer-row .mood-pick {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--msp-mute);
+}
+.composer-row .mood-pick select { font-size: 11px; padding: 1px 3px; }
+.composer-row label.anon {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--msp-mute);
+  user-select: none;
+}
+.composer-row label.anon input { margin: 0; }
+.status-widget .current-status {
+  background: var(--msp-tint-2);
+  border-top: 1px solid var(--msp-rule-l);
+  padding: 6px 9px;
+  font-size: 11px;
+}
+.status-widget .current-status .ss-line { display: flex; gap: 6px; align-items: baseline; }
+.status-widget .current-status .ss-line b { color: var(--msp-ink-link); }
+.status-widget .current-status .ss-meta {
+  font-size: 10px;
+  color: var(--msp-mute);
+  margin-top: 2px;
+}
+.status-widget .current-status .ss-actions { margin-top: 3px; font-size: 10px; }
+.status-widget .current-status .ss-actions a { margin-right: 6px; }
+
+/* Friend activity row */
+.feed { padding: 0; }
+.feed-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid var(--msp-rule-l);
+}
+.feed-row:last-child { border-bottom: 0; }
+.feed-avatar {
+  width: 58px; height: 58px;
+  border: 1px solid var(--msp-rule);
+  padding: 3px;
+  background: #fff;
+  flex-shrink: 0;
+}
+.feed-avatar .fa-inner {
+  width: 50px; height: 50px;
+  background: var(--msp-blue);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: bold;
+  overflow: hidden;
+  font-family: Georgia, serif;
+}
+.feed-avatar img { width: 50px; height: 50px; object-fit: cover; display: block; }
+.feed-main { flex: 1; min-width: 0; }
+.feed-name {
+  font-weight: bold;
+  font-size: 12px;
+  color: var(--msp-ink-link);
+  text-decoration: none;
+}
+.feed-name:hover { text-decoration: underline; }
+.feed-body { word-wrap: break-word; margin-top: 2px; font-size: 11px; }
+.feed-body img.feed-img { max-width: 100%; max-height: 320px; margin-top: 4px; border: 1px solid var(--msp-rule); }
+.feed-mood { color: var(--msp-mute); font-size: 10px; margin-top: 3px; }
+.feed-meta { font-size: 10px; color: var(--msp-mute); margin-top: 2px; }
+.feed-actions { font-size: 10px; margin-top: 3px; }
+.feed-actions a { margin-right: 8px; }
+.feed-quote {
+  margin-top: 4px;
+  border-left: 2px solid var(--msp-rule);
+  padding: 3px 6px;
+  background: var(--msp-tint-2);
+  font-size: 10px;
+  color: #333;
+}
+.feed-quote b { color: var(--msp-ink-link); }
+
+/* Inline comment box */
+.feed-comments { margin-top: 6px; padding-top: 4px; border-top: 1px dotted var(--msp-rule-l); }
+.feed-comments .fc-item {
+  font-size: 11px;
+  padding: 2px 0;
+  display: flex; gap: 5px;
+}
+.feed-comments .fc-item b { color: var(--msp-ink-link); }
+.feed-comments .fc-form { display: flex; gap: 4px; margin-top: 4px; }
+.feed-comments .fc-form input { flex: 1; }
+
+/* PYMK row */
+.pymk-row {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px dotted var(--msp-rule-l);
+}
+.pymk-row:last-child { border-bottom: 0; }
+.pymk-row .py-av {
+  width: 46px; height: 46px;
+  border: 1px solid var(--msp-rule);
+  padding: 2px; background: #fff;
+  flex-shrink: 0;
+}
+.pymk-row .py-av .pa-inner {
+  width: 40px; height: 40px;
+  background: var(--msp-blue);
+  color: #fff;
+  font-weight: bold;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  overflow: hidden;
+  font-family: Georgia, serif;
+}
+.pymk-row .py-av img { width: 40px; height: 40px; object-fit: cover; display: block; }
+.pymk-row .py-info { flex: 1; min-width: 0; }
+.pymk-row .py-name { font-weight: bold; color: var(--msp-ink-link); font-size: 11px; text-decoration: none; }
+.pymk-row .py-meta { font-size: 10px; color: var(--msp-mute); }
+.pymk-row .py-add { font-size: 10px; margin-top: 2px; }
+.pymk-row .py-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 9px;
+  color: var(--msp-mute);
+}
+.pymk-row .py-tools button {
+  width: 16px; height: 16px;
+  font-size: 9px;
+  padding: 0;
+  line-height: 14px;
+}
+
+/* Music/Daily-24 ad */
+.ad-card {
+  background: linear-gradient(135deg, #2a0040 0%, #5b1080 70%, #c01080 100%);
+  background: #2a0040; /* fallback for "no gradients" rule */
+  color: #fff;
+  padding: 14px 12px;
+  border: 1px solid #1a0030;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 160px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.ad-card .ad-banner-bg {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(180deg, #1a0030 0%, #4a0a6a 50%, #c01080 100%);
+  opacity: 0.85;
+  z-index: 0;
+}
+.ad-card .ad-inner { position: relative; z-index: 1; }
+.ad-card .ad-eyebrow {
+  font-size: 9px; letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ffe9b3;
+}
+.ad-card .ad-title {
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1.25;
+  margin: 6px 0;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+}
+.ad-card .ad-photo {
+  width: 100%; max-height: 100px;
+  object-fit: cover;
+  display: block;
+  border: 1px solid rgba(255,255,255,0.4);
+  margin: 4px 0;
+}
+.ad-card .ad-cta {
+  display: inline-block;
+  background: #ffcc00;
+  color: #2a0040 !important;
+  padding: 3px 10px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 10px;
+  border: 1px solid #b39800;
+  margin-top: 4px;
+}
+.adv-here {
+  text-align: right;
+  font-size: 10px;
+  padding: 1px 0 4px;
+}
+
+/* Online widget */
+.online-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px dotted var(--msp-rule-l);
+}
+.online-row:last-child { border-bottom: 0; }
+.online-row .od-dot {
+  width: 8px; height: 8px; background: var(--msp-green);
+  border: 1px solid #1f6624;
+  border-radius: 50%;
+}
+.online-row a { font-weight: bold; }
+.online-count {
+  background: var(--msp-tint-2);
+  padding: 4px 7px;
+  border-bottom: 1px solid var(--msp-rule-l);
+  font-size: 11px;
+}
+.online-count .dot { display: inline-block; width: 7px; height: 7px; background: var(--msp-green); border: 1px solid #1f6624; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.online-count .dot.pulse { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); animation: oc-pulse 1.6s ease-out infinite; }
+@keyframes oc-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
+  70%  { box-shadow: 0 0 0 7px rgba(76,175,80,0); }
+  100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+}
+.online-count #oc-num { color: #0d4a22; }
+#online-widget-top .widget-title { background: var(--msp-blue-l); }
+
+/* Daily-24 sneak (right rail) */
+.d24-pair {
+  display: flex; gap: 5px;
+  padding: 7px;
+}
+.d24-card { flex: 1; text-align: center; }
+.d24-card .d24-thumb {
+  width: 100%; aspect-ratio: 1/1;
+  border: 1px solid var(--msp-rule);
+  background: var(--msp-tint-2) center/cover no-repeat;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--msp-mute);
+  margin-bottom: 4px;
+}
+.d24-card button { width: 100%; font-size: 10px; }
+
+/* Birthdays */
+.bday-row { padding: 3px 0; border-bottom: 1px dotted var(--msp-rule-l); font-size: 11px; }
+.bday-row:last-child { border-bottom: 0; }
+.bday-row b { color: var(--msp-ink-link); }
+
+/* Footer */
+.foot {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--msp-mute);
+  border-top: 1px solid var(--msp-rule);
+  padding: 8px 0;
+}
+.foot a { margin: 0 5px; }
+
+/* === Modals === */
+.modal-back {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 12px;
+  overflow-y: auto;
+}
+.modal-back.open { display: flex; }
+.modal-card {
+  background: #fff;
+  border: 1px solid var(--msp-rule);
+  width: 100%;
+  max-width: 460px;
+}
+.modal-head {
+  background: var(--msp-blue);
+  color: #fff;
+  padding: 5px 9px;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-head .x {
+  cursor: pointer;
+  color: #fff;
+  background: transparent;
+  border: 1px solid #fff;
+  padding: 0 5px;
+  font-weight: bold;
+  font-size: 11px;
+}
+.modal-body { padding: 12px; font-size: 11px; line-height: 1.5; }
+.modal-body h3 { font-size: 13px; margin: 0 0 6px; }
+.modal-body label { display: block; margin: 8px 0 3px; font-weight: bold; font-size: 11px; }
+.modal-body input[type=text], .modal-body input[type=tel], .modal-body select, .modal-body textarea {
+  width: 100%;
+}
+
+/* Theme picker grid */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.theme-cell {
+  border: 1px solid var(--msp-rule);
+  padding: 0;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+}
+.theme-cell.is-on { outline: 2px solid var(--msp-orange); }
+.theme-swatch-big {
+  height: 38px;
+  display: block;
+}
+.theme-cell .tlabel { padding: 3px 4px; font-size: 10px; }
+
+/* Invite gate banner */
+.invite-gate {
+  background: #fff7c8;
+  border: 1px solid #cfa700;
+  color: #5b4400;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  text-align: center;
+  font-weight: bold;
+}
+.invite-gate.is-clear { background: #cfeed7; border-color: #1f6624; color: #0d4a22; }
+body.gated .col .widget:not(.invite-widget) {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+body.gated .invite-widget { outline: 2px solid var(--msp-orange); }
+
+/* Invite widget */
+.invite-widget .widget-body { font-size: 11px; }
+.invite-form { display: flex; gap: 5px; margin-top: 6px; align-items: stretch; }
+.invite-form input { flex: 1; }
+.invite-slot {
+  border: 1px solid var(--msp-rule);
+  background: var(--msp-tint-2);
+  padding: 5px 7px;
+  margin-top: 5px;
+  font-size: 11px;
+}
+.invite-slot .is-meta { font-size: 10px; color: var(--msp-mute); }
+.invite-slot .is-actions { margin-top: 3px; }
+.invite-slot .is-actions button { font-size: 10px; padding: 1px 6px; margin-right: 4px; }
+.invite-slot.claimed { background: #e2f0e6; border-color: var(--msp-green); }
+
+/* MySpace IM popup */
+.im-popup {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  width: 280px;
+  background: #fff;
+  border: 1px solid var(--msp-rule);
+  z-index: 250;
+  display: none;
+  flex-direction: column;
+  max-height: 380px;
+}
+.im-popup.open { display: flex; }
+.im-head {
+  background: var(--msp-blue);
+  color: #fff;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.im-head .x { cursor: pointer; }
+.im-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 8px;
+  font-size: 11px;
+  background: #fafbff;
+}
+.im-msg { margin-bottom: 4px; }
+.im-msg b { color: var(--msp-ink-link); }
+.im-msg.me { text-align: right; }
+.im-msg.me b { color: var(--msp-orange); }
+.im-form { display: flex; border-top: 1px solid var(--msp-rule); }
+.im-form input { flex: 1; border: 0; padding: 5px 7px; }
+.im-form button { border: 0; border-left: 1px solid var(--msp-rule); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 14px; left: 50%;
+  transform: translateX(-50%);
+  background: #000;
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 11px;
+  border: 1px solid #333;
+  z-index: 400;
+  display: none;
+}
+.toast.show { display: block; }
+
+/* Loading overlay */
+.boot-screen {
+  position: fixed; inset: 0;
+  background: var(--msp-bg);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  font-family: Verdana, sans-serif;
+  font-size: 12px;
+}
+.boot-screen .b-card {
+  background: #fff;
+  border: 1px solid var(--msp-rule);
+  padding: 18px 24px;
+  text-align: center;
+  min-width: 260px;
+}
+.boot-screen .b-title { font-weight: bold; font-size: 14px; color: var(--msp-blue); }
+.boot-screen .b-bar { height: 6px; background: #eee; border: 1px solid var(--msp-rule); margin: 10px 0 4px; overflow: hidden; }
+.boot-screen .b-bar i { display: block; height: 100%; width: 20%; background: var(--msp-blue); animation: boot 1.4s ease-in-out infinite; }
+@keyframes boot { 0% { margin-left: -20% } 100% { margin-left: 100% } }
+.hidden { display: none !important; }
+
+/* Waitlist receipt overlay */
+.waitlist-card {
+  max-width: 460px;
+  margin: 60px auto;
+  background: #fff;
+  border: 1px solid var(--msp-rule);
+}
+.waitlist-card .widget-title { background: var(--msp-blue); }
+.waitlist-card .widget-body { padding: 16px; text-align: center; }
+.waitlist-card .big-num { font-size: 38px; font-weight: bold; color: var(--msp-blue); }
+
+/* ============== MOBILE ============== */
+@media (max-width: 760px) {
+  body { font-size: 12px; }
+  .top-strip-inner { gap: 6px; flex-wrap: wrap; }
+  .top-pwr { display: none; }
+  .nav-inner { position: relative; }
+  .nav-left, .nav-right { display: none; }
+  .nav-strip.open .nav-left,
+  .nav-strip.open .nav-right { display: flex; flex-direction: column; align-items: stretch; }
+  .nav-strip.open .nav-left { width: 100%; }
+  .nav-strip.open .nav-right { width: 100%; border-top: 1px solid var(--msp-blue-d); }
+  .nav-strip.open .nav-item {
+    border-right: 0;
+    border-left: 0;
+    border-bottom: 1px solid var(--msp-blue-d);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .nav-strip.open .nav-drop { position: static; border-left: 0; border-right: 0; }
+  .nav-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--msp-blue);
+    color: #fff;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .nav-hamburger .ham-toggle {
+    background: transparent; border: 1px solid #fff; color: #fff;
+    padding: 3px 8px;
+  }
+
+  .cols { grid-template-columns: 1fr; }
+  .col.col-left { order: 3; }
+  .col.col-center { order: 1; }
+  .col.col-right { order: 2; }
+  .hello-h1 { font-size: 18px; }
+  .url-bar { flex-wrap: wrap; }
+  .profile-thumb { width: 100px; height: 100px; padding: 3px; }
+  .profile-thumb .pt-inner, .profile-thumb img { width: 92px; height: 92px; }
+
+  .im-popup {
+    bottom: 0; right: 0; left: 0;
+    width: 100%; max-height: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Boot loader (shown while we resolve whoami) -->
+<div id="boot" class="boot-screen">
+  <div class="b-card">
+    <div class="b-title">Paths</div>
+    <div class="b-bar"><i></i></div>
+    <div style="color: var(--msp-mute);">checking your session...</div>
+  </div>
+</div>
+
+<!-- Top strip + nav strip are rendered server-side via /api/nav and
+     injected by chrome.js so they are IDENTICAL on every page. -->
+<div id="os-chrome-mount"></div>
+
+<!-- ============ PAGE BODY ============ -->
+<div class="page-wrap">
+
+  <!-- Invite gate banner -->
+  <div id="invite-gate" class="invite-gate hidden">
+    Both of your starting referrals need to join before Paths opens up. Send your two invites below.
+  </div>
+
+  <!-- Greeting -->
+  <div class="hello-bar">
+    <h1 class="hello-h1">Hello, <span id="hello-name">friend</span>!</h1>
+    <a class="hello-themes" href="#" onclick="os.openThemes();return false;">
+      <span class="theme-swatch"></span> Page Themes (6)
+    </a>
+  </div>
+
+  <!-- URL row -->
+  <div class="url-bar">
+    <div class="url-left">
+      <span class="url-mono">My URL: <b id="my-url">oldstreets.org/u/...</b></span>
+      <button class="copy-btn" id="copy-url" onclick="os.copyMyUrl()">Copy</button>
+      <a href="/profile-edit.html">[Edit Profile]</a>
+    </div>
+    <div class="clock" id="clock">--</div>
+  </div>
+
+  <!-- 3-column body -->
+  <div class="cols">
+
+    <!-- ============ LEFT COL ============ -->
+    <div class="col col-left">
+
+      <!-- Profile thumb — click to view your MySpace profile -->
+      <div class="widget">
+        <div class="widget-body">
+          <a href="#" id="profile-thumb-link" onclick="os.viewMyProfile();return false;" title="view my profile" style="text-decoration:none; color:inherit; display:block; cursor:pointer;">
+            <div class="profile-thumb" id="profile-thumb">
+              <div class="pt-inner" id="pt-inner">?</div>
+            </div>
+            <div class="profile-name" id="profile-name">...</div>
+            <div class="profile-handle" id="profile-handle">@...</div>
+          </a>
+          <div class="profile-stats">
+            <div><b>View My:</b></div>
+            <div>Profile Views: <b id="pv-count">0</b></div>
+            <div>Last Login: <b id="last-login">--</b></div>
+            <div>Streak: <b id="streak-count">0</b> days</div>
+            <div>Friends: <b id="friend-count">0</b></div>
+          </div>
+          <div class="profile-actions">
+            <div><span class="pa-label">Photos:</span><a href="#" onclick="os.openUpload('image');return false;">Edit</a> | <a href="#" onclick="os.openUpload('image');return false;">Upload</a></div>
+            <div><span class="pa-label">Videos:</span><a href="#" onclick="os.openUpload('video');return false;">Edit</a> | <a href="#" onclick="os.openUpload('video');return false;">Upload</a></div>
+            <div><span class="pa-label">Headline:</span><a href="/profile-edit.html">Edit</a></div>
+          </div>
+          <div class="manage-list">
+            <a href="/mail.html">View My Mail <span id="mail-badge-sb" style="background:var(--msp-red);color:#fff;font-size:9px;padding:0 4px;margin-left:4px;display:none;">0</span></a>
+            <a href="/mail.html">View My Chats</a>
+          </div>
+          <div class="view-my-row">
+            <span>View My:</span>
+            <select id="view-my-select" onchange="os.viewMyMode(this.value)">
+              <option value="">--</option>
+              <option value="profile">Profile</option>
+              <option value="posts">Posts</option>
+              <option value="photos">Photos</option>
+                    <option value="friends">Friends</option>
+              <option value="comments">Comments</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Advertise Here link (left rail) -->
+      <div class="adv-here"><a href="https://forms.gle/PuLCaBFL6T8wxL8A8" target="_blank" rel="noopener">Advertise Here</a></div>
+
+    </div>
+
+    <!-- ============ CENTER COL ============ -->
+    <div class="col col-center">
+
+      <!-- Hidden invite widget — kept for modal use, surfaced via "Invite" tab -->
+      <div class="widget invite-widget hidden" id="invite-widget" style="display:none;">
+        <div class="widget-title">
+          <span><span class="wt-ico">+</span> Invite Friends</span>
+          <span class="wt-right">Balance: <b id="invite-balance">0</b></span>
+        </div>
+        <div class="widget-body">
+          <div id="invite-summary" style="font-size:11px;"></div>
+          <div class="invite-form">
+            <input type="tel" id="invite-phone" placeholder="+1 (555) 123-4567" />
+            <button type="button" onclick="os.sendInvite()">Send Invite</button>
+          </div>
+          <div id="invite-slots" style="margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <!-- Hidden status widget — opened via "Status" tab -->
+      <div class="widget status status-widget hidden" id="status-widget" style="display:none;">
+        <div class="composer">
+          <input class="status-input" id="status-input" type="text" maxlength="500"
+                 placeholder="What are you doing right now?" />
+          <div class="composer-row">
+            <div class="mood-pick">
+              Mood:
+              <select id="mood-select"></select>
+            </div>
+            <label class="anon">
+              <input type="checkbox" id="anon-check" />
+              post anon
+            </label>
+            <button type="button" onclick="os.postStatus()">Post</button>
+          </div>
+        </div>
+        <div class="current-status" id="my-current-status" style="display:none;"></div>
+      </div>
+
+      <!-- Friend activity feed with inline composer on top -->
+      <div class="widget" data-drop-zone="post" id="wall-drop-zone">
+        <div class="widget-title">
+          <span id="wall-title">🏫 The Wall — my school</span>
+          <span class="wt-right">
+            <a href="#" id="sort-recent" onclick="os.setFeedSort('recent');return false;" style="font-weight:bold;text-decoration:underline;">recent</a> ·
+            <a href="#" id="sort-foryou" onclick="os.setFeedSort('foryou');return false;">for you</a> ·
+            <a href="#" id="sort-popular" onclick="os.setFeedSort('popular');return false;">popular</a>
+          </span>
+        </div>
+        <!-- INLINE COMPOSER (always visible at top) -->
+        <div class="wall-composer" style="padding:10px 12px; border-bottom:1px solid var(--msp-rule);">
+          <textarea id="wc-text" maxlength="2000" rows="2"
+            placeholder="what's on your mind? paste a youtube/spotify/tiktok link and it'll embed automatically. drag in an image or video too."
+            style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid var(--msp-rule); font:13px inherit; resize:vertical; min-height:44px;"></textarea>
+          <div id="wc-media-preview" style="display:none; margin-top:6px; padding:6px; border:1px dashed var(--msp-rule); background:#fff;"></div>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap;">
+            <button type="button" id="wc-btn-gif" title="add GIF"
+              style="background:#eef2f8;color:#003399;border:1px solid var(--msp-rule);padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">🎬 GIF</button>
+            <button type="button" id="wc-btn-image" title="add image"
+              style="background:#eef2f8;color:#003399;border:1px solid var(--msp-rule);padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">🖼 Image</button>
+            <button type="button" id="wc-btn-video" title="add video"
+              style="background:#eef2f8;color:#003399;border:1px solid var(--msp-rule);padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">🎥 Video</button>
+            <input type="file" id="wc-file-image" accept="image/*" style="display:none;"/>
+            <input type="file" id="wc-file-video" accept="video/*" style="display:none;"/>
+            <label style="display:flex; align-items:center; gap:4px; font-size:11px; cursor:pointer;">
+              <input type="checkbox" id="wc-anon"/>
+              <span>anon</span>
+            </label>
+            <div style="flex:1;"></div>
+            <button type="button" id="wc-btn-post"
+              style="background:var(--msp-blue);color:#fff;border:1px solid var(--msp-blue-d);padding:6px 18px;font-weight:700;font-size:11.5px;cursor:pointer;">Post</button>
+          </div>
+          <div id="wc-status" style="margin-top:4px; font-size:10px; color:var(--msp-mute); min-height:12px;"></div>
+        </div>
+        <div class="widget-body none feed" id="feed-list">
+          <div style="padding: 10px; color: var(--msp-mute); font-style: italic;">loading...</div>
+        </div>
+        <div style="padding: 6px 9px; border-top: 1px solid var(--msp-rule-l); font-size: 10px;">
+          <a href="#" onclick="os.refreshFeed();return false;">refresh</a> |
+          <a href="#" onclick="os.viewAllPosts();return false;">view all</a>
+        </div>
+      </div>
+
+      <!-- Hidden activity stream — surfaced via 🔔 bell -->
+      <div class="widget activity-stream hidden" id="activity-stream-widget" style="display:none;">
+        <div class="widget-body" id="activity-stream-body"></div>
+      </div>
+
+    </div>
+
+    <!-- ============ RIGHT COL ============ -->
+    <div class="col col-right">
+
+      <!-- Online Now (top of right rail) -->
+      <div class="widget online" id="online-widget-top">
+        <div class="widget-title">Online Now!</div>
+        <div class="online-count" id="online-count">
+          <span class="dot pulse"></span><b id="oc-num">0</b> <span id="oc-label">members online</span>
+        </div>
+        <div class="widget-body" id="online-body">
+          <div style="color: var(--msp-mute); font-style: italic;">loading...</div>
+        </div>
+      </div>
+
+      <!-- People You May Know -->
+      <div class="widget pymk">
+        <div class="widget-title"><span>People You May Know</span><span class="wt-right"><a href="#" onclick="os.refreshPymk();return false;">refresh</a></span></div>
+        <div class="widget-body" id="pymk-body">
+          <div style="color: var(--msp-mute); font-style: italic;">loading...</div>
+        </div>
+      </div>
+
+      <!-- 🌟 FOUNDER STATUS — first 25 per school -->
+      <div class="widget">
+        <div class="widget-title" style="background:#7a4a00; border-bottom-color:#5a3500;">
+          <span>🌟 Founders · my school</span>
+        </div>
+        <div class="widget-body" id="founder-body" style="padding:10px 12px; font-size:11.5px;">
+          <span class="muted">loading…</span>
+        </div>
+      </div>
+
+      <!-- 🎥 Live Rooms — click to join, or create your own -->
+      <div class="widget">
+        <div class="widget-title">
+          <span>🔴 Live Rooms</span>
+          <span class="wt-right"><a href="/rooms.html">→ all rooms</a></span>
+        </div>
+        <div class="widget-body none" id="live-rooms">
+          <div style="padding: 10px; color: var(--msp-mute); font-style: italic;">loading…</div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+  <div class="foot">
+    <a href="/profile-edit.html">Account</a> |
+    <a href="#" onclick="os.toast('Privacy: Paths is invite-only and not affiliated with any school.');return false;">Privacy</a> |
+    <a href="#" onclick="os.toast('Have a tip? message admin@old-streets in the inbox.');return false;">Contact</a> |
+    <a href="#" onclick="os.logout();return false;">Sign Out</a>
+    <div style="margin-top: 4px; color: var(--msp-mute);">
+      <span id="footer-brand">Paths</span> &copy; <span id="footer-year">2026</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL HOST ============ -->
+<div class="modal-back" id="modal-back" onclick="os.closeModalIfBack(event)">
+  <div class="modal-card" id="modal-card">
+    <div class="modal-head">
+      <span id="modal-title">Title</span>
+      <button class="x" onclick="os.closeModal()" type="button">X</button>
+    </div>
+    <div class="modal-body" id="modal-body">...</div>
+  </div>
+</div>
+
+<!-- ============ IM POPUP ============ -->
+<div class="im-popup" id="im-popup">
+  <div class="im-head">
+    <span id="im-with">IM</span>
+    <span class="x" onclick="os.closeIm()">X</span>
+  </div>
+  <div class="im-body" id="im-body"></div>
+  <form class="im-form" id="im-form" onsubmit="return os.sendIm(event)">
+    <input type="text" id="im-input" placeholder="Type a message..." autocomplete="off" />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<!-- ============ INLINE APP (no app.js) ============ -->
+<script>
+(function () {
+  "use strict";
+
+  // ==========================================================
+  // Globals & helpers
+  // ==========================================================
+  const TOKEN_KEY = 'oldstreets-token';
+  const THEME_KEY = 'oldstreets-theme';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+  const token = () =>
+    localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || '';
+
+  function api(path, opts) {
+    opts = opts || {};
+    const headers = Object.assign(
+      { 'Content-Type': 'application/json', 'X-User-Token': token() },
+      opts.headers || {}
+    );
+    return fetch(path, {
+      method: opts.method || 'GET',
+      headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }).then(async (r) => {
+      const text = await r.text();
+      let json; try { json = text ? JSON.parse(text) : {}; } catch { json = { _raw: text }; }
+      if (!r.ok) {
+        const e = new Error(json.error || ('HTTP ' + r.status));
+        e.status = r.status; e.payload = json; throw e;
+      }
+      return json;
+    });
+  }
+
+  function timeAgo(ts) {
+    if (!ts) return '';
+    const s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    if (s < 86400 * 7) return Math.floor(s / 86400) + 'd ago';
+    return new Date(ts).toLocaleDateString();
+  }
+
+  function initials(name) {
+    if (!name) return '?';
+    const parts = String(name).trim().split(/\s+/);
+    return ((parts[0]||'')[0] || '?').toUpperCase() +
+           ((parts[1]||'')[0] || '').toUpperCase();
+  }
+
+  function avatarBlock(name, avatarUrl, sizeClass) {
+    // returns inner HTML for an avatar inner box
+    if (avatarUrl) return `<img src="${esc(avatarUrl)}" alt="" />`;
+    return `<div class="${sizeClass}">${esc(initials(name))}</div>`;
+  }
+
+  function userInitialsHtml(name, avatarUrl) {
+    if (avatarUrl) return `<img src="${esc(avatarUrl)}" alt="" />`;
+    return esc(initials(name));
+  }
+
+  function showToast(msg, ms) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => t.classList.remove('show'), ms || 2400);
+  }
+
+  // ==========================================================
+  // STATE
+  // ==========================================================
+  const state = {
+    user: null,
+    siteInfo: null,
+    moods: [],
+    feed: [],
+    feedMode: 'recent',
+    feedScope: 'school',
+    directory: [],
+    pendingFriendRequests: [],
+    sentFriendRequests: [],
+    notifications: [],
+    inbox: [],
+    invites: null,
+    daily24Leaderboard: null,
+    daily24Pair: null,
+    dismissedPymk: new Set(),
+    imWithEmail: '',
+    imMessages: []
+  };
+
+  // ==========================================================
+  // BOOT
+  // ==========================================================
+  async function boot() {
+    if (!token()) return location.replace('/onboard.html');
+
+    // load saved theme early
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+
+    try {
+      const who = await api('/api/whoami');
+      state.user = who.user || who;
+    } catch (e) {
+      if (e.status === 401 || e.status === 403) return location.replace('/onboard.html');
+      console.error('whoami failed', e);
+      return location.replace('/onboard.html');
+    }
+
+    // Waitlist receipt — block the page
+    if (state.user.status === 'waitlist') {
+      showWaitlist(state.user);
+      $('boot').classList.add('hidden');
+      return;
+    }
+
+    // load site info + moods in parallel
+    const tasks = [
+      api('/api/site-info').then(d => state.siteInfo = d).catch(()=>{}),
+      api('/api/moods').then(d => state.moods = Array.isArray(d) ? d : []).catch(()=>{})
+    ];
+    await Promise.all(tasks);
+
+    paintShell();
+    applyInviteGate();
+
+    // Wire global drop-zones (wall + any other static drop targets)
+    document.querySelectorAll('[data-drop-zone]').forEach(wireDropZone);
+    // Wire the inline wall composer (GIF, image, video, anon, post)
+    wireWallComposer();
+    // First-run guided tour — only for users who haven't posted yet AND
+    // haven't already dismissed/finished the tour.
+    setTimeout(maybeStartTour, 600);
+
+    // background data loads — parallel, don't block UI
+    refreshFeed();
+    refreshPymk();
+    refreshInbox();
+    refreshNotifications();
+    refreshFriendRequests();
+    refreshInvites();
+    refreshDaily24();
+    refreshOnline();
+    refreshLiveRooms();
+    refreshFounders();
+    setInterval(refreshLiveRooms, 20000);
+    setInterval(refreshFounders, 90000);
+    // Force school re-confirm on first login of the session
+    maybePromptSchoolConfirm();
+    refreshBirthdays();
+    refreshThrowback();
+
+    // boot screen off
+    $('boot').classList.add('hidden');
+
+    // periodic polls
+    setInterval(() => api('/api/whoami').then(d => {
+      const u = d.user || d;
+      state.user = u;
+      applyInviteGate();
+      updateStatsBar();
+    }).catch(()=>{}), 15000);
+    setInterval(refreshFeed, 30000);
+    setInterval(refreshNotifications, 30000);
+    setInterval(refreshInbox, 30000);
+    setInterval(refreshFriendRequests, 30000);
+    setInterval(refreshOnline, 45000);
+    setInterval(refreshDaily24, 60000);
+    setInterval(() => api('/api/me/heartbeat', { method: 'POST', body: {} }).catch(()=>{}), 60000);
+    setInterval(() => api('/api/site-info').then(d => {
+      state.siteInfo = d;
+      updateOnlineCount();
+      updateBrand();
+    }).catch(()=>{}), 300000);
+
+    // clock
+    tickClock();
+    setInterval(tickClock, 30000);
+
+    // socket connection so the user counts as "online" and the meter at
+    // the top of the left rail updates live without a 45s poll.
+    connectHomeSocket();
+
+    // hook outside-click for nav dropdowns
+    document.addEventListener('click', closeOpenDrops);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // hook dropdown nav items
+    document.querySelectorAll('.nav-item[data-drop]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        // don't toggle if clicking a child link inside the drop
+        if (e.target.closest('.nav-drop a')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const wasOpen = el.classList.contains('open');
+        document.querySelectorAll('.nav-item.open').forEach(x => x.classList.remove('open'));
+        if (!wasOpen) el.classList.add('open');
+      });
+    });
+
+    // phone input formatting on the invite input
+    attachPhoneInput($('invite-phone'));
+  }
+
+  function closeOpenDrops(e) {
+    if (e.target.closest('.nav-item[data-drop]')) return;
+    document.querySelectorAll('.nav-item.open').forEach(x => x.classList.remove('open'));
+  }
+
+  // ==========================================================
+  // SHELL PAINT
+  // ==========================================================
+  function paintShell() {
+    const u = state.user;
+    const brand = (state.siteInfo && state.siteInfo.brandToday) || 'Paths';
+
+    document.title = 'Paths';
+
+    const bt = $('brand-text'); if (bt) bt.textContent = brand;
+    const fb = $('footer-brand'); if (fb) fb.textContent = brand;
+    const fy = $('footer-year'); if (fy) fy.textContent = new Date().getFullYear();
+    // Show the user's school next to the wordmark — "(Beverly Hills High)"
+    // Per-school wordmark — replaces "Paths" with the school-flavored
+    // brand. Edition subtitle goes below in tiny italic.
+    // School branding removed — wordmark is just "Paths" via chrome.js
+    const ed = $('brand-edition');
+    if (ed) ed.textContent = '';
+
+    const hn = $('hello-name'); if (hn) hn.textContent = u.name || 'friend';
+    const handle = u.handle || (u.email || '').split('@')[0] || '';
+    const myUrl = $('my-url'); if (myUrl) myUrl.textContent = `paths.app/u/${handle || '...'}`;
+
+    // profile thumb
+    const ptInner = $('pt-inner');
+    if (ptInner) {
+      if (u.avatar) {
+        ptInner.outerHTML = `<img id="pt-inner" src="${esc(u.avatar)}" alt="" />`;
+      } else {
+        ptInner.textContent = initials(u.name);
+      }
+    }
+    const pn = $('profile-name'); if (pn) pn.textContent = u.name || 'friend';
+    const ph = $('profile-handle'); if (ph) ph.textContent = handle ? '@' + handle : '';
+
+    // populate mood selector
+    const sel = $('mood-select');
+    if (sel) sel.innerHTML = '<option value="">--</option>' +
+      state.moods.map(m =>
+        `<option value="${esc(m.id)}" ${u.moodId === m.id ? 'selected':''}>${esc(m.emoji)} ${esc(m.label)}</option>`
+      ).join('');
+
+    // admin link visibility — chrome.js handles this server-side via me.isAdmin
+
+    // current status display
+    paintCurrentStatus();
+    updateStatsBar();
+
+    // anon checkbox default checked per spec
+    $('anon-check').checked = true;
+  }
+
+  function paintCurrentStatus() {
+    const u = state.user;
+    const el = $('my-current-status');
+    if (!u.headline && !u.moodId && !u.mood) { el.style.display = 'none'; return; }
+    const m = state.moods.find(x => x.id === u.moodId);
+    const moodLabel = m ? (m.emoji + ' ' + m.label) : (u.mood || '');
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="ss-line"><b>${esc(u.name)}</b><span>${esc(u.headline || '...')}</span></div>
+      ${moodLabel ? `<div class="ss-meta">Mood: ${esc(moodLabel)}</div>` : ''}
+      <div class="ss-actions">
+        <a href="#" onclick="os.viewMyProfile();return false;">view more</a>
+        <a href="/profile-edit.html">edit</a>
+      </div>
+    `;
+  }
+
+  function updateStatsBar() {
+    const u = state.user;
+    const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    set('pv-count', (u.profileViews && u.profileViews.totalCount) || (u.profileViewsCount || 0));
+    set('last-login', u.lastVisitAt ? new Date(u.lastVisitAt).toLocaleDateString() : 'today');
+    set('streak-count', u.streak || 0);
+    set('friend-count', (u.friends || []).length);
+    set('dd-friend-count', (u.friends || []).length);
+  }
+
+  function updateBrand() {
+    if (!state.siteInfo) return;
+    // School-flavored wordmark overrides the daily rotation when a school
+    // is locked in. Falls back to the rotation for users without a school
+    // (which after the forced lock won't happen, but keeps it safe).
+    const brand = 'Paths';
+    const bt = $('brand-text'); if (bt) bt.textContent = brand;
+    const fb = $('footer-brand'); if (fb) fb.textContent = brand;
+    const t = $('tomorrow-name');
+    if (t) t.textContent = state.siteInfo.brandTomorrow || '—';
+    const link = $('tomorrow-link');
+    const badge = $('tomorrow-badge');
+    const votes = $('tomorrow-votes');
+    if (state.siteInfo.brandTomorrowFromVote) {
+      if (link) { link.title = state.siteInfo.brandTomorrow + ' is winning the vote. tap to vote or suggest.'; link.style.color = '#cc5500'; }
+      if (badge) badge.style.display = '';
+      // refresh vote count
+      api('/api/brand-vote').then(d => {
+        const top = (d.suggestions || [])[0];
+        if (top && votes) votes.textContent = '· ' + top.votes + ' vote' + (top.votes === 1 ? '' : 's');
+      }).catch(()=>{});
+    } else {
+      if (badge) badge.style.display = 'none';
+      if (votes) votes.textContent = '';
+    }
+  }
+
+  async function openTomorrowVote() {
+    let data;
+    try { data = await api('/api/brand-vote'); } catch (e) { showToast('vote board offline'); return; }
+    const list = (data.suggestions || []).map(s => `
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid #d8dcde;font-size:11px;">
+        <button type="button"
+                style="background:${s.didIVote ? '#3b5998' : '#eef2f8'};color:${s.didIVote ? '#fff' : '#003399'};border:1px solid #29447e;padding:3px 8px;font-weight:700;font-size:11px;min-width:42px;cursor:pointer;"
+                onclick="os.bvUp('${s.id}', this)">
+          ${s.didIVote ? '✓ ' : '▲ '}<span data-vc>${s.votes}</span>
+        </button>
+        <div style="flex:1;">
+          <div style="font-weight:700;color:#222;">${esc(s.text)}</div>
+          ${s.byHandle ? '<div style="font-size:10px;color:#666;">@' + esc(s.byHandle) + (s.mine ? ' · yours' : '') + '</div>' : ''}
+        </div>
+      </div>
+    `).join('') || '<div style="padding:14px;color:#666;font-style:italic;font-size:11px;">no suggestions yet. be the first.</div>';
+    const top = (data.suggestions || [])[0];
+    const topVotes = top ? top.votes : 0;
+    openModal('👑 Top voted → tomorrow\'s name', `
+      <div style="background:linear-gradient(90deg,#cc5500,#ff8833); color:#fff; padding:12px 14px; margin:-12px -12px 12px; font-size:11px; line-height:1.5;">
+        <div style="font-size:9px; letter-spacing:0.06em; text-transform:uppercase; opacity:0.85; font-weight:700;">tomorrow's name will be</div>
+        <div style="font-size:22px; font-weight:700; line-height:1.1; margin:4px 0;">${esc(data.tomorrow)}</div>
+        <div style="font-size:10.5px; opacity:0.95;">${data.tomorrow === data.fallback ? 'default rotation — no votes yet. <b>be the first to suggest one</b>.' : '👑 top voted · ' + topVotes + ' vote' + (topVotes===1?'':'s') + ' · locks at UTC midnight'}</div>
+      </div>
+      <div style="font-size:11px;color:#666;margin-bottom:10px;line-height:1.5;">
+        the top-voted suggestion replaces the rotation tomorrow, runs for one day, then retires. vote, then check back at midnight.
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <input id="bv-input" type="text" maxlength="28" placeholder="e.g. Forgotten Boulevards" style="flex:1;padding:6px 8px;border:1px solid #b5bbcc;font:13px Verdana,sans-serif;"/>
+        <button type="button" onclick="os.bvSuggest()" style="background:#3b5998;color:#fff;border:1px solid #29447e;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer;">suggest</button>
+      </div>
+      <div id="bv-list" style="max-height:55vh;overflow-y:auto;border:1px solid #d8dcde;background:#fff;">${list}</div>
+    `);
+  }
+  async function bvUp(id, btn) {
+    try {
+      const r = await api('/api/brand-vote/upvote', { method: 'POST', body: { id } });
+      btn.style.background = r.didIVote ? '#3b5998' : '#eef2f8';
+      btn.style.color = r.didIVote ? '#fff' : '#003399';
+      btn.querySelector('[data-vc]').textContent = r.votes;
+      btn.firstChild.nodeValue = (r.didIVote ? '✓ ' : '▲ ');
+    } catch (e) { showToast(e.message); }
+  }
+  async function bvSuggest() {
+    const input = $('bv-input');
+    const text = (input.value || '').trim();
+    if (!text) return;
+    try {
+      await api('/api/brand-vote/suggest', { method: 'POST', body: { text } });
+      input.value = '';
+      openTomorrowVote();
+    } catch (e) { showToast(e.message || 'could not suggest'); }
+  }
+
+  function updateOnlineCount() {
+    if (!state.siteInfo) return;
+    const oc = $('oc-num'); if (oc) oc.textContent = state.siteInfo.onlineCount || 0;
+    const lbl = $('oc-label'); if (lbl) lbl.textContent = ((state.siteInfo.onlineCount||0) === 1 ? 'member online' : 'members online');
+  }
+
+  // Live socket so this tab counts as "online" and the meter at the top of
+  // the left rail updates in real time instead of every 45s.
+  function connectHomeSocket() {
+    if (state.socket) return;
+    function setOnline(n) {
+      n = n|0;
+      const oc = $('oc-num'); if (oc) oc.textContent = n;
+      const lbl = $('oc-label'); if (lbl) lbl.textContent = (n === 1 ? 'member online' : 'members online');
+      if (state.siteInfo) state.siteInfo.onlineCount = n;
+    }
+    function wire() {
+      try {
+        const s = window.io({ transports: ['websocket', 'polling'] });
+        state.socket = s;
+        s.on('connect', () => s.emit('register', { token: token(), username: (state.user && state.user.name) || '' }));
+        s.on('online-count', setOnline);
+        s.on('registered', () => {
+          // Refresh the online list so the viewer appears in it without
+          // waiting up to 45s for the next poll.
+          try { refreshOnline(); } catch {}
+        });
+        s.on('register-failed', () => { /* ignore — silent */ });
+      } catch (e) { console.warn('[socket]', e.message); }
+    }
+    if (window.io) return wire();
+    const sc = document.createElement('script');
+    sc.src = '/socket.io/socket.io.js';
+    sc.onload = wire;
+    document.head.appendChild(sc);
+  }
+
+  // ==========================================================
+  // INVITE GATE
+  // ==========================================================
+  function applyInviteGate() {
+    const u = state.user;
+    const banner = $('invite-gate');
+    const claimed = (u.pendingInvites || []).filter(i => i.claimedBy).length;
+    if (u.mustSpendInitialInvites) {
+      document.body.classList.add('gated');
+      banner.classList.remove('hidden', 'is-clear');
+      banner.innerHTML = '&#128274; Both of your starting referrals need to join before Paths opens up. (' + claimed + '/2 in) Send your two invites below.';
+    } else if (claimed >= 2 && u.referralsEarned && u.referralsEarned >= 2) {
+      document.body.classList.remove('gated');
+      banner.classList.remove('hidden');
+      banner.classList.add('is-clear');
+      banner.innerHTML = "&#127881; You're in. Invite friends any time below.";
+      setTimeout(() => banner.classList.add('hidden'), 8000);
+    } else {
+      document.body.classList.remove('gated');
+      banner.classList.add('hidden');
+    }
+  }
+
+  // ==========================================================
+  // CLOCK
+  // ==========================================================
+  function tickClock() {
+    const d = new Date();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let h = d.getHours();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if (h === 0) h = 12;
+    const m = String(d.getMinutes()).padStart(2, '0');
+    $('clock').textContent = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${h}:${m} ${ampm}`;
+  }
+
+  // ==========================================================
+  // WAITLIST RECEIPT
+  // ==========================================================
+  function showWaitlist(u) {
+    document.body.innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'waitlist-card';
+    card.innerHTML = `
+      <div class="widget-title">Waitlist Receipt</div>
+      <div class="widget-body">
+        <p>You're on the list, <b>${esc(u.name)}</b>.</p>
+        <div class="big-num">#${esc(u.waitlistPosition || '?')}</div>
+        <p style="color: var(--msp-mute);">We'll text you when a spot opens. Refresh anytime.</p>
+        <p style="margin-top: 14px;"><a href="#" onclick="window.location.reload();return false;">Refresh status</a> &middot; <a href="#" onclick="(function(){try{localStorage.removeItem('oldstreets-token');sessionStorage.removeItem('oldstreets-token');}catch(e){};location.replace('/onboard.html');})();return false;">Sign out</a></p>
+      </div>
+    `;
+    document.body.appendChild(card);
+  }
+
+  // ==========================================================
+  // FEED
+  // ==========================================================
+  async function refreshFeed() {
+    // School-isolated by default. ?scope=globe shows all schools.
+    const scope = state.feedScope || 'school';
+    const url = state.feedMode === 'foryou'
+      ? '/api/posts/foryou?scope=' + scope
+      : state.feedMode === 'popular'
+        ? '/api/posts?sort=popular&scope=' + scope
+        : '/api/posts?scope=' + scope;
+    try {
+      const posts = await api(url);
+      state.feed = Array.isArray(posts) ? posts : [];
+      paintFeed();
+      paintActivityStream();
+      paintVideoOfDay();
+    } catch (e) {
+      $('feed-list').innerHTML = '<div style="padding:10px;color:var(--msp-mute);">could not load feed.</div>';
+    }
+  }
+
+  function paintFeed() {
+    const list = state.feed.slice(0, 20);
+    if (!list.length) {
+      $('feed-list').innerHTML = '<div style="padding:10px;color:var(--msp-mute);">no posts yet. be the first to post!</div>';
+      return;
+    }
+    $('feed-list').innerHTML = list.map(renderFeedRow).join('');
+    list.forEach(p => {
+      const btn = document.querySelector(`[data-post-comment-toggle="${p.id}"]`);
+      if (btn) btn.addEventListener('click', (e) => { e.preventDefault(); toggleComments(p.id); });
+      // Click anywhere on the post body to open the full comments modal —
+      // but ignore clicks that land on video/audio/links/buttons (so the
+      // media still works) or directly on a child <a>.
+      const body = document.querySelector(`[data-post-open="${p.id}"]`);
+      if (body) body.addEventListener('click', (e) => {
+        const tag = (e.target && e.target.tagName || '').toLowerCase();
+        if (['a', 'button', 'video', 'audio', 'input', 'textarea', 'iframe', 'select'].includes(tag)) return;
+        if (e.target.closest && e.target.closest('a,button,video,audio,iframe')) return;
+        openCommentsModal(p.id);
+      });
+    });
+  }
+
+  // Auto-embed common URL types inline. Returns HTML.
+  function embedLinks(text) {
+    if (!text) return '';
+    const t = String(text);
+    const urlRe = /(https?:\/\/[^\s<>"']+)/g;
+    return t.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+      .replace(urlRe, (match) => {
+        // Decode the entities we already encoded for the URL match
+        const url = match.replace(/&amp;/g, '&');
+        try {
+          const u = new URL(url);
+          const host = u.hostname.toLowerCase().replace(/^www\./,'');
+          // YouTube
+          if (host === 'youtube.com' || host === 'm.youtube.com') {
+            const v = u.searchParams.get('v');
+            if (v) return `<iframe class="emb-yt" src="https://www.youtube.com/embed/${encodeURIComponent(v)}" frameborder="0" allowfullscreen style="width:100%;max-width:480px;aspect-ratio:16/9;border:1px solid var(--msp-rule);display:block;margin:6px 0;"></iframe>`;
+          }
+          if (host === 'youtu.be') {
+            const v = u.pathname.replace(/^\//, '').split('/')[0];
+            if (v) return `<iframe class="emb-yt" src="https://www.youtube.com/embed/${encodeURIComponent(v)}" frameborder="0" allowfullscreen style="width:100%;max-width:480px;aspect-ratio:16/9;border:1px solid var(--msp-rule);display:block;margin:6px 0;"></iframe>`;
+          }
+          // Spotify (track / playlist / album / episode)
+          if (host === 'open.spotify.com') {
+            const path = u.pathname; // e.g. /track/abc123
+            const m = path.match(/^\/(track|playlist|album|episode|show)\/([A-Za-z0-9]+)/);
+            if (m) return `<iframe class="emb-sp" src="https://open.spotify.com/embed/${m[1]}/${m[2]}" frameborder="0" allow="encrypted-media" style="width:100%;max-width:480px;height:152px;border:0;display:block;margin:6px 0;"></iframe>`;
+          }
+          // SoundCloud — fallback to widget API
+          if (host === 'soundcloud.com') {
+            return `<iframe class="emb-sc" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%233b5998&show_user=true" frameborder="0" scrolling="no" style="width:100%;max-width:480px;height:120px;border:1px solid var(--msp-rule);display:block;margin:6px 0;"></iframe>`;
+          }
+          // Tenor gif direct
+          if (/(media\d?|c)\.tenor\.com/.test(host) || host === 'tenor.com') {
+            if (/\.(gif|mp4)(\?|$)/i.test(url)) {
+              return `<img src="${url}" alt="gif" style="max-width:280px;max-height:280px;display:block;margin:6px 0;border:1px solid var(--msp-rule);"/>`;
+            }
+          }
+          // Direct image
+          if (/\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(u.pathname)) {
+            return `<img src="${url}" alt="" style="max-width:280px;max-height:280px;display:block;margin:6px 0;border:1px solid var(--msp-rule);"/>`;
+          }
+          // Direct video
+          if (/\.(mp4|webm|mov)(\?|$)/i.test(u.pathname)) {
+            return `<video src="${url}" controls style="max-width:280px;max-height:280px;display:block;margin:6px 0;border:1px solid var(--msp-rule);"></video>`;
+          }
+          // Twitter / X / Instagram / TikTok — render as a clean link card (lightweight; no third-party embeds)
+        } catch {}
+        return `<a href="${match}" target="_blank" rel="noopener">${match}</a>`;
+      });
+  }
+
+  function renderFeedRow(p) {
+    const isAnon = p.isAnonymous;
+    const name = isAnon ? 'anonymous' : (p.author || '?');
+    // Prefer the real @handle from server; only fall back to email prefix
+    // if not present (legacy posts before authorHandle was exposed).
+    const handle = p.authorHandle || (p.authorEmail || '').split('@')[0];
+    const profileLink = (handle && !isAnon) ? `onclick="os.viewProfile('${esc(handle)}');return false;"` : '';
+    let body = '';
+    if (p.type === 'gif' && p.gifUrl) {
+      body = `<img src="${esc(p.gifUrl)}" alt="gif" style="max-width:100%; max-height:560px; height:auto; width:auto; border:1px solid var(--msp-rule); display:block; margin:0 auto;"/>`;
+      if (p.content) body = esc(p.content) + '<br/>' + body;
+    } else if (p.type === 'image' && p.content) {
+      body = `<img class="feed-img" src="${esc(p.content)}" alt="" />`;
+      if (p.caption) body += `<div style="margin-top:2px;">${esc(p.caption)}</div>`;
+    } else if (p.type === 'video' && p.content) {
+      // playsinline + preload=metadata for iOS Safari. onerror shows a friendly
+      // fallback so a broken codec doesn't just show a black box.
+      body = `<video src="${esc(p.content)}" controls playsinline preload="metadata"
+        onerror="this.outerHTML='<div style=\\'padding:8px;background:#fff7c2;border:1px solid #d4b243;color:#7a4a00;font-size:11px;\\'>⚠ this video format can\\'t play in browser. mp4 works best — try re-uploading as mp4.</div>'"
+        style="max-width:100%; max-height:320px; border:1px solid var(--msp-rule); background:#000;"></video>`;
+      if (p.caption) body += `<div style="margin-top:2px;">${esc(p.caption)}</div>`;
+    } else if (p.type === 'blog') {
+      body = `<b>${esc(p.title || 'untitled blog')}</b><br/><span>${esc((p.content||'').slice(0,180))}${(p.content||'').length>180?'...':''}</span>`;
+    } else {
+      // Auto-detect URLs in plain text and render rich embeds (youtube,
+      // spotify, soundcloud, direct images/video, tenor).
+      body = embedLinks(p.content || p.caption || '');
+      if (p.gifUrl) body += `<br/><img src="${esc(p.gifUrl)}" alt="gif" style="max-width:100%; max-height:560px; height:auto; width:auto; border:1px solid var(--msp-rule); display:block; margin:4px auto 0;"/>`;
+    }
+    let mood = '';
+    if (p.moodId) {
+      const m = state.moods.find(x => x.id === p.moodId);
+      if (m) mood = `Mood: ${m.emoji} ${m.label}`;
+    }
+    const reactCount = Object.values(p.reactions || {}).reduce((s,b) => s + Object.keys(b).length, 0);
+    const commentCount = (p.comments || []).length;
+    let quoteHtml = '';
+    if (p.repostOf) {
+      if (p.repostOf.deleted) {
+        quoteHtml = `<div class="feed-quote"><i>(reposted thread was deleted)</i></div>`;
+      } else {
+        const ro = p.repostOf;
+        // Render the original post's media inside the quote card so reposts
+        // of a gif / image / video carry the visual, not just a text snippet.
+        let roMedia = '';
+        if (ro.type === 'gif' && ro.gifUrl) {
+          roMedia = `<img src="${esc(ro.gifUrl)}" alt="gif" style="max-width:100%; max-height:200px; display:block; margin-top:4px; border:1px solid var(--msp-rule);"/>`;
+        } else if (ro.type === 'image' && ro.content) {
+          roMedia = `<img src="${esc(ro.content)}" alt="" style="max-width:100%; max-height:220px; display:block; margin-top:4px; border:1px solid var(--msp-rule);"/>`;
+        } else if (ro.type === 'video' && ro.content) {
+          roMedia = `<video src="${esc(ro.content)}" controls style="max-width:100%; max-height:220px; display:block; margin-top:4px; border:1px solid var(--msp-rule);"></video>`;
+        } else if (ro.gifUrl) {
+          roMedia = `<img src="${esc(ro.gifUrl)}" alt="gif" style="max-width:100%; max-height:200px; display:block; margin-top:4px; border:1px solid var(--msp-rule);"/>`;
+        }
+        const text = (ro.content || ro.caption || '').slice(0, 280);
+        const handle = (ro.authorEmail || '').split('@')[0];
+        const handleHtml = !ro.isAnonymous && handle ? ' <span style="color:var(--msp-mute);font-size:10px;">@'+esc(handle)+'</span>' : '';
+        quoteHtml = `<div class="feed-quote" style="border:1px solid var(--msp-rule); background:var(--msp-tint-2); padding:6px 8px; margin-top:6px;">
+          <b style="color:var(--msp-blue-d);">${esc(ro.author||'?')}</b>${handleHtml}
+          ${text ? `<div style="margin-top:3px;">${embedLinks(text)}</div>` : ''}
+          ${roMedia}
+        </div>`;
+      }
+    }
+    return `
+      <div class="feed-row" data-post-id="${esc(p.id)}">
+        <a href="#" ${profileLink}>
+          <div class="feed-avatar"><div class="fa-inner">${userInitialsHtml(name, p.authorAvatar)}</div></div>
+        </a>
+        <div class="feed-main">
+          <a href="#" class="feed-name" ${profileLink}>${esc(name)}</a>
+          ${handle && !isAnon ? `<span style="color:var(--msp-mute);font-size:10px;"> @${esc(handle)}</span>` : ''}
+          <div class="feed-body" data-post-open="${esc(p.id)}" style="cursor:pointer;">${body}</div>
+          ${quoteHtml}
+          ${mood ? `<div class="feed-mood">${esc(mood)}</div>`:''}
+          <div class="feed-meta">Posted ${esc(timeAgo(p.createdAt))} &middot; ${esc(p.type || 'text')} &middot; ${reactCount} react &middot; ${commentCount} comment${commentCount===1?'':'s'}${(p.viewCount||0) > 0 ? ' &middot; 👁 ' + p.viewCount : ''}</div>
+          ${(p.seenBy && p.seenBy.length) ? `<div class="feed-seenby" style="font-size:10.5px; color:var(--msp-mute); padding:2px 0 4px;">seen by <b style="color:#5b6f9a;">${p.seenBy.slice(0,4).map(n => esc(n)).join(', ')}</b>${(p.viewCount || 0) > p.seenBy.length ? ' + ' + ((p.viewCount || 0) - p.seenBy.length) + ' more' : ''}</div>` : ''}
+          <div class="feed-actions">
+            <span class="react-row" style="display:inline-flex; gap:4px; margin-right:8px;">
+              ${['👍','😂','🔥','💀','😍','👎'].map(em => {
+                const cnt = (p.reactions && p.reactions[em]) ? Object.keys(p.reactions[em]).length : 0;
+                const mine = (p.reactions && p.reactions[em] && state.user && p.reactions[em][state.user.email]) ? ' react-mine' : '';
+                return `<button type="button" class="react-btn${mine}" onclick="os.reactPost('${esc(p.id)}','${em}')" style="background:${mine?'#dde6f6':'#eef2f8'}; border:1px solid ${mine?'#29447e':'#b5bbcc'}; padding:1px 5px; font-size:11px; cursor:pointer; line-height:1.2;">${em}${cnt ? '<span style=\"font-size:10px;color:#444;margin-left:2px;\">'+cnt+'</span>' : ''}</button>`;
+              }).join('')}
+            </span>
+            <a href="#" data-post-comment-toggle="${esc(p.id)}">comment</a>
+            <a href="#" onclick="os.openRepost('${esc(p.id)}');return false;">↻ repost</a>
+            <a href="#" onclick="os.reportPost('${esc(p.id)}');return false;">report</a>
+            ${!isAnon && handle ? `<a href="#" onclick="os.openIm('${esc(p.authorEmail)}','${esc(name)}');return false;">message</a>` : ''}
+            ${p.isMine ? `<a href="#" onclick="os.deletePost('${esc(p.id)}');return false;" style="color:var(--msp-red)">delete</a>` : ''}
+          </div>
+          <div class="feed-comments" id="cm-${esc(p.id)}">${renderCommentsInline(p)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Inline comment preview — shows up to 3 most-recent comments by default.
+  // If there are more, surface a "view all N comments" link that opens the
+  // full thread modal.
+  function renderCommentsInline(p) {
+    const comments = p.comments || [];
+    const preview = comments.slice(-3);
+    const hasMore = comments.length > 3;
+    let html = '';
+    if (hasMore) {
+      html += `<div style="padding:3px 0; font-size:11px;"><a href="#" onclick="os.openCommentsModal('${esc(p.id)}');return false;" style="color:#5b6f9a;">view all ${comments.length} comments →</a></div>`;
+    }
+    html += preview.map(c => {
+      const body = embedLinks(c.content || c.text || '');
+      const gif = c.gifUrl ? `<br/><img src="${esc(c.gifUrl)}" alt="gif" style="max-width:140px; max-height:140px; border:1px solid var(--msp-rule); margin-top:3px;"/>` : '';
+      return `<div class="fc-item"><b>${esc(c.author || 'anon')}:</b> <span>${body}</span>${gif}</div>`;
+    }).join('');
+    html += `<form class="fc-form" onsubmit="return os.submitComment(event,'${esc(p.id)}')">
+        <input type="text" placeholder="say something..." maxlength="500" />
+        <button type="button" onclick="os.openGifPicker('comment','${esc(p.id)}')" title="add GIF" style="background:#eef2f8;color:#003399;border:1px solid #b5bbcc;padding:2px 6px;font-size:11px;cursor:pointer;margin-right:3px;">🎬</button>
+        <button type="submit">Post</button>
+      </form>`;
+    return html;
+  }
+
+  // Modal: full comments thread for a single post.
+  function openCommentsModal(postId) {
+    const p = state.feed.find(x => x.id === postId);
+    if (!p) return;
+    const comments = p.comments || [];
+    const rows = comments.map(c => {
+      const body = embedLinks(c.content || c.text || '');
+      const gif = c.gifUrl ? `<br/><img src="${esc(c.gifUrl)}" alt="gif" style="max-width:200px; max-height:200px; border:1px solid var(--msp-rule); margin-top:4px;"/>` : '';
+      return `<div class="fc-item" style="padding:6px 8px; border-bottom:1px solid var(--msp-rule-l); font-size:11.5px;">
+        <b style="color:#003399;">${esc(c.author || 'anon')}:</b> <span>${body}</span>${gif}
+        <div style="font-size:10px; color:#888; margin-top:2px;">${esc(timeAgo(c.createdAt))}</div>
+      </div>`;
+    }).join('');
+    openModal(`Comments · ${comments.length}`, `
+      <div style="max-height:60vh; overflow-y:auto; border:1px solid #d8dcde; background:#fff;">${rows || '<div style="padding:14px; color:#666; font-style:italic;">no comments yet.</div>'}</div>
+      <form style="display:flex; gap:4px; margin-top:8px;" onsubmit="return os.submitComment(event,'${esc(postId)}', true)">
+        <input type="text" placeholder="say something…" maxlength="500" style="flex:1; padding:6px 8px; border:1px solid #b5bbcc; font:13px inherit;"/>
+        <button type="button" onclick="os.openGifPicker('comment','${esc(postId)}')" title="add GIF" style="background:#eef2f8;color:#003399;border:1px solid #b5bbcc;padding:5px 10px;font-size:11px;cursor:pointer;">🎬</button>
+        <button type="submit" style="background:#3b5998;color:#fff;border:1px solid #29447e;padding:5px 14px;font-weight:700;font-size:11px;cursor:pointer;">Post</button>
+      </form>
+    `);
+  }
+
+  function toggleComments(postId) {
+    // Comments are now visible inline by default; this just opens the
+    // detail modal when the user explicitly clicks the "comment" link.
+    return openCommentsModal(postId);
+    const wrap = document.getElementById('cm-' + postId);
+    if (!wrap) return;
+    const isHidden = wrap.classList.toggle('hidden');
+    if (isHidden) return;
+    const p = state.feed.find(x => x.id === postId);
+    if (!p) return;
+    wrap.innerHTML = (p.comments || []).map(c => {
+      const gif = c.gifUrl ? `<br/><img src="${esc(c.gifUrl)}" alt="gif" style="max-width:160px; max-height:160px; border:1px solid var(--msp-rule); margin-top:3px;"/>` : '';
+      const body = embedLinks(c.content || c.text || '');
+      return `<div class="fc-item"><b>${esc(c.author || 'anon')}:</b> <span>${body}</span>${gif}</div>`;
+    }).join('') +
+    `<form class="fc-form" onsubmit="return os.submitComment(event,'${esc(postId)}')">
+       <input type="text" placeholder="say something..." maxlength="500" />
+       <button type="button" onclick="os.openGifPicker('comment','${esc(postId)}')" title="add GIF" style="background:#eef2f8;color:#003399;border:1px solid #b5bbcc;padding:2px 6px;font-size:11px;cursor:pointer;margin-right:3px;">🎬</button>
+       <button type="submit">Post</button>
+     </form>`;
+  }
+
+  async function submitComment(ev, postId) {
+    ev.preventDefault();
+    const input = ev.target.querySelector('input');
+    const txt = input.value.trim();
+    if (!txt) return false;
+    input.disabled = true;
+    try {
+      await api(`/api/posts/${encodeURIComponent(postId)}/comment`, { method: 'POST', body: { content: txt, isAnonymous: false } });
+      input.value = '';
+      await refreshFeed();
+      // re-open comments since refresh wipes them
+      const wrap = document.getElementById('cm-' + postId);
+      if (wrap) wrap.classList.remove('hidden');
+      toggleComments(postId);
+      // it was just toggled closed; reopen
+      const wrap2 = document.getElementById('cm-' + postId);
+      if (wrap2 && wrap2.classList.contains('hidden')) toggleComments(postId);
+    } catch (e) {
+      showToast(e.message || 'comment failed');
+    } finally {
+      input.disabled = false;
+    }
+    return false;
+  }
+
+  async function reactPost(postId, emoji) {
+    try {
+      await api(`/api/posts/${encodeURIComponent(postId)}/react`, { method: 'POST', body: { emoji } });
+      refreshFeed();
+    } catch (e) { showToast(e.message || 'failed'); }
+  }
+  async function deletePost(postId) {
+    if (!confirm('delete this post?')) return;
+    try {
+      await api(`/api/posts/${encodeURIComponent(postId)}`, { method: 'DELETE' });
+      refreshFeed();
+    } catch (e) { showToast(e.message || 'failed'); }
+  }
+  async function reportPost(postId) {
+    const reason = prompt('why are you reporting this post?');
+    if (!reason) return;
+    try {
+      await api(`/api/posts/${encodeURIComponent(postId)}/report`, { method: 'POST', body: { reason } });
+      showToast('reported, thanks.');
+    } catch (e) { showToast(e.message || 'failed'); }
+  }
+
+  function setFeedSort(mode) {
+    state.feedMode = mode;
+    ['recent','foryou','popular'].forEach(m => {
+      const el = $('sort-' + m);
+      if (el) { el.style.fontWeight = m === mode ? 'bold' : 'normal'; el.style.textDecoration = m === mode ? 'underline' : 'none'; }
+    });
+    refreshFeed();
+  }
+  function setFeedScope(scope) {
+    state.feedScope = scope;
+    ['school','globe'].forEach(s => {
+      const el = $('scope-' + s);
+      if (el) { el.style.fontWeight = s === scope ? 'bold' : 'normal'; el.style.textDecoration = s === scope ? 'underline' : 'none'; }
+    });
+    const title = $('wall-title');
+    if (title) title.textContent = scope === 'globe' ? '🌎 The Wall — nationwide' : '🏫 The Wall — my school';
+    refreshFeed();
+  }
+  function toggleFeedMode() {
+    // legacy — cycle: recent → for you → popular → recent
+    const order = ['recent','foryou','popular'];
+    const idx = order.indexOf(state.feedMode || 'recent');
+    setFeedSort(order[(idx+1) % order.length]);
+    refreshFeed();
+  }
+
+  function viewAllPosts() { state.feedMode = 'all'; $('feed-mode').textContent = 'all'; refreshFeed(); }
+
+  // ==========================================================
+  // STATUS POSTING
+  // ==========================================================
+  async function postStatus() {
+    const input = $('status-input');
+    const txt = input.value.trim();
+    const gifUrl = state._pendingGif || '';
+    if (!txt && !gifUrl) return showToast('say something first.');
+    const moodId = $('mood-select') ? $('mood-select').value : '';
+    const anon = $('anon-check') ? $('anon-check').checked : false;
+    try {
+      await api('/api/posts', {
+        method: 'POST',
+        body: {
+          type: gifUrl ? 'gif' : 'text',
+          content: txt,
+          gifUrl,
+          isAnonymous: anon,
+          moodId
+        }
+      });
+      if (moodId && !anon) {
+        try { await api('/api/users/me', { method: 'PUT', body: { moodId } }); } catch {}
+      }
+      input.value = '';
+      state._pendingGif = '';
+      refreshFeed();
+      showToast('posted.');
+    } catch (e) {
+      showToast(e.message || 'post failed');
+    }
+  }
+
+  // ==========================================================
+  // ACTIVITY STREAM (notifications digest)
+  // ==========================================================
+  function paintActivityStream() {
+    const el = $('activity-stream-body');
+    const notifs = state.notifications.slice(0, 8);
+    if (!notifs.length) {
+      el.innerHTML = '<div style="color:var(--msp-mute);font-style:italic;">nothing this week.</div>';
+      return;
+    }
+    el.innerHTML = notifs.map(n => {
+      const nm = esc(n.fromName || n.from || 'someone');
+      const h = n.fromHandle ? esc(n.fromHandle) : '';
+      const who = h ? `<a href="/u/${h}" style="color:var(--msp-ink-link);font-weight:700;">${nm}</a>` : `<b style="color:var(--msp-ink-link)">${nm}</b>`;
+      return `
+      <div style="padding:3px 0; border-bottom:1px dotted var(--msp-rule-l); font-size:11px;">
+        ${who}
+        ${esc(n.text || n.type || '')}
+        <span style="color:var(--msp-mute);font-size:10px;"> &middot; ${esc(timeAgo(n.ts))}</span>
+      </div>
+    `;
+    }).join('');
+  }
+
+  // ==========================================================
+  // ALERTS WIDGET
+  // ==========================================================
+  function paintAlerts() {
+    const el = $('alerts-body');
+    const widget = $('alerts-widget');
+    const unread = state.notifications.filter(n => !n.read).slice(0, 5);
+    const pending = state.pendingFriendRequests || [];
+    const items = [];
+    pending.forEach(r => items.push({
+      type: 'Friend Request',
+      text: `from ${r.fromName || r.from}`,
+      ts: r.createdAt
+    }));
+    // Sanitize "ghost" / synthetic names that leak from the viral kit —
+    // never surface the word "ghost" as the actor of a real-looking event.
+    function cleanActor(name) {
+      const n = String(name || '').trim().toLowerCase();
+      if (!n || n === 'ghost' || n.startsWith('ghost-') || n === 'system') return 'someone';
+      return name;
+    }
+    unread.forEach(n => items.push({
+      type: alertTypeLabel(n.type),
+      text: (n.fromName ? cleanActor(n.fromName) + ' ' : '') + (n.text || ''),
+      ts: n.ts
+    }));
+    if (!items.length) {
+      // Empty state — hide the loud widget. The bell handles the silent case.
+      if (widget) widget.style.display = 'none';
+      if (el) el.innerHTML = '';
+      return;
+    }
+    if (widget) widget.style.display = '';
+    const pill = $('alerts-count-pill');
+    if (pill) pill.textContent = items.length;
+    el.innerHTML = items.slice(0, 6).map(it => `
+      <div class="alert-item">
+        <span class="a-type">${esc(it.type)}!</span>
+        <span>${esc(it.text)}</span>
+        <div class="a-meta">${esc(timeAgo(it.ts))}</div>
+      </div>
+    `).join('');
+  }
+
+  // Pulse the top-right bell based on unread count, and prefix the tab
+  // title with "(N) " so the alerts count shows in the browser tab.
+  const BASE_TITLE = 'Streets';
+  function paintBell() {
+    const bell = $('nav-bell');
+    const badge = $('nav-bell-badge');
+    const unread = (state.notifications || []).filter(n => !n.read).length
+                 + (state.pendingFriendRequests || []).length;
+    if (bell && badge) {
+      if (unread > 0) {
+        bell.classList.add('has-unread');
+        badge.style.display = 'inline-block';
+        badge.classList.add('has');
+        badge.textContent = unread > 99 ? '99+' : String(unread);
+      } else {
+        bell.classList.remove('has-unread');
+        badge.style.display = 'none';
+        badge.classList.remove('has');
+      }
+    }
+    // Tab title prefix
+    const prefix = unread > 0 ? '(' + (unread > 99 ? '99+' : unread) + ') ' : '';
+    if (!document.title.startsWith(prefix) || (unread === 0 && /^\(\d+\)/.test(document.title))) {
+      document.title = prefix + BASE_TITLE;
+    }
+  }
+
+  // ==========================================================
+  // STATUS & MOOD MODAL (now a tab, not a widget)
+  // ==========================================================
+  function openStatusMood() {
+    state._pendingGif = '';
+    openModal("What's on your mind?", `
+      <div id="sm-modal-mount" data-drop-zone="post">
+        <input id="sm-input" type="text" maxlength="500" placeholder="What are you doing right now?"
+               style="width:100%; padding:8px 10px; border:1px solid #b5bbcc; font:13px inherit; box-sizing:border-box;"/>
+        <div id="sm-gif-preview" style="display:none; margin-top:8px; padding:6px; border:1px dashed #b5bbcc; background:#fff;">
+          <img id="sm-gif-img" style="max-width:100%; max-height:200px; display:block;" />
+          <button type="button" onclick="os.clearPendingGif()" style="margin-top:4px; font-size:10px; background:#cc0000; color:#fff; border:0; padding:2px 6px; cursor:pointer;">remove gif</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-top:10px; font-size:11px; flex-wrap:wrap;">
+          <button type="button" onclick="os.openGifPicker('post')" style="background:#eef2f8;color:#003399;border:1px solid #b5bbcc;padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">🎬 add GIF</button>
+          <div>Mood: <select id="sm-mood" style="font:11px inherit;"></select></div>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+            <input type="checkbox" id="sm-anon" checked/> post anon
+          </label>
+          <div style="flex:1;"></div>
+          <button type="button" onclick="os.submitStatusMood()" style="background:#3b5998;color:#fff;border:1px solid #29447e;padding:6px 14px;font-weight:700;font-size:11px;cursor:pointer;">Post</button>
+        </div>
+        <div style="margin-top:6px; font-size:10px; color:#888; font-style:italic;">tip: you can also drag &amp; drop an image or video here.</div>
+        <div id="sm-result" style="margin-top:10px; font-size:11px;"></div>
+      </div>
+    `);
+    const src = $('mood-select');
+    const dst = $('sm-mood');
+    if (src && dst) dst.innerHTML = src.innerHTML;
+    wireDropZone($('sm-modal-mount'));
+  }
+  function clearPendingGif() {
+    state._pendingGif = '';
+    const pv = $('sm-gif-preview'); if (pv) pv.style.display = 'none';
+  }
+
+  // ============ GIF PICKER (Tenor via /api/gif/search) ============
+  function openGifPicker(target, commentPostId) {
+    state._gifTarget = target;
+    state._gifCommentPostId = commentPostId || '';
+    openModal('Pick a GIF', `
+      <div>
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+          <input id="gif-q" type="text" placeholder="search tenor (e.g. excited, fail, vibe)" style="flex:1;padding:6px 8px;border:1px solid #b5bbcc;font:13px inherit;"/>
+          <button type="button" onclick="os.searchGifs()" style="background:#3b5998;color:#fff;border:1px solid #29447e;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer;">search</button>
+        </div>
+        <div id="gif-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; max-height:55vh; overflow-y:auto;">
+          <div style="grid-column:1/-1;text-align:center;color:#888;padding:20px;">loading featured…</div>
+        </div>
+      </div>
+    `);
+    const q = $('gif-q');
+    if (q) q.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); searchGifs(); } });
+    searchGifs();
+  }
+  async function searchGifs() {
+    const q = ($('gif-q') ? $('gif-q').value : '').trim();
+    const grid = $('gif-grid');
+    if (!grid) return;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:20px;">searching…</div>';
+    try {
+      const r = await api('/api/gif/search?q=' + encodeURIComponent(q));
+      const items = r.items || [];
+      if (!items.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#888;padding:20px;">no gifs.</div>'; return; }
+      // object-fit:contain so the whole gif is visible in the box (rather
+      // than cropped by cover). Each cell is a square, gif sits inside with
+      // letterboxing as needed.
+      grid.innerHTML = items.map(g => `
+        <button type="button" onclick="os.pickGif('${esc(g.full)}')" style="border:1px solid #b5bbcc; padding:0; cursor:pointer; background:#f4f4f4; aspect-ratio:1; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+          <img src="${esc(g.preview)}" alt="${esc(g.alt)}" style="max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; display:block;"/>
+        </button>
+      `).join('');
+    } catch (e) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#cc0000;padding:20px;">gif search failed: ' + esc(e.message || '') + '</div>'; }
+  }
+  function pickGif(url) {
+    if (state._gifTarget === 'comment' && state._gifCommentPostId) {
+      submitGifComment(state._gifCommentPostId, url);
+      closeModal();
+      return;
+    }
+    if (state._gifTarget === 'wall') {
+      state._wcGif = url;
+      closeModal();
+      const pv = $('wc-media-preview');
+      if (pv) {
+        pv.innerHTML = `<img src="${esc(url)}" style="max-width:100%; max-height:200px; display:block;"/> <button type="button" onclick="os.clearWcMedia()" style="margin-left:6px; font-size:10px; background:#cc0000; color:#fff; border:0; padding:2px 6px; cursor:pointer;">remove</button>`;
+          pv.style.display = '';
+      }
+      return;
+    }
+    if (state._gifTarget === 'repost') {
+      state._repostGif = url;
+      // Re-open the repost modal so the user sees the gif attached.
+      // Easier: just show inline preview in the same modal if open.
+      const pv = $('rp-media-preview');
+      if (pv) {
+        pv.innerHTML = `<img src="${esc(url)}" style="max-width:100%; max-height:200px; display:block;"/>`;
+        pv.style.display = '';
+      }
+      // Close the gif picker modal but keep repost open by reopening it.
+      closeModal();
+      // re-render repost preserving text — caller handles state on next submit
+      return;
+    }
+    // modal post target: stash and preview
+    state._pendingGif = url;
+    closeModal();
+    const pv = $('sm-gif-preview');
+    const img = $('sm-gif-img');
+    if (pv && img) { img.src = url; pv.style.display = ''; }
+  }
+  // ============ DRAG-AND-DROP file upload helper ============
+  // Wires any element with `data-drop-zone="post|comment|avatar"` to accept
+  // image/video drops. Uses /api/upload to push the file to the server,
+  // then either previews it (for post composer) or attaches.
+  function wireDropZone(el) {
+    if (!el || el._dropWired) return;
+    el._dropWired = true;
+    let depth = 0;
+    el.addEventListener('dragenter', (e) => {
+      if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+      e.preventDefault(); depth++;
+      el.classList.add('drop-active');
+    });
+    el.addEventListener('dragover', (e) => {
+      if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+      e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+    });
+    el.addEventListener('dragleave', () => {
+      depth = Math.max(0, depth - 1);
+      if (depth === 0) el.classList.remove('drop-active');
+    });
+    el.addEventListener('drop', async (e) => {
+      e.preventDefault(); depth = 0; el.classList.remove('drop-active');
+      const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+      if (!files.length) return;
+      const f = files[0];
+      if (!/^image\/|^video\//.test(f.type)) { showToast('only images or video'); return; }
+      const target = el.getAttribute('data-drop-zone') || 'post';
+      const dataUrl = await fileToDataUrl(f);
+      if (target === 'post') {
+        // Open status composer if not already open; preview the file inline.
+        if (!$('sm-modal-mount')) openStatusMood();
+        state._pendingMedia = { type: f.type.startsWith('video') ? 'video' : 'image', content: dataUrl };
+        const pv = $('sm-gif-preview'); // re-use preview slot
+        const img = $('sm-gif-img');
+        if (pv && img) {
+          if (f.type.startsWith('video')) {
+            pv.innerHTML = `<video src="${dataUrl}" controls style="max-width:100%; max-height:200px;"></video>
+              <button type="button" onclick="os.clearPendingMedia()" style="margin-top:4px; font-size:10px; background:#cc0000; color:#fff; border:0; padding:2px 6px; cursor:pointer;">remove</button>`;
+          } else {
+            img.src = dataUrl;
+            pv.querySelector('button').onclick = clearPendingMedia;
+          }
+          pv.style.display = '';
+        }
+      }
+    });
+  }
+  function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = () => reject(new Error('read failed'));
+      r.readAsDataURL(file);
+    });
+  }
+  function clearPendingMedia() {
+    state._pendingMedia = null;
+    const pv = $('sm-gif-preview'); if (pv) pv.style.display = 'none';
+  }
+
+  // ============ Inline WALL COMPOSER (text/gif/image/video/anon) ============
+  // ============ FIRST-RUN GUIDED TOUR ============
+  const TOUR_KEY = 'oldstreets-tour-done';
+  const TOUR_STEPS = [
+    {
+      title: '👋 welcome to old streets',
+      body: "you're in. this is the wall — the main feed. let's take 30 seconds to walk through how this place works.",
+      target: null
+    },
+    {
+      title: 'this is your wall',
+      body: "everyone's posts land here. react with emoji, drop comments, share GIFs. text posts auto-embed youtube / spotify / soundcloud links.",
+      target: '#wall-drop-zone'
+    },
+    {
+      title: 'post anything',
+      body: "type something, paste a link, hit 🎬 for a GIF, 🖼 for an image, 🎥 for video. tick 'anon' to post anonymously. you can also drag &amp; drop a file straight onto the wall.",
+      target: '.wall-composer'
+    },
+    {
+      title: 'the bell up top',
+      body: 'reactions, comments, mentions, friend requests — they all collect under the 🔔. it shakes when you have something new.',
+      target: '#nav-bell'
+    },
+    {
+      title: 'chats + locked groups',
+      body: 'DM anyone under "Chats". the two people you invited (and your inviter) automatically share a permanent locked group with you — that\'s your starter crew, forever.',
+      target: '.nav-item[href="/mail.html"]'
+    },
+    {
+      title: 'invite two people',
+      body: "old streets only accepts people in groups of three. spend your 2 invites (phone or shareable link) to anchor your crew.",
+      target: '.nav-item[href="/invite.html"]'
+    },
+    {
+      title: "tomorrow's name",
+      body: 'click "tomorrow → ..." next to the wordmark to suggest the next site name and upvote others. the top vote-getter is locked in at midnight.',
+      target: '#tomorrow-link'
+    },
+    {
+      title: 'now: make your first post',
+      body: "your wall is empty. it stays empty until you write something. introduce yourself, drop a link, anything — get it out of the way.",
+      target: '#wc-text',
+      cta: 'make my first post',
+      focus: true
+    }
+  ];
+
+  function maybeStartTour() {
+    try {
+      if (localStorage.getItem(TOUR_KEY)) return;
+      // Don't tour anyone who already posted before this device saw the tour
+      if (state.user && state.user.hasPostedOnce) {
+        try { localStorage.setItem(TOUR_KEY, 'auto'); } catch {}
+        return;
+      }
+      startTour();
+    } catch {}
+  }
+
+  let _tourIdx = 0;
+  function startTour() {
+    _tourIdx = 0;
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="tour-overlay" id="tour-ov" onclick="os.tourNext()"></div>
+      <div class="tour-target-spot" id="tour-spot" style="display:none;"></div>
+      <div class="tour-bubble" id="tour-bubble"></div>
+    `);
+    renderTourStep();
+    window.addEventListener('resize', positionTour);
+    window.addEventListener('scroll', positionTour, true);
+  }
+  function renderTourStep() {
+    const s = TOUR_STEPS[_tourIdx];
+    const bubble = document.getElementById('tour-bubble');
+    if (!bubble || !s) return endTour();
+    const isLast = _tourIdx === TOUR_STEPS.length - 1;
+    bubble.innerHTML = `
+      <div class="head"><span>${esc(s.title)}</span><span class="step-num">${_tourIdx+1} / ${TOUR_STEPS.length}</span></div>
+      <div class="body"><p>${s.body}</p></div>
+      <div class="actions">
+        ${_tourIdx > 0 ? '<button class="skip" onclick="os.tourPrev()">back</button>' : '<button class="skip" onclick="os.tourSkip()">skip tour</button>'}
+        <button onclick="os.tourNext()">${isLast ? (s.cta || 'finish') : 'next →'}</button>
+      </div>
+    `;
+    positionTour();
+    if (s.focus && s.target) {
+      const el = document.querySelector(s.target);
+      if (el && el.focus) setTimeout(() => el.focus(), 150);
+    }
+  }
+  function positionTour() {
+    const s = TOUR_STEPS[_tourIdx];
+    const spot = document.getElementById('tour-spot');
+    const bubble = document.getElementById('tour-bubble');
+    if (!s || !bubble || !spot) return;
+    if (!s.target) {
+      spot.style.display = 'none';
+      bubble.classList.add('no-target');
+      bubble.style.left = ''; bubble.style.top = '';
+      return;
+    }
+    const el = document.querySelector(s.target);
+    if (!el) { spot.style.display = 'none'; bubble.classList.add('no-target'); return; }
+    const r = el.getBoundingClientRect();
+    const pad = 6;
+    spot.style.display = '';
+    spot.style.left = (r.left - pad) + 'px';
+    spot.style.top = (r.top - pad) + 'px';
+    spot.style.width = (r.width + pad * 2) + 'px';
+    spot.style.height = (r.height + pad * 2) + 'px';
+    bubble.classList.remove('no-target');
+    // Position bubble below if space, else above
+    const bw = bubble.offsetWidth || 320;
+    const bh = bubble.offsetHeight || 140;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let left = r.left + r.width / 2 - bw / 2;
+    left = Math.max(10, Math.min(vw - bw - 10, left));
+    let top = r.bottom + 14;
+    if (top + bh > vh - 10) top = Math.max(10, r.top - bh - 14);
+    bubble.style.left = left + 'px';
+    bubble.style.top = top + 'px';
+  }
+  function tourNext() {
+    _tourIdx++;
+    if (_tourIdx >= TOUR_STEPS.length) return endTour();
+    renderTourStep();
+  }
+  function tourPrev() { if (_tourIdx > 0) { _tourIdx--; renderTourStep(); } }
+  function tourSkip() { try { localStorage.setItem(TOUR_KEY, 'skipped'); } catch {} endTour(); }
+  function endTour() {
+    try { localStorage.setItem(TOUR_KEY, 'done'); } catch {}
+    ['tour-ov','tour-spot','tour-bubble'].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
+  }
+
+  // ============ REPOST / QUOTE-REPOST ============
+  // Snapshots an existing post into a new one. Twitter-style: original
+  // post embeds as a quote card; you add your own text or GIF on top.
+  function openRepost(postId) {
+    const orig = state.feed.find(p => p.id === postId);
+    if (!orig) { showToast('post not found'); return; }
+    state._repostOfId = postId;
+    state._repostGif = '';
+    state._repostMedia = null;
+    const origAuthor = orig.isAnonymous ? 'anonymous' : (orig.author || '?');
+    const origHandle = orig.isAnonymous ? '' : (orig.authorEmail || '').split('@')[0];
+    let origBody = '';
+    if (orig.type === 'gif' && orig.gifUrl) {
+      origBody = `<img src="${esc(orig.gifUrl)}" style="max-width:100%;max-height:180px;display:block;border:1px solid #b5bbcc;"/>`;
+    } else if (orig.type === 'image' && orig.content) {
+      origBody = `<img src="${esc(orig.content)}" style="max-width:100%;max-height:180px;display:block;border:1px solid #b5bbcc;"/>`;
+    } else if (orig.type === 'video' && orig.content) {
+      origBody = `<video src="${esc(orig.content)}" controls style="max-width:100%;max-height:180px;"></video>`;
+    } else {
+      origBody = `<div style="font-size:11.5px;color:#222;">${esc((orig.content || orig.caption || '').slice(0, 240))}</div>`;
+    }
+    openModal('Repost with your take', `
+      <div data-drop-zone="repost" id="rp-mount">
+        <textarea id="rp-text" maxlength="1000" placeholder="add your take, a gif, anything…"
+          style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #b5bbcc; font:13px inherit; min-height:60px; resize:vertical;"></textarea>
+        <div id="rp-media-preview" style="display:none; margin-top:6px; padding:6px; border:1px dashed #b5bbcc; background:#fff;"></div>
+
+        <!-- ORIGINAL POST SNAPSHOT (quote card) -->
+        <div style="margin-top:10px; padding:10px 12px; border:1px solid #b5bbcc; background:#f8f9fb;">
+          <div style="font-size:11px; margin-bottom:6px;">
+            <b style="color:#003399;">${esc(origAuthor)}</b>
+            ${origHandle && !orig.isAnonymous ? '<span style="color:#666;">@' + esc(origHandle) + '</span>' : ''}
+            <span style="color:#666;"> · ${esc(timeAgo(orig.createdAt))}</span>
+          </div>
+          ${origBody}
+        </div>
+
+        <div style="display:flex; align-items:center; gap:6px; margin-top:10px; flex-wrap:wrap;">
+          <button type="button" onclick="os.openGifPicker('repost')"
+            style="background:#eef2f8;color:#003399;border:1px solid #b5bbcc;padding:5px 10px;font-weight:700;font-size:11px;cursor:pointer;">🎬 GIF</button>
+          <label style="display:flex; align-items:center; gap:4px; font-size:11px; cursor:pointer;">
+            <input type="checkbox" id="rp-anon"/>
+            <span>anon</span>
+          </label>
+          <div style="flex:1;"></div>
+          <button type="button" onclick="os.submitRepost()"
+            style="background:var(--msp-blue);color:#fff;border:1px solid var(--msp-blue-d);padding:6px 18px;font-weight:700;font-size:11.5px;cursor:pointer;">Repost</button>
+        </div>
+        <div id="rp-status" style="margin-top:6px; font-size:11px;"></div>
+      </div>
+    `);
+  }
+  async function submitRepost() {
+    const ta = $('rp-text');
+    const text = ta ? ta.value.trim() : '';
+    const isAnonymous = $('rp-anon') ? $('rp-anon').checked : false;
+    const gifUrl = state._repostGif || '';
+    if (!state._repostOfId) { $('rp-status').textContent = 'no source post'; return; }
+    try {
+      await api('/api/posts', {
+        method: 'POST',
+        body: {
+          type: gifUrl ? 'gif' : 'text',
+          content: text,
+          gifUrl,
+          isAnonymous,
+          repostOf: state._repostOfId
+        }
+      });
+      closeModal();
+      showToast('reposted.');
+      await refreshFeed();
+    } catch (e) {
+      $('rp-status').innerHTML = '<span style="color:#cc0000;">' + esc(e.message || 'repost failed') + '</span>';
+    }
+  }
+
+  function wireWallComposer() {
+    const ta = $('wc-text');
+    const btnGif = $('wc-btn-gif');
+    const btnImg = $('wc-btn-image');
+    const btnVid = $('wc-btn-video');
+    const fileImg = $('wc-file-image');
+    const fileVid = $('wc-file-video');
+    const btnPost = $('wc-btn-post');
+    if (!ta || !btnPost) return;
+    state._wcGif = '';
+    state._wcMedia = null;
+
+    function setMediaPreview(html) {
+      const pv = $('wc-media-preview');
+      if (!pv) return;
+      pv.innerHTML = html + ' <button type="button" onclick="os.clearWcMedia()" style="margin-left:6px; font-size:10px; background:#cc0000; color:#fff; border:0; padding:2px 6px; cursor:pointer;">remove</button>';
+      pv.style.display = '';
+    }
+    function clearMedia(){
+      state._wcGif = ''; state._wcMedia = null;
+      const pv = $('wc-media-preview'); if (pv) pv.style.display = 'none';
+    }
+    state._wcClearMedia = clearMedia;
+
+    if (btnGif) btnGif.addEventListener('click', () => {
+      state._gifTarget = 'wall';
+      openGifPicker('wall');
+    });
+    if (btnImg) btnImg.addEventListener('click', () => fileImg.click());
+    if (btnVid) btnVid.addEventListener('click', () => fileVid.click());
+    if (fileImg) fileImg.addEventListener('change', async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      if (f.size > 8 * 1024 * 1024) { showToast('image too big (max 8MB)'); return; }
+      const dataUrl = await fileToDataUrl(f);
+      state._wcMedia = { type: 'image', content: dataUrl };
+      setMediaPreview(`<img src="${dataUrl}" style="max-width:100%; max-height:200px; display:block;"/>`);
+    });
+    if (fileVid) fileVid.addEventListener('change', async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      if (f.size > 30 * 1024 * 1024) { showToast('video too big (max 30MB)'); return; }
+      const dataUrl = await fileToDataUrl(f);
+      state._wcMedia = { type: 'video', content: dataUrl };
+      setMediaPreview(`<video src="${dataUrl}" controls style="max-width:100%; max-height:200px; display:block;"></video>`);
+    });
+
+    btnPost.addEventListener('click', async () => {
+      const text = (ta.value || '').trim();
+      const gifUrl = state._wcGif || '';
+      const media = state._wcMedia;
+      if (!text && !gifUrl && !media) { $('wc-status').textContent = 'say something, drop a GIF, or attach media.'; return; }
+      btnPost.disabled = true; const old = btnPost.textContent; btnPost.textContent = 'posting…';
+      $('wc-status').textContent = '';
+      try {
+        const isAnonymous = $('wc-anon') ? $('wc-anon').checked : false;
+        let body;
+        if (media) {
+          body = { type: media.type, content: media.content, caption: text, isAnonymous };
+        } else if (gifUrl) {
+          body = { type: 'gif', content: text, gifUrl, isAnonymous };
+        } else {
+          body = { type: 'text', content: text, isAnonymous };
+        }
+        await api('/api/posts', { method: 'POST', body });
+        ta.value = ''; clearMedia();
+        if ($('wc-anon')) $('wc-anon').checked = false;
+        await refreshFeed();
+        showToast('posted.');
+      } catch (e) {
+        $('wc-status').innerHTML = '<span style="color:#cc0000;">' + esc(e.message || 'post failed') + '</span>';
+      } finally {
+        btnPost.disabled = false; btnPost.textContent = old;
+      }
+    });
+  }
+  function clearWcMedia(){ if (state._wcClearMedia) state._wcClearMedia(); }
+
+  async function submitGifComment(postId, url) {
+    try {
+      // Use the singular /comment endpoint (the canonical one). Send both
+      // `content` and `text` so the server handler that reads either picks
+      // it up, plus `gifUrl` for the attached gif.
+      await api(`/api/posts/${encodeURIComponent(postId)}/comment`, {
+        method: 'POST',
+        body: { content: '', text: '', gifUrl: url, type: 'gif', isAnonymous: false }
+      });
+      showToast('gif sent');
+      await refreshFeed();
+      // re-open the comments section so the user sees their gif comment
+      const wrap = document.getElementById('cm-' + postId);
+      if (wrap) { wrap.classList.remove('hidden'); toggleComments(postId); toggleComments(postId); }
+    } catch (e) { showToast(e.message || 'gif comment failed'); }
+  }
+  async function submitStatusMood() {
+    const input = $('sm-input');
+    const mood = $('sm-mood');
+    const anon = $('sm-anon');
+    const text = (input.value || '').trim();
+    if (!text) { $('sm-result').textContent = 'say something first.'; return; }
+    try {
+      // re-use existing post pipeline by mirroring values into hidden controls
+      $('status-input').value = text;
+      if (mood && $('mood-select')) $('mood-select').value = mood.value;
+      if (anon && $('anon-check')) $('anon-check').checked = anon.checked;
+      await postStatus();
+      closeModal();
+      showToast('posted');
+    } catch (e) { $('sm-result').textContent = e.message || 'could not post'; }
+  }
+
+  // Top-right bell click — show the activity stream in a modal.
+  function openActivityStream() {
+    const notifs = (state.notifications || []).slice(0, 30);
+    const pending = state.pendingFriendRequests || [];
+    const rows = [];
+    pending.forEach(r => {
+      const nm = esc(r.fromName || r.from || 'someone');
+      const h = r.fromHandle ? esc(r.fromHandle) : '';
+      const who = h ? `<a href="/u/${h}" style="color:#003399;font-weight:700;">${nm}</a>` : `<b>${nm}</b>`;
+      rows.push(`
+      <div style="padding:7px 10px; background:#fff4d3; border-bottom:1px solid #d8dcde; font-size:11px;">
+        <strong style="color:#cc5500;">Friend Request</strong> from ${who}
+        <a href="#" onclick="os.openFriendRequests();os.closeModal();return false;" style="float:right; font-size:10px;">view →</a>
+      </div>
+      `);
+    });
+    notifs.forEach(n => {
+      const nm = esc(n.fromName || 'someone');
+      const h = n.fromHandle ? esc(n.fromHandle) : '';
+      const who = h ? `<a href="/u/${h}" style="color:#003399;font-weight:700;" onclick="event.stopPropagation();">${nm}</a>` : `<b style="color:#003399;">${nm}</b>`;
+      rows.push(`
+      <div style="padding:7px 10px; background:${n.read ? '#fff' : '#eef2f8'}; border-bottom:1px solid #d8dcde; font-size:11px; cursor:pointer;" onclick="os.markRead('${esc(n.id || '')}')">
+        ${who}
+        ${esc(n.text || alertTypeLabel(n.type))}
+        <span style="float:right; color:#888; font-size:10px;">${esc(timeAgo(n.ts))}</span>
+      </div>
+      `);
+    });
+    const body = rows.length
+      ? `<div style="max-height:60vh; overflow-y:auto; border:1px solid #d8dcde; background:#fff;">${rows.join('')}</div>
+         <div style="text-align:right; margin-top:8px;"><a href="#" onclick="os.markAllRead();os.closeModal();return false;" style="font-size:11px;">mark all read →</a></div>`
+      : '<div style="padding:18px; color:#666; font-style:italic; font-size:11px; text-align:center;">no activity yet. when people react, comment, or follow, you\'ll see it here.</div>';
+    openModal('Activity Stream', body);
+  }
+
+  function alertTypeLabel(t) {
+    const map = {
+      'friend-request': 'Friend Request',
+      'comment': 'New Comment',
+      'react': 'New React',
+      'reaction': 'New React',
+      'mention': 'Mention',
+      'dm': 'New Message',
+      'message': 'New Message',
+      'blog-comment': 'Blog Comment',
+      'love-letter': 'Love Letter',
+      'crush': 'Crush'
+    };
+    return map[t] || (t ? t : 'Alert');
+  }
+
+  async function markRead(id) {
+    if (!id) return;
+    try { await api(`/api/notifications/${encodeURIComponent(id)}/read`, { method: 'POST', body: {} }); refreshNotifications(); } catch {}
+  }
+  async function markAllRead() {
+    try { await api('/api/notifications/read-all', { method: 'POST', body: {} }); refreshNotifications(); } catch {}
+  }
+
+  // ==========================================================
+  // NOTIFICATIONS
+  // ==========================================================
+  async function refreshNotifications() {
+    try {
+      const d = await api('/api/notifications');
+      state.notifications = d.notifications || [];
+      const unread = state.notifications.filter(n => !n.read).length;
+      paintAlerts();
+      paintActivityStream();
+      paintBell();
+      // Chats badge: ONLY real unread DMs (was bug-summing notif count too).
+      const mailBadge = $('mail-badge');
+      const dmUnread = (d.unreadDmCount || 0);
+      if (mailBadge) {
+        if (dmUnread > 0) {
+          mailBadge.classList.remove('hidden');
+          mailBadge.textContent = dmUnread;
+        } else {
+          mailBadge.classList.add('hidden');
+          mailBadge.textContent = '';
+        }
+      }
+      const ddMail = $('dd-mail-count');
+      if (ddMail) ddMail.textContent = dmUnread ? '(' + dmUnread + ')' : '';
+      const mailBadgeSb = $('mail-badge-sb');
+      if (mailBadgeSb) {
+        if (dmUnread > 0) { mailBadgeSb.style.display = ''; mailBadgeSb.textContent = dmUnread; }
+        else mailBadgeSb.style.display = 'none';
+      }
+    } catch {}
+  }
+
+  // ==========================================================
+  // INBOX
+  // ==========================================================
+  async function refreshInbox() {
+    try {
+      const d = await api('/api/inbox');
+      state.inbox = Array.isArray(d) ? d : [];
+    } catch {}
+  }
+
+  // ==========================================================
+  // FRIEND REQUESTS
+  // ==========================================================
+  async function refreshFriendRequests() {
+    try {
+      const [p, s] = await Promise.all([
+        api('/api/friend-requests/pending').catch(()=>[]),
+        api('/api/friend-requests/sent').catch(()=>[])
+      ]);
+      state.pendingFriendRequests = Array.isArray(p) ? p : [];
+      state.sentFriendRequests = Array.isArray(s) ? s : [];
+      const n = state.pendingFriendRequests.length;
+      const fb = $('fr-badge');
+      if (fb) { fb.textContent = n; fb.classList.toggle('hidden', n === 0); }
+      const ddfr = $('dd-fr-count'); if (ddfr) ddfr.textContent = n ? '(' + n + ')' : '';
+      paintAlerts();
+    } catch {}
+  }
+
+  // ==========================================================
+  // INVITES
+  // ==========================================================
+  async function refreshInvites() {
+    try {
+      const d = await api('/api/invites/me');
+      state.invites = d;
+      $('invite-balance').textContent = d.referralBalance || 0;
+      const slots = (d.pendingInvites || []);
+      $('invite-summary').textContent = state.user.mustSpendInitialInvites
+        ? 'Spend both of your starting invites to unlock the rest of the site.'
+        : `You have ${d.referralBalance} invite${d.referralBalance===1?'':'s'} to spend.`;
+      $('invite-slots').innerHTML = slots.length
+        ? slots.map(renderInviteSlot).join('')
+        : '';
+    } catch {}
+  }
+
+  function renderInviteSlot(inv) {
+    const claimed = !!inv.claimedBy;
+    return `
+      <div class="invite-slot ${claimed?'claimed':''}">
+        <div><b>${esc(inv.contact || 'phone')}</b></div>
+        <div class="is-meta">
+          ${claimed ? `Claimed by ${esc(inv.claimedName || inv.claimedBy)} &middot; ${esc(timeAgo(inv.claimedAt))}` :
+            `Sent ${esc(timeAgo(inv.sentAt))} &middot; not joined yet`}
+        </div>
+        ${claimed ? '' : `
+          <div class="is-actions">
+            <button type="button" onclick="os.copyInvite('${esc(inv.inviteUrl||'')}')">Copy Link</button>
+            <button type="button" onclick="os.openSms('${esc(inv.inviteUrl||'')}','${esc(inv.contact||'')}')">Text it</button>
+            <button type="button" onclick="os.revokeInvite('${esc(inv.inviteToken||'')}')">Revoke</button>
+          </div>
+        `}
+      </div>
+    `;
+  }
+
+  async function sendInvite() {
+    const phone = $('invite-phone').value;
+    if (!phone || phone.replace(/\D/g,'').length < 11) return showToast('enter a valid phone');
+    try {
+      const r = await api('/api/invites/send', { method: 'POST', body: { phone } });
+      $('invite-phone').value = '+1 ';
+      showToast('invite sent!');
+      refreshInvites();
+      // offer immediate share
+      openModal('Invite sent', `
+        <p>Share this link with <b>${esc(r.contact)}</b>:</p>
+        <p style="word-break:break-all"><a href="${esc(r.inviteUrl)}">${esc(r.inviteUrl)}</a></p>
+        <div style="margin-top:8px;">
+          <button type="button" onclick="os.copyInvite('${esc(r.inviteUrl)}')">Copy Link</button>
+          <a href="sms:${esc(r.contact)};?&body=${encodeURIComponent(r.smsBody||'')}"><button type="button">Open in Messages</button></a>
+        </div>
+      `);
+    } catch (e) {
+      showToast(e.message || 'invite failed');
+    }
+  }
+  async function revokeInvite(tok) {
+    if (!confirm('revoke this invite?')) return;
+    try { await api('/api/invites/revoke', { method: 'POST', body: { inviteToken: tok } }); refreshInvites(); }
+    catch (e) { showToast(e.message); }
+  }
+  function copyInvite(url) {
+    if (!url) return;
+    try { navigator.clipboard.writeText(url); showToast('copied!'); } catch { showToast(url); }
+  }
+  function openSms(url, phone) {
+    const body = (state.user.name || 'a friend') + ' invited you to Paths — a small invite-only place. Open: ' + url;
+    window.location.href = `sms:${phone};?&body=${encodeURIComponent(body)}`;
+  }
+
+  // ==========================================================
+  // PEOPLE YOU MAY KNOW
+  // ==========================================================
+  async function refreshPymk() {
+    try {
+      const dir = await api('/api/directory');
+      state.directory = Array.isArray(dir) ? dir : [];
+    } catch { state.directory = []; }
+    paintPymk();
+  }
+
+  function paintPymk() {
+    const el = $('pymk-body');
+    const u = state.user;
+    const friends = new Set((u.friends || []).map(e => e.toLowerCase()));
+    const myEmail = (u.email || '').toLowerCase();
+    const sent = new Set((state.sentFriendRequests || []).filter(r => r.status==='pending').map(r => r.to.toLowerCase()));
+    const candidates = state.directory.filter(d =>
+      d.claimed && d.email && d.email.toLowerCase() !== myEmail &&
+      !friends.has(d.email.toLowerCase()) &&
+      !state.dismissedPymk.has(d.email.toLowerCase())
+    );
+    // shuffle stable-ish
+    const pool = candidates.slice().sort(() => Math.random() - 0.5).slice(0, 5);
+    if (!pool.length) {
+      el.innerHTML = '<div style="color:var(--msp-mute);font-style:italic;">no suggestions right now.</div>';
+      return;
+    }
+    el.innerHTML = pool.map(d => {
+      const handle = d.email.split('@')[0];
+      const requested = sent.has(d.email.toLowerCase());
+      return `
+        <div class="pymk-row">
+          <div class="py-av"><div class="pa-inner">${esc(initials(d.name))}</div></div>
+          <div class="py-info">
+            <a href="#" class="py-name" onclick="os.viewProfile('${esc(handle)}');return false;">${esc(d.name)}</a>
+            <div class="py-meta">@${esc(handle)}</div>
+            <div class="py-add">${requested
+              ? '<span style="color:var(--msp-mute)">request sent</span>'
+              : `<a href="#" onclick="os.sendFriendRequest('${esc(d.email)}');return false;">Add to Friends</a>`}</div>
+          </div>
+          <div class="py-tools">
+            <button type="button" title="view" onclick="os.viewProfile('${esc(handle)}')">?</button>
+            <button type="button" title="dismiss" onclick="os.dismissPymk('${esc(d.email)}')">x</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function dismissPymk(email) {
+    state.dismissedPymk.add(email.toLowerCase());
+    paintPymk();
+  }
+
+  async function sendFriendRequest(toEmail) {
+    try {
+      await api('/api/friend-requests/send', { method: 'POST', body: { toEmail } });
+      showToast('request sent!');
+      refreshFriendRequests();
+      paintPymk();
+    } catch (e) {
+      showToast(e.message || 'failed');
+    }
+  }
+
+  // ==========================================================
+  // DAILY 24
+  // ==========================================================
+  async function refreshDaily24() {
+    try {
+      const lb = await api('/api/daily-24/leaderboard');
+      state.daily24Leaderboard = lb;
+      if (lb && lb.leaderboard && lb.leaderboard[0] && lb.leaderboard[0].imageUrl) {
+        $('ad-photo').src = lb.leaderboard[0].imageUrl;
+        $('ad-photo').style.display = 'block';
+      }
+    } catch {}
+    try {
+      const pair = await api('/api/daily-24/pair');
+      state.daily24Pair = pair;
+      paintD24Sneak();
+    } catch { paintD24Sneak(); }
+  }
+
+  function paintD24Sneak() {
+    const el = $('d24-sneak');
+    if (!el) return;
+    const p = state.daily24Pair;
+    if (!p || !p.ok || !p.left || !p.right) {
+      el.innerHTML = '<div style="padding:10px;color:var(--msp-mute);font-style:italic;">no pair yet today.</div>';
+      return;
+    }
+    el.innerHTML = `
+      <div class="d24-pair">
+        <div class="d24-card">
+          <div class="d24-thumb" style="background-image: url('${esc(p.left.imageUrl)}');"></div>
+          <button type="button" onclick="os.d24Vote('${esc(p.left.id)}','${esc(p.right.id)}')">Vote</button>
+        </div>
+        <div class="d24-card">
+          <div class="d24-thumb" style="background-image: url('${esc(p.right.imageUrl)}');"></div>
+          <button type="button" onclick="os.d24Vote('${esc(p.right.id)}','${esc(p.left.id)}')">Vote</button>
+        </div>
+      </div>
+      <div style="text-align:center;padding:2px 6px 6px;font-size:10px;color:var(--msp-mute);">${esc(p.totalVotes||0)} votes today</div>
+    `;
+  }
+
+  async function d24Vote(winnerId, loserId) {
+    try {
+      await api('/api/daily-24/vote', { method: 'POST', body: { winnerId, loserId } });
+      showToast('voted!');
+      refreshDaily24();
+    } catch (e) { showToast(e.message || 'failed'); }
+  }
+
+  // ==========================================================
+  // VIDEO OF THE DAY (from posts)
+  // ==========================================================
+  function paintVideoOfDay() {
+    const el = $('vid-of-day');
+    if (!el) return; // widget deleted
+    const vids = state.feed.filter(p => p.type === 'video' && p.content);
+    if (!vids.length) {
+      el.innerHTML = '<div style="color:var(--msp-mute);font-style:italic;">no video yet — be the first.</div>';
+      return;
+    }
+    const v = vids[Math.floor(Math.random() * vids.length)];
+    const handle = (v.authorEmail || '').split('@')[0];
+    el.innerHTML = `
+      <video src="${esc(v.content)}" controls style="width:100%;max-height:160px;border:1px solid var(--msp-rule);"></video>
+      <div style="margin-top:4px;font-size:11px;">
+        by <a href="#" onclick="os.viewProfile('${esc(handle)}');return false;"><b>${esc(v.author||'?')}</b></a>
+        <div style="font-size:10px;color:var(--msp-mute)">${esc(timeAgo(v.createdAt))} &middot; ${esc(v.caption||'')}</div>
+      </div>
+    `;
+  }
+
+  // ==========================================================
+  // ONLINE NOW
+  // ==========================================================
+  // FORCED 3-school lock — appears the moment a user signs in and is
+  // dismissable ONLY by completing the double-confirm flow. Locked-in
+  // forever after that. Three schools only: Ancient Paths, Beverly Hills,
+  // Crossroads.
+  function maybePromptSchoolConfirm() {
+    try {
+      if (state.user.schoolLocked) return;
+      if (state.user.isAdmin) return; // admin bypass
+      const LAUNCH = [
+        { id: 'new-roads',     name: 'Ancient Paths' },
+        { id: 'beverly-hills', name: 'Beverly Hills High' },
+        { id: 'crossroads',    name: 'Crossroads' }
+      ];
+      let picked = null;
+
+      function renderPicker() {
+        openModal('🏫 Pick your school', `
+          <div style="background:#cc0000; color:#fff; padding:8px 10px; font-size:11px; font-weight:700; margin:-12px -12px 12px;">
+            REQUIRED · PERMANENT · pick one to continue
+          </div>
+          <p style="margin-top:0; font-size:13px;">old streets is community-isolated. you can only see + post with people from your own school. this choice can't be undone.</p>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
+            ${LAUNCH.map(s => `
+              <button class="btn big-school" data-id="${s.id}" style="text-align:left; padding:14px 16px; font-size:14px; font-weight:700; border:2px solid var(--msp-rule); background:#f6f8fc; color:#1a2a4a; cursor:pointer;">
+                🏫 ${esc(s.name)}
+              </button>
+            `).join('')}
+          </div>
+          <p class="muted" style="font-size:10.5px; margin-top:14px; line-height:1.5;">if your school isn't here, you're not in our launch wave. you'll need to wait for your school to be added.</p>
+        `, { dismissable: false });
+        setTimeout(() => {
+          document.querySelectorAll('.big-school').forEach(b => {
+            b.addEventListener('mouseenter', () => { b.style.background = '#e8eef8'; b.style.borderColor = '#3b5998'; });
+            b.addEventListener('mouseleave', () => { b.style.background = '#f6f8fc'; b.style.borderColor = ''; });
+            b.addEventListener('click', () => {
+              picked = LAUNCH.find(x => x.id === b.dataset.id);
+              renderConfirm();
+            });
+          });
+        }, 60);
+      }
+
+      function renderConfirm() {
+        if (!picked) return renderPicker();
+        openModal('⚠ Confirm — this is permanent', `
+          <div style="background:#7a1818; color:#fff; padding:10px 12px; font-size:12px; font-weight:700; margin:-12px -12px 14px; line-height:1.4;">
+            ⚠ THIS CHOICE IS PERMANENT. you will be locked into this school. no changes. no swaps. an admin would have to manually intervene to undo this.
+          </div>
+          <p style="margin-top:0;">you're choosing:</p>
+          <div style="background:#fff7c2; border:2px solid #d4b243; padding:14px; font-size:18px; font-weight:700; color:#5a3500; text-align:center; margin:8px 0 14px;">
+            🏫 ${esc(picked.name)}
+          </div>
+          <p style="font-size:12px; margin-bottom:14px;">you'll only see and chat with people from <b>${esc(picked.name)}</b>. you can't move schools later. is this the school you actually attend?</p>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" id="sc-back" style="flex:1; background:#eef2f8; color:#1a2a4a; border-color:#aaa;">← back, pick again</button>
+            <button class="btn danger" id="sc-confirm" style="flex:2; background:#1a4f1a; border-color:#0d3a0d; color:#fff; font-weight:700;">
+              yes — lock me into ${esc(picked.name)} forever
+            </button>
+          </div>
+        `, { dismissable: false });
+        setTimeout(() => {
+          const back = document.getElementById('sc-back');
+          const conf = document.getElementById('sc-confirm');
+          if (back) back.addEventListener('click', renderPicker);
+          if (conf) conf.addEventListener('click', async () => {
+            conf.disabled = true; conf.textContent = 'locking…';
+            try {
+              await api('/api/me/lock-school', { method: 'POST', body: { schoolId: picked.id, confirm: 'PERMANENT' } });
+              closeModal();
+              location.reload();
+            } catch (e) {
+              showToast(e.message || 'lock failed');
+              conf.disabled = false; conf.textContent = 'yes — lock me in forever';
+            }
+          });
+        }, 60);
+      }
+
+      renderPicker();
+    } catch {}
+  }
+
+  // ============ 👑 TOMORROW'S WINNING NAME ============
+  async function refreshWinning() {
+    try {
+      const d = await api('/api/brand-vote');
+      const top = (d.suggestions || [])[0];
+      const name = $('winning-name');
+      const votes = $('winning-votes');
+      if (!name) return;
+      if (top && top.votes > 0) {
+        name.textContent = top.text;
+        if (votes) votes.textContent = '👑 ' + top.votes + ' vote' + (top.votes === 1 ? '' : 's') + ' · locks at UTC midnight';
+      } else {
+        name.textContent = d.tomorrow || '—';
+        if (votes) votes.textContent = '🟡 default rotation · no votes yet — suggest one!';
+      }
+    } catch {}
+  }
+  async function refreshFounders() {
+    try {
+      const r = await api('/api/school/founders');
+      const body = $('founder-body');
+      if (!body) return;
+      const founders = r.founders || [];
+      if (!founders.length) { body.innerHTML = '<span class="muted">no founders yet — be the first.</span>'; return; }
+      const status = r.iAmFounder
+        ? `<div style="background:#fff4d3; border:1px solid #d4b243; padding:6px 8px; margin-bottom:8px; font-size:11px; font-weight:700; color:#7a4a00;">⭐ you are FOUNDER #${r.myFounderRank}/25 at your school.</div>`
+        : `<div style="background:#ffe9e9; border:1px solid #cc0000; padding:6px 8px; margin-bottom:8px; font-size:11px; color:#7a0000;">${r.capLeft} founder slots left. first 25 in get permanent 🌟 status.</div>`;
+      body.innerHTML = status + founders.slice(0, 5).map((f, i) => `
+        <div style="display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px dotted var(--msp-rule-l);">
+          <span style="width:18px; font-weight:700; color:#7a4a00;">${i+1}</span>
+          <a href="/u/${esc(f.handle)}" style="flex:1; font-weight:700;">${esc(f.name)}</a>
+          <span style="color:#7a4a00;">🌟</span>
+        </div>`).join('');
+    } catch {}
+  }
+
+  // K3/topInviters/recentClaims widgets were removed from the right rail;
+  // no-op stubs remain in case any handler still references them.
+  function refreshK3Progress() {}
+  function refreshTopInviters() {}
+  function refreshRecentClaims() {}
+
+  // ============ LIVE ROOMS ============
+  state._knownRoomIds = new Set();
+  async function refreshLiveRooms() {
+    const el = $('live-rooms');
+    if (!el) return;
+    try {
+      const r = await api('/api/rooms/live');
+      const list = r.rooms || [];
+      if (!list.length) { el.innerHTML = '<div style="padding:10px; color:var(--msp-mute); font-style:italic;">no live rooms. <a href="#" onclick="os.openCreateRoom();return false;">start one →</a></div>'; return; }
+      const previouslyKnown = state._knownRoomIds;
+      const nextKnown = new Set();
+      el.innerHTML = list.slice(0, 6).map(rm => {
+        nextKnown.add(rm.id);
+        const isNew = !previouslyKnown.has(rm.id) && previouslyKnown.size > 0;
+        const flash = isNew ? ' style="animation: liveroom-flash 1.6s ease-out 3;"' : '';
+        return `<div class="online-row"${flash} style="padding:7px 9px; border-bottom:1px dotted var(--msp-rule-l); cursor:pointer;" onclick="os.joinRoom('${esc(rm.id)}')">
+          <span style="display:inline-block; width:7px; height:7px; background:#cc0000; border-radius:50%; margin-right:6px; animation: pulse 1.2s ease-in-out infinite;"></span>
+          <b style="color:var(--msp-blue-d);">${esc(rm.name)}</b>
+          <div style="margin-left:14px; font-size:10px; color:var(--msp-mute);">${rm.memberCount} in · by <a href="/u/${esc(rm.createdByHandle)}" onclick="event.stopPropagation();">${esc(rm.createdByName)}</a></div>
+        </div>`;
+      }).join('');
+      state._knownRoomIds = nextKnown;
+    } catch { el.innerHTML = '<div style="padding:10px; color:var(--msp-mute);">offline</div>'; }
+  }
+  function openCreateRoom() {
+    openModal('Create a live room', `
+      <p>Spin up a room. Anyone on Paths can drop in.</p>
+      <div class="form-row" style="margin:8px 0;">
+        <label for="room-name">Room name</label>
+        <input id="room-name" type="text" maxlength="60" placeholder="e.g. friday night gossip" style="width:100%;"/>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:6px;">
+        <button class="btn alt" onclick="os.closeModal()">cancel</button>
+        <button class="btn" onclick="os.submitCreateRoom()">Go Live →</button>
+      </div>
+      <div id="room-err" style="color:var(--msp-red); font-size:11px; margin-top:6px;"></div>
+    `);
+  }
+  async function submitCreateRoom() {
+    const name = ($('room-name')||{}).value || '';
+    try {
+      const r = await api('/api/rooms', { method:'POST', body: { name } });
+      closeModal();
+      refreshLiveRooms();
+      joinRoom(r.room.id);
+    } catch (e) { $('room-err').textContent = e.message; }
+  }
+  async function joinRoom(id) {
+    try { await api(`/api/rooms/${encodeURIComponent(id)}/join`, { method:'POST' }); }
+    catch {}
+    // For now just toast — real video/audio wiring comes next.
+    showToast('joined the room. (video coming next)');
+    refreshLiveRooms();
+  }
+
+  async function refreshOnline() {
+    try {
+      const info = await api('/api/site-info');
+      state.siteInfo = info;
+      updateOnlineCount();
+      updateBrand();
+    } catch {}
+    // Online now: show real online users with their current activity (last
+    // post / last mood) below their name. Clickable goes to their profile.
+    try {
+      const onlineData = await api('/api/online');
+      const list = (onlineData && onlineData.users) || [];
+      if (list.length) {
+        $('online-body').innerHTML = list.slice(0, 10).map(u => {
+          const handle = u.handle || (u.email||'').split('@')[0];
+          const activity = u.activity || u.lastPostText || u.mood || u.lastSeenText || 'browsing';
+          const star = (u.rating && u.rating > 0) ? `<span style="color:#cc7700;font-size:10px;margin-left:4px;font-weight:700;">★${u.rating.toFixed(1)}</span>` : '';
+          return `<div class="online-row" style="padding:5px 7px; border-bottom:1px dotted var(--msp-rule-l);">
+            <span class="od-dot" style="display:inline-block; width:7px; height:7px; background:var(--msp-green); border-radius:50%; margin-right:5px;"></span>
+            <a href="/u/${esc(handle)}" style="font-weight:bold;">${esc(u.name||'?')}</a>${star}
+            <div style="margin-left:14px; color:var(--msp-mute); font-size:10px; font-style:italic;">${esc(String(activity).slice(0, 60))}</div>
+          </div>`;
+        }).join('');
+      } else {
+        // No real users online right now — say so honestly. No directory
+        // shuffle fallback (that was the old "nobody online but here are
+        // some random members" tell that the count was fake).
+        $('online-body').innerHTML = '<div style="padding:10px; color:var(--msp-mute); font-style:italic;">no one else is online right now. you\'re early.</div>';
+      }
+    } catch {}
+    // Top-3 leaderboard widget
+    try {
+      const lb = await api('/api/leaderboard?mode=streaks');
+      const list = (lb && (lb.leaderboard || lb)) || [];
+      const top = list.slice(0, 3);
+      if (!top.length) { $('top3-body').innerHTML = '<div style="padding:10px; color:var(--msp-mute); font-style:italic;">no rankings yet.</div>'; return; }
+      $('top3-body').innerHTML = top.map((u, i) => {
+        const handle = u.handle || (u.email||'').split('@')[0];
+        const medal = i===0?'🥇':i===1?'🥈':'🥉';
+        return `<div style="display:flex; align-items:center; gap:8px; padding:6px 8px; border-bottom:1px dotted var(--msp-rule-l);">
+          <span style="font-size:16px;">${medal}</span>
+          <a href="/u/${esc(handle)}" style="flex:1; font-weight:bold; color:var(--msp-blue-d);">${esc(u.name||'?')}</a>
+          <span style="font-weight:700; color:var(--msp-orange); font-size:11px;">${u.streak||0}d</span>
+        </div>`;
+      }).join('');
+    } catch {}
+  }
+
+  // ==========================================================
+  // BIRTHDAYS / THROWBACK / GIFTS
+  // ==========================================================
+  async function refreshBirthdays() {
+    const el = $('bday-body'); if (!el) return;
+    el.innerHTML = '<div style="color:var(--msp-mute);font-style:italic;">no birthdays today.</div>';
+  }
+  async function refreshThrowback() {
+    const el = $('throwback-body'); if (!el) return;
+    try {
+      const r = await api('/api/me/throwback');
+      if (r && r.post) {
+        el.innerHTML = `
+          <div style="font-size:11px;">
+            <b>${esc(r.post.author)}</b> ${esc(timeAgo(r.post.createdAt))}<br/>
+            <span>${esc((r.post.content||'').slice(0,140))}</span>
+          </div>
+        `;
+      } else {
+        el.innerHTML = '<div style="color:var(--msp-mute);font-style:italic;">no throwbacks yet — the site is too young.</div>';
+      }
+    } catch {
+      el.innerHTML = '<div style="color:var(--msp-mute);font-style:italic;">no throwbacks yet.</div>';
+    }
+  }
+  async function refreshGifts() {
+    try {
+      const cat = await api('/api/gifts/catalog');
+      const items = Array.isArray(cat) ? cat.slice(0, 4) : [];
+      $('gifts-body').innerHTML = items.length
+        ? items.map(g => `<div style="display:flex;align-items:center;gap:5px;padding:2px 0;border-bottom:1px dotted var(--msp-rule-l)"><span style="font-size:16px;">${esc(g.emoji||'?')}</span><a href="#" onclick="os.sendGift('${esc(g.id)}');return false;">${esc(g.label||g.id)}</a></div>`).join('')
+        : '<div style="color:var(--msp-mute);font-style:italic;">no gifts available.</div>';
+    } catch {
+      $('gifts-body').innerHTML = '<div style="color:var(--msp-mute);font-style:italic;">gifts unavailable.</div>';
+    }
+  }
+
+  function sendGift(giftId) {
+    const handle = prompt('send to which @handle?');
+    if (!handle) return;
+    api('/api/u/' + encodeURIComponent(handle)).then(r => {
+      const target = r.user;
+      if (!target) return showToast('no such user');
+      api('/api/gifts/send', { method:'POST', body: { giftId, toEmail: target.email } })
+        .then(() => showToast('gift sent!'))
+        .catch(e => showToast(e.message||'failed'));
+    }).catch(()=>showToast('no such user'));
+  }
+
+  // ==========================================================
+  // MODALS
+  // ==========================================================
+  function openModal(title, html, opts) {
+    opts = opts || {};
+    $('modal-title').textContent = title;
+    $('modal-body').innerHTML = html;
+    $('modal-back').classList.add('open');
+    $('modal-back').dataset.dismissable = opts.dismissable === false ? '0' : '1';
+    // Hide the X close button on forced modals
+    const xBtn = document.querySelector('#modal-back .modal-head .x, #modal-back .modal-close, #modal-back [data-close]');
+    if (xBtn) xBtn.style.display = (opts.dismissable === false) ? 'none' : '';
+  }
+  function closeModal() {
+    const back = $('modal-back');
+    if (back && back.dataset.dismissable === '0') return; // forced — block
+    back.classList.remove('open');
+  }
+  function closeModalIfBack(e) { if (e.target === $('modal-back')) closeModal(); }
+
+  // ==========================================================
+  // THEMES
+  // ==========================================================
+  function openThemes() {
+    const themes = [
+      { id: 'classic', label: 'Classic Blue', swatch: '#c1cdf5' },
+      { id: 'sunset',  label: 'Sunset',       swatch: '#ffd9a8' },
+      { id: 'hotpink', label: 'Hot Pink',     swatch: '#ffc1e3' },
+      { id: 'purple',  label: 'Deep Purple',  swatch: '#d4c1f5' },
+      { id: 'emerald', label: 'Emerald',      swatch: '#b8e0c4' },
+      { id: 'navy',    label: 'Deep Navy',    swatch: '#9aacd6' },
+      { id: 'ink',     label: 'Inkwell',      swatch: '#b8b8b8' }
+    ];
+    const current = document.documentElement.dataset.theme || 'classic';
+    openModal('Page Themes', `
+      <p>Pick a color for your Paths dashboard. Saved to your profile.</p>
+      <div class="theme-grid" id="theme-grid">
+        ${themes.map(t => `
+          <button class="theme-cell ${t.id===current?'is-on':''}" data-theme="${t.id}" onclick="os.pickTheme('${t.id}')">
+            <span class="theme-swatch-big" style="background:${t.swatch}"></span>
+            <span class="tlabel">${esc(t.label)}</span>
+          </button>
+        `).join('')}
+      </div>
+    `);
+  }
+  async function pickTheme(id) {
+    if (id === 'classic') delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = id;
+    localStorage.setItem(THEME_KEY, id);
+    document.querySelectorAll('.theme-cell').forEach(c => c.classList.toggle('is-on', c.dataset.theme === id));
+    try { await api('/api/users/me', { method: 'PUT', body: { theme: id } }); } catch {}
+    showToast('theme saved');
+  }
+
+  // ==========================================================
+  // INBOX MODAL
+  // ==========================================================
+  async function openInbox() {
+    await refreshInbox();
+    const items = state.inbox.slice(0, 30);
+    const html = items.length ? items.map(t => {
+      if (t.kind === 'group') {
+        return `
+          <div style="border-bottom:1px solid var(--msp-rule-l);padding:5px 0;">
+            <b>[group] ${esc(t.name)}</b> <span style="color:var(--msp-mute)">(${t.memberCount})</span><br/>
+            <span style="color:var(--msp-mute);font-size:10px;">${esc((t.lastText||'').slice(0,90))} &middot; ${esc(timeAgo(t.lastTs))}</span>
+            ${t.unread ? ` <span style="color:var(--msp-red)">(${t.unread} new)</span>` : ''}
+          </div>
+        `;
+      }
+      const handle = (t.email || '').split('@')[0];
+      return `
+        <div style="border-bottom:1px solid var(--msp-rule-l);padding:5px 0;">
+          <a href="#" onclick="os.openIm('${esc(t.email)}','${esc(t.name)}');os.closeModal();return false;"><b>${esc(t.name)}</b></a>
+          <span style="color:var(--msp-mute)">@${esc(handle)}</span><br/>
+          <span style="color:var(--msp-mute);font-size:10px;">${esc((t.lastText||'').slice(0,90))} &middot; ${esc(timeAgo(t.lastTs))}</span>
+          ${t.unread ? ` <span style="color:var(--msp-red)">(${t.unread} new)</span>` : ''}
+        </div>
+      `;
+    }).join('') : '<div style="color:var(--msp-mute);font-style:italic;">no messages yet.</div>';
+    openModal('Inbox', `
+      ${html}
+      <div style="margin-top:10px;text-align:right;">
+        <button type="button" onclick="os.openComposeDm()">New Message</button>
+      </div>
+    `);
+  }
+
+  function openComposeDm() {
+    closeModal();
+    openModal('New Message', `
+      <label>To (@handle):</label>
+      <input type="text" id="dm-to-handle" placeholder="e.g. lila" />
+      <label>Message:</label>
+      <textarea id="dm-text" rows="4" placeholder="say hi..."></textarea>
+      <div style="margin-top:10px;text-align:right;">
+        <button type="button" onclick="os.sendComposeDm()">Send</button>
+      </div>
+    `);
+  }
+  async function sendComposeDm() {
+    const handle = $('dm-to-handle').value.trim().replace(/^@/,'');
+    const text = $('dm-text').value.trim();
+    if (!handle || !text) return showToast('need handle and text');
+    try {
+      const r = await api('/api/u/' + encodeURIComponent(handle));
+      const target = r.user;
+      if (!target) return showToast('no such user');
+      await api('/api/dm/with/' + encodeURIComponent(target.email), { method: 'POST', body: { text } });
+      showToast('sent!');
+      closeModal();
+      openIm(target.email, target.name);
+    } catch (e) { showToast(e.message || 'send failed'); }
+  }
+
+  // ==========================================================
+  // FRIENDS MODALS
+  // ==========================================================
+  async function openFriends() {
+    const u = state.user;
+    const f = u.friends || [];
+    if (!f.length) return openModal('My Friends', '<div style="color:var(--msp-mute);font-style:italic;">no friends yet — accept requests or send some.</div>');
+    // fetch each
+    const rows = await Promise.all(f.map(email =>
+      api('/api/users/profile/' + encodeURIComponent(email)).then(p => p.user || p).catch(() => null)
+    ));
+    const html = rows.filter(Boolean).map(p => {
+      const handle = (p.email||'').split('@')[0];
+      return `<div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid var(--msp-rule-l);">
+        <div style="width:36px;height:36px;border:1px solid var(--msp-rule);background:var(--msp-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;">${esc(initials(p.name))}</div>
+        <div style="flex:1;"><b><a href="#" onclick="os.viewProfile('${esc(handle)}');os.closeModal();return false;">${esc(p.name)}</a></b><br/><span style="color:var(--msp-mute);font-size:10px;">@${esc(handle)}</span></div>
+        <button type="button" onclick="os.openIm('${esc(p.email)}','${esc(p.name)}');os.closeModal();">Msg</button>
+      </div>`;
+    }).join('');
+    openModal('My Friends (' + rows.length + ')', html);
+  }
+
+  async function openFriendRequests() {
+    const pending = state.pendingFriendRequests || [];
+    const sent = state.sentFriendRequests || [];
+    let html = '<h3>Incoming</h3>';
+    html += pending.length ? pending.map(r => `
+      <div style="display:flex;gap:6px;align-items:center;padding:4px 0;border-bottom:1px solid var(--msp-rule-l);">
+        <div style="width:36px;height:36px;border:1px solid var(--msp-rule);background:var(--msp-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;">${esc(initials(r.fromName))}</div>
+        <div style="flex:1;"><b>${esc(r.fromName)}</b><br/><span style="color:var(--msp-mute);font-size:10px;">${esc(timeAgo(r.createdAt))}</span></div>
+        <button type="button" onclick="os.respondFriend('${esc(r.id)}',true)">Accept</button>
+        <button type="button" onclick="os.respondFriend('${esc(r.id)}',false)">Decline</button>
+      </div>
+    `).join('') : '<div style="color:var(--msp-mute);font-style:italic;">no incoming requests.</div>';
+    html += '<h3 style="margin-top:14px;">Sent</h3>';
+    html += sent.length ? sent.slice(0,30).map(r => `
+      <div style="padding:3px 0;border-bottom:1px dotted var(--msp-rule-l);font-size:11px;">
+        to <b>${esc(r.toName)}</b> &middot; <span style="color:var(--msp-mute)">${esc(r.status)}</span> &middot; <span style="color:var(--msp-mute);font-size:10px;">${esc(timeAgo(r.createdAt))}</span>
+      </div>
+    `).join('') : '<div style="color:var(--msp-mute);font-style:italic;">no sent requests.</div>';
+    openModal('Friend Requests', html);
+  }
+
+  async function respondFriend(id, accept) {
+    try {
+      await api(`/api/friend-requests/${encodeURIComponent(id)}/respond`, { method: 'POST', body: { accept } });
+      refreshFriendRequests();
+      api('/api/whoami').then(d => { state.user = d.user || d; updateStatsBar(); });
+      showToast(accept ? 'accepted!' : 'declined');
+      openFriendRequests();
+    } catch (e) { showToast(e.message); }
+  }
+
+  function openFindFriends() {
+    const dir = state.directory.filter(d => d.claimed).slice(0, 200);
+    const html = `
+      <input type="search" id="find-q" placeholder="search names..." style="width:100%;margin-bottom:8px;" oninput="os.filterFind(this.value)" />
+      <div id="find-list">${dir.map(renderFindRow).join('') || '<div style="color:var(--msp-mute);font-style:italic;">no one yet.</div>'}</div>
+    `;
+    openModal('Find Friends', html);
+  }
+  function renderFindRow(d) {
+    const handle = (d.email||'').split('@')[0];
+    return `<div data-name="${esc(d.name.toLowerCase())}" style="padding:3px 0;border-bottom:1px dotted var(--msp-rule-l);">
+      <a href="#" onclick="os.viewProfile('${esc(handle)}');os.closeModal();return false;"><b>${esc(d.name)}</b></a> <span style="color:var(--msp-mute);font-size:10px;">@${esc(handle)}</span>
+      <button type="button" style="float:right;font-size:10px;" onclick="os.sendFriendRequest('${esc(d.email)}')">Add</button>
+    </div>`;
+  }
+  function filterFind(q) {
+    q = q.toLowerCase();
+    $('find-list').querySelectorAll('[data-name]').forEach(el => {
+      el.style.display = el.dataset.name.indexOf(q) >= 0 ? '' : 'none';
+    });
+  }
+
+  // ==========================================================
+  // BULLETINS / BLOGS / LATE-NIGHT / CRUSH / GROUPS / LEADERBOARD modals
+  // ==========================================================
+  async function openBulletins() {
+    try {
+      const list = await api('/api/bulletins');
+      const arr = Array.isArray(list) ? list : [];
+      const html = `
+        <p>Broadcast a quick bulletin to all your friends.</p>
+        <textarea id="bull-text" rows="3" placeholder="What's on your mind?"></textarea>
+        <div style="text-align:right;margin-top:5px;"><button type="button" onclick="os.postBulletin()">Post Bulletin</button></div>
+        <hr style="border:0;border-top:1px solid var(--msp-rule-l);margin:10px 0;" />
+        <h3>Recent</h3>
+        ${arr.length ? arr.slice(0,30).map(b => `
+          <div style="padding:4px 0;border-bottom:1px dotted var(--msp-rule-l);">
+            <b>${esc(b.author||'?')}</b> <span style="color:var(--msp-mute);font-size:10px;">${esc(timeAgo(b.createdAt))}</span><br/>
+            <span>${esc(b.content || b.text || '')}</span>
+          </div>
+        `).join('') : '<div style="color:var(--msp-mute);font-style:italic;">no bulletins yet.</div>'}
+      `;
+      openModal('Bulletins', html);
+    } catch (e) { showToast(e.message); }
+  }
+  async function postBulletin() {
+    const text = $('bull-text').value.trim();
+    if (!text) return showToast('say something');
+    try { await api('/api/bulletins', { method: 'POST', body: { content: text, text } }); showToast('posted'); openBulletins(); }
+    catch (e) { showToast(e.message); }
+  }
+
+  async function openLateNight() {
+    try {
+      const s = await api('/api/late-night/status');
+      const html = `
+        <p>${s.isOpen ? 'Late Night is OPEN. Confess away.' : 'Late Night opens after midnight.'}</p>
+        ${s.isOpen ? `<textarea id="ln-text" rows="3" placeholder="confess..."></textarea>
+          <div style="text-align:right;margin-top:5px;"><button type="button" onclick="os.postLateNight()">Post</button></div>` : ''}
+        <hr style="border:0;border-top:1px solid var(--msp-rule-l);margin:10px 0;" />
+        ${(s.recent||[]).slice(0,20).map(p => `
+          <div style="padding:4px 0;border-bottom:1px dotted var(--msp-rule-l);">
+            <span style="color:var(--msp-mute);font-size:10px;">${esc(timeAgo(p.createdAt))}</span><br/>${esc(p.content||'')}
+          </div>`).join('') || '<div style="color:var(--msp-mute);font-style:italic;">nothing yet.</div>'}
+      `;
+      openModal('Late Night', html);
+    } catch (e) { showToast(e.message); }
+  }
+  async function postLateNight() {
+    const txt = $('ln-text').value.trim(); if (!txt) return;
+    try { await api('/api/late-night', { method: 'POST', body: { content: txt } }); showToast('confessed.'); openLateNight(); }
+    catch (e) { showToast(e.message); }
+  }
+
+  async function openCrush() {
+    try {
+      const [listR, matchesR] = await Promise.all([api('/api/crush/list'), api('/api/crush/matches').catch(()=>({matches:[]}))]);
+      const list = listR.crushes || listR.list || [];
+      const matches = matchesR.matches || [];
+      openModal('Crush Lab', `
+        <h3>Your crushes (private)</h3>
+        ${list.length ? list.map(c => `
+          <div style="padding:3px 0;border-bottom:1px dotted var(--msp-rule-l);">
+            <b>${esc(c.name || c.toEmail)}</b>
+            <button type="button" style="float:right;font-size:10px;" onclick="os.removeCrush('${esc(c.toEmail||c.email)}')">Remove</button>
+          </div>`).join('') : '<div style="color:var(--msp-mute);font-style:italic;">add a few. nobody sees these.</div>'}
+        <h3 style="margin-top:12px;">Mutual matches</h3>
+        ${matches.length ? matches.map(m => `<div><b>${esc(m.name||m.email)}</b> — it's mutual!</div>`).join('') : '<div style="color:var(--msp-mute);font-style:italic;">none yet.</div>'}
+        <h3 style="margin-top:12px;">Add a crush</h3>
+        <input type="text" id="crush-handle" placeholder="@handle" />
+        <div style="text-align:right;margin-top:5px;"><button type="button" onclick="os.addCrush()">Add</button></div>
+      `);
+    } catch (e) { showToast(e.message); }
+  }
+  async function addCrush() {
+    const h = $('crush-handle').value.replace(/^@/,'').trim(); if (!h) return;
+    try {
+      const r = await api('/api/u/' + encodeURIComponent(h));
+      await api('/api/crush/add', { method: 'POST', body: { toEmail: r.user.email } });
+      showToast('added.'); openCrush();
+    } catch (e) { showToast(e.message || 'failed'); }
+  }
+  async function removeCrush(email) {
+    try { await api('/api/crush/' + encodeURIComponent(email), { method: 'DELETE' }); openCrush(); }
+    catch (e) { showToast(e.message); }
+  }
+
+  async function openGroups() {
+    try {
+      const inbox = await api('/api/inbox');
+      const groups = (inbox || []).filter(t => t.kind === 'group');
+      openModal('Groups', `
+        ${groups.length ? groups.map(g => `<div style="padding:4px 0;border-bottom:1px solid var(--msp-rule-l);"><b>${esc(g.name)}</b> <span style="color:var(--msp-mute)">(${g.memberCount} members)</span></div>`).join('') : '<div style="color:var(--msp-mute);font-style:italic;">no groups yet.</div>'}
+        <h3 style="margin-top:12px;">Create a group</h3>
+        <label>Name</label><input type="text" id="gr-name" />
+        <label>Members (comma-separated @handles)</label><input type="text" id="gr-mem" />
+        <div style="text-align:right;margin-top:5px;"><button type="button" onclick="os.createGroup()">Create</button></div>
+      `);
+    } catch (e) { showToast(e.message); }
+  }
+  async function createGroup() {
+    const name = $('gr-name').value.trim();
+    const handles = $('gr-mem').value.split(',').map(s => s.trim().replace(/^@/,'')).filter(Boolean);
+    if (!name || !handles.length) return showToast('need name + handles');
+    try {
+      const members = [];
+      for (const h of handles) {
+        const r = await api('/api/u/' + encodeURIComponent(h)).catch(()=>null);
+        if (r && r.user) members.push(r.user.email);
+      }
+      await api('/api/groups', { method: 'POST', body: { name, members } });
+      showToast('group created.'); openGroups();
+    } catch (e) { showToast(e.message); }
+  }
+
+  async function openThrowback() {
+    try {
+      const r = await api('/api/me/throwback');
+      const post = r.post;
+      openModal('Throwback', post
+        ? `<p><b>${esc(post.author)}</b> &middot; ${esc(new Date(post.createdAt).toLocaleDateString())}</p><p>${esc(post.content||'')}</p>`
+        : '<div style="color:var(--msp-mute);font-style:italic;">no throwbacks yet — the site is too young.</div>'
+      );
+    } catch (e) { showToast(e.message); }
+  }
+
+  async function openLeaderboard() {
+    try {
+      const lb = await api('/api/leaderboard');
+      const html = (lb.leaders || lb || []).slice(0,20).map((u, i) => `
+        <div style="padding:3px 0;border-bottom:1px dotted var(--msp-rule-l);">
+          ${i+1}. <b>${esc(u.name||'?')}</b> &middot; <span style="color:var(--msp-mute)">${esc(u.score||u.points||0)} pts</span>
+        </div>
+      `).join('') || '<div style="color:var(--msp-mute);font-style:italic;">nobody yet.</div>';
+      openModal('Leaderboard', html);
+    } catch (e) { showToast(e.message); }
+  }
+
+  async function openDaily24() {
+    try {
+      const lb = await api('/api/daily-24/leaderboard');
+      const top = lb.leaderboard || [];
+      openModal('Daily 24 — Today', `
+        <p>${esc(lb.totalVotes||0)} votes so far today.</p>
+        ${top.slice(0,12).map((it, i) => `
+          <div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--msp-rule-l);">
+            <b>#${i+1}</b>
+            <img src="${esc(it.imageUrl||'')}" style="width:42px;height:42px;object-fit:cover;border:1px solid var(--msp-rule);" alt="" />
+            <div style="flex:1;"><b>${esc(it.author||'?')}</b><div style="color:var(--msp-mute);font-size:10px;">${esc(it.score||0)} pts</div></div>
+          </div>
+        `).join('') || '<div style="color:var(--msp-mute);font-style:italic;">no photos in today\'s 24 yet.</div>'}
+      `);
+    } catch (e) { showToast(e.message); }
+  }
+
+  async function openAds() {
+    try {
+      const r = await api('/api/ads/current');
+      const ad = r.ad;
+      openModal('Ads', ad
+        ? `<div style="border:1px solid var(--msp-rule);padding:8px;">
+            <b>${esc(ad.title||'')}</b><br/>
+            <span>${esc(ad.body||'')}</span>
+          </div>`
+        : '<div style="color:var(--msp-mute);font-style:italic;">no ads right now.</div>'
+      );
+    } catch { openModal('Ads', '<div style="color:var(--msp-mute);font-style:italic;">no ads right now.</div>'); }
+  }
+
+  async function openMusic() {
+    // Show users who have set songEmbed via directory
+    const dir = state.directory.filter(d => d.claimed);
+    const users = await Promise.all(dir.slice(0, 20).map(d =>
+      api('/api/users/profile/' + encodeURIComponent(d.email)).then(p => p.user || p).catch(()=>null)
+    ));
+    const withSongs = users.filter(u => u && (u.songEmbed || u.songUrl));
+    const html = withSongs.length ? withSongs.map(u => `
+      <div style="border-bottom:1px solid var(--msp-rule-l); padding:5px 0;">
+        <b>${esc(u.name)}</b> <span style="color:var(--msp-mute);font-size:10px;">@${esc((u.email||'').split('@')[0])}</span><br/>
+        <a href="${esc(u.songUrl||'#')}" target="_blank">${esc(u.songUrl || 'tap to play')}</a>
+      </div>
+    `).join('') : '<div style="color:var(--msp-mute);font-style:italic;">no one has set a song yet. add one in your profile!</div>';
+    openModal('Paths Music', html);
+  }
+
+  function openTopFriends() {
+    openModal('Top Friends', '<p>Pick up to 8 friends to show on your profile.</p><p style="color:var(--msp-mute)">Open your profile edit page to rearrange.</p><p style="margin-top:8px;"><a href="/profile-edit.html">Go to Profile Edit</a></p>');
+  }
+
+  function openBlinkies() {
+    api('/api/blinkies').then(list => {
+      const arr = Array.isArray(list) ? list : [];
+      openModal('Blinkies Hut', `
+        <p>Pick up to 8 blinky badges. Display on your profile.</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+          ${arr.slice(0,40).map(b => `
+            <div style="text-align:center;border:1px solid var(--msp-rule);padding:5px;font-size:9px;">
+              <div style="height:22px;background:${esc(b.color||'#888')};color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;">${esc(b.label||b.id)}</div>
+            </div>
+          `).join('') || '<div>nothing here yet.</div>'}
+        </div>
+      `);
+    }).catch(()=>openModal('Blinkies', '<div>no blinkies right now.</div>'));
+  }
+  function openMoodRing() {
+    openModal('Mood Ring', `
+      <p>Pick your mood. Shown on your status.</p>
+      <select id="mr-sel">${state.moods.map(m => `<option value="${esc(m.id)}" ${state.user.moodId===m.id?'selected':''}>${esc(m.emoji)} ${esc(m.label)}</option>`).join('')}</select>
+      <div style="text-align:right;margin-top:8px;"><button type="button" onclick="os.saveMoodRing()">Save</button></div>
+    `);
+  }
+  async function saveMoodRing() {
+    const id = $('mr-sel').value;
+    try { await api('/api/users/me', { method: 'PUT', body: { moodId: id } }); state.user.moodId = id; paintCurrentStatus(); showToast('mood set'); closeModal(); }
+    catch (e) { showToast(e.message); }
+  }
+  function openEncoder() {
+    openModal('Super Secret Encoder', `
+      <p>Encode a message in pig-Latin-style cipher. Just for fun.</p>
+      <label>Plain</label><textarea id="enc-in" rows="3"></textarea>
+      <label>Encoded</label><textarea id="enc-out" rows="3" readonly></textarea>
+      <div style="text-align:right;margin-top:5px;"><button type="button" onclick="os.runEncoder()">Encode</button></div>
+    `);
+  }
+  function runEncoder() {
+    const v = $('enc-in').value;
+    const out = v.split(/\b/).map(w => /^\w+$/.test(w) ? (w.slice(1)+w[0]+'ay') : w).join('');
+    $('enc-out').value = out;
+  }
+
+  function openUpload(type) {
+    openModal(type === 'video' ? 'Upload Video' : 'Upload Photo', `
+      <p>Pick a file. We'll post it to your wall.</p>
+      <input type="file" id="upl-file" accept="${type==='video'?'video/*':'image/*'}" />
+      <label>Caption (optional)</label><input type="text" id="upl-cap" />
+      <div style="text-align:right;margin-top:5px;"><button type="button" onclick="os.runUpload('${type}')">Upload</button></div>
+    `);
+  }
+  async function runUpload(type) {
+    const file = $('upl-file').files[0];
+    if (!file) return showToast('pick a file');
+    const cap = $('upl-cap').value.trim();
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch('/api/uploads', { method: 'POST', headers: { 'X-User-Token': token() }, body: fd });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || 'upload failed');
+      await api('/api/posts', { method: 'POST', body: { type, content: j.url, caption: cap, isAnonymous: false } });
+      showToast('uploaded!'); closeModal(); refreshFeed();
+    } catch (e) { showToast(e.message || 'failed'); }
+  }
+
+  function openInvites() {
+    // scroll to the invite widget
+    const w = document.getElementById('invite-widget');
+    if (w) w.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => $('invite-phone').focus(), 400);
+  }
+
+  // ==========================================================
+  // IM POPUP
+  // ==========================================================
+  async function openIm(email, name) {
+    state.imWithEmail = email;
+    $('im-with').textContent = 'IM with ' + (name || email);
+    $('im-popup').classList.add('open');
+    $('im-body').innerHTML = '<div style="color:var(--msp-mute)">loading...</div>';
+    try {
+      const r = await api('/api/dm/with/' + encodeURIComponent(email));
+      state.imMessages = r.messages || [];
+      paintIm();
+      setTimeout(() => $('im-input').focus(), 200);
+    } catch (e) { showToast(e.message); }
+  }
+  function paintIm() {
+    const me = (state.user.email || '').toLowerCase();
+    $('im-body').innerHTML = state.imMessages.map(m => `
+      <div class="im-msg ${m.from === me ? 'me':''}"><b>${esc(m.fromName || (m.from===me?'you':m.from))}:</b> ${esc(m.text)}</div>
+    `).join('') || '<div style="color:var(--msp-mute);font-style:italic;">no messages yet.</div>';
+    $('im-body').scrollTop = 99999;
+  }
+  function closeIm() { $('im-popup').classList.remove('open'); }
+  async function sendIm(ev) {
+    ev.preventDefault();
+    const txt = $('im-input').value.trim();
+    if (!txt || !state.imWithEmail) return false;
+    try {
+      const r = await api('/api/dm/with/' + encodeURIComponent(state.imWithEmail), { method: 'POST', body: { text: txt } });
+      state.imMessages.push(r);
+      $('im-input').value = '';
+      paintIm();
+    } catch (e) { showToast(e.message || 'send failed'); }
+    return false;
+  }
+
+  // ==========================================================
+  // PROFILE VIEW
+  // ==========================================================
+  function viewMyProfile() {
+    // Go to the full MySpace-style profile page, not the modal preview.
+    const h = state.user.handle || (state.user.email || '').split('@')[0];
+    if (h) location.href = '/u/' + encodeURIComponent(h);
+  }
+  async function viewProfile(handle) {
+    if (!handle) return;
+    try {
+      const r = await api('/api/u/' + encodeURIComponent(handle));
+      const u = r.user;
+      const html = `
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:90px;height:90px;border:1px solid var(--msp-rule);padding:2px;background:#fff;">
+            <div style="width:86px;height:86px;background:var(--msp-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:30px;font-family:Georgia,serif;">${u.avatar ? `<img src="${esc(u.avatar)}" style="width:86px;height:86px;object-fit:cover;"/>` : esc(initials(u.name))}</div>
+          </div>
+          <div style="flex:1;">
+            <h3 style="margin:0;">${esc(u.name)}</h3>
+            <div style="color:var(--msp-mute);">@${esc(u.handle||handle)}</div>
+            <div>${esc(u.headline||'')}</div>
+            <div style="margin-top:5px;color:var(--msp-mute);">Friends: ${(u.friends||[]).length} &middot; Streak: ${u.streak||0}</div>
+            <div style="margin-top:8px;">
+              <button type="button" onclick="os.sendFriendRequest('${esc(u.email)}')">Add Friend</button>
+              <button type="button" onclick="os.openIm('${esc(u.email)}','${esc(u.name)}');os.closeModal();">Message</button>
+              <button type="button" onclick="os.pokeUser('${esc(u.email)}')">Poke</button>
+            </div>
+          </div>
+        </div>
+        <h3 style="margin-top:14px;">About</h3>
+        <div>${esc(u.aboutMe||'(nothing yet)')}</div>
+        <h3 style="margin-top:10px;">Interests</h3>
+        <div>${esc(u.interests||'(nothing yet)')}</div>
+      `;
+      openModal('Profile — ' + u.name, html);
+    } catch (e) { showToast(e.message || 'profile not found'); }
+  }
+  async function pokeUser(email) {
+    try { await api('/api/poke', { method: 'POST', body: { toEmail: email } }); showToast('poked!'); }
+    catch (e) { showToast(e.message); }
+  }
+
+  function viewMyMode(mode) {
+    if (!mode) return;
+    if (mode === 'profile') return viewMyProfile();
+    if (mode === 'posts') { state.feedMode = 'all'; refreshFeed(); document.querySelector('.col-center').scrollIntoView({behavior:'smooth'}); return; }
+    if (mode === 'blogs') { window.location.href = '/blogs'; return; }
+    if (mode === 'friends') return openFriends();
+    if (mode === 'photos') return openUpload('image');
+    if (mode === 'comments') return openInbox();
+    $('view-my-select').value = '';
+  }
+
+  // ==========================================================
+  // SEARCH
+  // ==========================================================
+  function runSearch(ev) {
+    ev.preventDefault();
+    const q = $('search-q').value.trim();
+    const scope = $('search-scope').value;
+    if (!q) return false;
+    if (scope === 'people') {
+      const hits = state.directory.filter(d => d.name.toLowerCase().includes(q.toLowerCase()) && d.claimed).slice(0, 20);
+      openModal('Search: ' + q, hits.length ? hits.map(d => {
+        const h = (d.email||'').split('@')[0];
+        return `<div style="padding:3px 0;border-bottom:1px dotted var(--msp-rule-l);"><a href="#" onclick="os.viewProfile('${esc(h)}');os.closeModal();return false;"><b>${esc(d.name)}</b></a> <span style="color:var(--msp-mute);font-size:10px;">@${esc(h)}</span></div>`;
+      }).join('') : '<div>no people found.</div>');
+    } else if (scope === 'posts') {
+      const hits = state.feed.filter(p => (p.content||'').toLowerCase().includes(q.toLowerCase()));
+      openModal('Search posts: ' + q, hits.length ? hits.slice(0,20).map(p => `<div style="padding:3px 0;border-bottom:1px dotted var(--msp-rule-l);"><b>${esc(p.author||'?')}</b>: ${esc((p.content||'').slice(0,180))}</div>`).join('') : '<div>no posts found.</div>');
+    } else {
+      openModal('Search', '<p>blog search coming soon.</p>');
+    }
+    return false;
+  }
+
+  // ==========================================================
+  // MOBILE NAV
+  // ==========================================================
+  function toggleMobNav() {
+    $('nav-strip').classList.toggle('open');
+  }
+
+  // ==========================================================
+  // PHONE INPUT HELPER (spec-required)
+  // ==========================================================
+  function attachPhoneInput(input){
+    if(!input) return;
+    const PREFIX = '+1 ';
+    function digitsOnly(){ let d = input.value.replace(/\D/g,''); if(d.startsWith('1')) d = d.slice(1); return d.slice(0,10); }
+    function fmt(d){ if(!d) return PREFIX; if(d.length<=3) return PREFIX+'('+d; if(d.length<=6) return PREFIX+'('+d.slice(0,3)+') '+d.slice(3); return PREFIX+'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6); }
+    function toEnd(){ const n=input.value.length; try{input.setSelectionRange(n,n);}catch{} }
+    function clamp(){ if((input.selectionStart||0) < PREFIX.length){ try{input.setSelectionRange(PREFIX.length, Math.max(PREFIX.length, input.selectionEnd||PREFIX.length));}catch{} } }
+    if(!input.value.startsWith(PREFIX)) input.value = PREFIX;
+    input.addEventListener('focus',()=>{ if(!input.value.startsWith(PREFIX)) input.value=PREFIX; setTimeout(toEnd,0); });
+    input.addEventListener('click',()=>setTimeout(clamp,0));
+    input.addEventListener('keyup',clamp);
+    input.addEventListener('input',()=>{ input.value=fmt(digitsOnly()); toEnd(); });
+    input.addEventListener('keydown',(e)=>{ const p=input.selectionStart||0; if((e.key==='Backspace'||e.key==='Delete') && p<=PREFIX.length) e.preventDefault(); if(e.key==='ArrowLeft' && p<=PREFIX.length) e.preventDefault(); if(e.key==='Home'){ e.preventDefault(); try{input.setSelectionRange(PREFIX.length, PREFIX.length);}catch{} } });
+  }
+
+  // ==========================================================
+  // MISC
+  // ==========================================================
+  function scrollTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  function copyMyUrl() {
+    const url = $('my-url').textContent;
+    try { navigator.clipboard.writeText('https://' + url); showToast('URL copied!'); }
+    catch { showToast(url); }
+  }
+  async function logout() {
+    try { await api('/api/auth/logout', { method: 'POST', body: {} }); } catch {}
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    location.replace('/onboard.html');
+  }
+
+  // ==========================================================
+  // EXPORT
+  // ==========================================================
+  window.os = {
+    // nav
+    scrollTop, toggleMobNav, runSearch, logout, copyMyUrl,
+    // posts
+    refreshFeed, toggleFeedMode, setFeedSort, setFeedScope, viewAllPosts, postStatus, reactPost,
+    deletePost, reportPost, submitComment,
+    // status/activity (new tab + bell)
+    openStatusMood, submitStatusMood, openActivityStream,
+    // gif picker + drag-drop helpers
+    openGifPicker, searchGifs, pickGif, submitGifComment, clearPendingGif, clearPendingMedia, clearWcMedia,
+    // tour
+    tourNext, tourPrev, tourSkip,
+    // repost
+    openRepost, submitRepost,
+    // comments
+    openCommentsModal,
+    // brand vote
+    openTomorrowVote, bvUp, bvSuggest,
+    // notifications
+    markAllRead, markRead,
+    // alerts/inbox
+    openInbox, openComposeDm, sendComposeDm,
+    // friends
+    openFriends, openFindFriends, openFriendRequests, sendFriendRequest, respondFriend,
+    dismissPymk, refreshPymk, filterFind,
+    // invites
+    openInvites, sendInvite, copyInvite, openSms, revokeInvite,
+    // misc modals
+    openThemes, pickTheme,
+    openBulletins, postBulletin,
+    openLateNight, postLateNight,
+    openCrush, addCrush, removeCrush,
+    openGroups, createGroup,
+    openThrowback, openLeaderboard, openDaily24, openAds, openMusic,
+    openTopFriends, openBlinkies, openMoodRing, saveMoodRing,
+    openEncoder, runEncoder,
+    openUpload, runUpload,
+    // profile
+    viewMyProfile, viewProfile, viewMyMode, pokeUser,
+    // im
+    openIm, closeIm, sendIm,
+    // d24
+    d24Vote,
+    // gifts
+    sendGift,
+    // modal helpers
+    closeModal, closeModalIfBack,
+    // toast
+    toast: showToast
+  };
+
+  // GO
+  boot();
+
+})();
+</script>
+
+<script>
+(function(){ var t = localStorage.getItem("oldstreets-token") || sessionStorage.getItem("oldstreets-token"); if(!t) return;
+  fetch("/api/whoami", { headers: { "X-User-Token": t } }).then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); }).then(function(r){
+    if(!r.ok) return; var u = r.data && r.data.user; if(!u) return;
+    if(u.mustSpendInitialInvites === true && location.pathname !== "/gate.html") { location.replace("/gate.html"); }
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>

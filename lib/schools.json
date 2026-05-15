@@ -1,0 +1,2528 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-12",
+  "schools": [
+    {
+      "id": "ca-private-061",
+      "name": "Fresno Christian Schools",
+      "city": "Fresno",
+      "region": "Fresno County",
+      "state": "CA",
+      "type": "private",
+      "lat": 36.8316,
+      "lng": -119.7126,
+      "zips": [
+        "93720"
+      ]
+    },
+    {
+      "id": "ca-private-062",
+      "name": "San Joaquin Memorial High School",
+      "city": "Fresno",
+      "region": "Fresno County",
+      "state": "CA",
+      "type": "private",
+      "lat": 36.806,
+      "lng": -119.782,
+      "zips": [
+        "93704"
+      ]
+    },
+    {
+      "id": "ca-private-060",
+      "name": "Garces Memorial High School",
+      "city": "Bakersfield",
+      "region": "Kern County",
+      "state": "CA",
+      "type": "private",
+      "lat": 35.369,
+      "lng": -119.108,
+      "zips": [
+        "93309"
+      ]
+    },
+    {
+      "id": "ca-private-059",
+      "name": "Stockdale Christian School",
+      "city": "Bakersfield",
+      "region": "Kern County",
+      "state": "CA",
+      "type": "private",
+      "lat": 35.365,
+      "lng": -119.093,
+      "zips": [
+        "93309"
+      ]
+    },
+    {
+      "id": "la-public-001",
+      "name": "Alexander Hamilton High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.0289,
+      "lng": -118.396,
+      "zips": [
+        "90034"
+      ]
+    },
+    {
+      "id": "la-private-001",
+      "name": "Alverno Heights Academy",
+      "city": "Sierra Madre",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.164,
+      "lng": -118.044,
+      "zips": [
+        "91024"
+      ]
+    },
+    {
+      "id": "la-private-002",
+      "name": "Archer School for Girls",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0625,
+      "lng": -118.4628,
+      "zips": [
+        "90049"
+      ]
+    },
+    {
+      "id": "la-public-002",
+      "name": "Beverly Hills High School",
+      "city": "Beverly Hills",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.07,
+      "lng": -118.4023,
+      "zips": [
+        "90212"
+      ]
+    },
+    {
+      "id": "la-public-003",
+      "name": "Birmingham Community Charter High School",
+      "city": "Lake Balboa",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "charter",
+      "lat": 34.188,
+      "lng": -118.499,
+      "zips": [
+        "91406"
+      ]
+    },
+    {
+      "id": "la-private-003",
+      "name": "Bishop Alemany High School",
+      "city": "Mission Hills",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.2742,
+      "lng": -118.4711,
+      "zips": [
+        "91345"
+      ]
+    },
+    {
+      "id": "la-private-004",
+      "name": "Bishop Conaty-Our Lady of Loretto High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.051,
+      "lng": -118.287,
+      "zips": [
+        "90006"
+      ]
+    },
+    {
+      "id": "la-private-005",
+      "name": "Bishop Montgomery High School",
+      "city": "Torrance",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.8378,
+      "lng": -118.3422,
+      "zips": [
+        "90505"
+      ]
+    },
+    {
+      "id": "la-private-006",
+      "name": "Brentwood School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0719,
+      "lng": -118.4738,
+      "zips": [
+        "90049"
+      ]
+    },
+    {
+      "id": "la-private-007",
+      "name": "Buckley School",
+      "city": "Sherman Oaks",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.145,
+      "lng": -118.454,
+      "zips": [
+        "91423"
+      ]
+    },
+    {
+      "id": "la-private-008",
+      "name": "Campbell Hall School",
+      "city": "North Hollywood",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1675,
+      "lng": -118.3909,
+      "zips": [
+        "91607"
+      ]
+    },
+    {
+      "id": "la-private-009",
+      "name": "Cathedral High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0697,
+      "lng": -118.2255,
+      "zips": [
+        "90012"
+      ]
+    },
+    {
+      "id": "la-private-010",
+      "name": "Chadwick School",
+      "city": "Palos Verdes Peninsula",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.7727,
+      "lng": -118.3608,
+      "zips": [
+        "90274"
+      ]
+    },
+    {
+      "id": "la-private-011",
+      "name": "Chaminade College Preparatory",
+      "city": "West Hills",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.2014,
+      "lng": -118.631,
+      "zips": [
+        "91307"
+      ]
+    },
+    {
+      "id": "la-private-012",
+      "name": "Chandler School",
+      "city": "Pasadena",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.164,
+      "lng": -118.128,
+      "zips": [
+        "91104"
+      ]
+    },
+    {
+      "id": "la-public-004",
+      "name": "Cleveland Charter High School",
+      "city": "Reseda",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "charter",
+      "lat": 34.199,
+      "lng": -118.539,
+      "zips": [
+        "91335"
+      ]
+    },
+    {
+      "id": "la-private-013",
+      "name": "Crespi Carmelite High School",
+      "city": "Encino",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.167,
+      "lng": -118.518,
+      "zips": [
+        "91316"
+      ]
+    },
+    {
+      "id": "la-private-014",
+      "name": "Crossroads School for Arts and Sciences",
+      "city": "Santa Monica",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0259,
+      "lng": -118.4884,
+      "zips": [
+        "90404"
+      ]
+    },
+    {
+      "id": "la-public-005",
+      "name": "Culver City High School",
+      "city": "Culver City",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.0044,
+      "lng": -118.406,
+      "zips": [
+        "90230"
+      ]
+    },
+    {
+      "id": "la-private-015",
+      "name": "Curtis School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.085,
+      "lng": -118.469,
+      "zips": [
+        "90049"
+      ]
+    },
+    {
+      "id": "la-public-006",
+      "name": "Da Vinci Communications High School",
+      "city": "El Segundo",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "charter",
+      "lat": 33.923,
+      "lng": -118.388,
+      "zips": [
+        "90245"
+      ]
+    },
+    {
+      "id": "la-private-016",
+      "name": "Don Bosco Technical Institute",
+      "city": "Rosemead",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.061,
+      "lng": -118.079,
+      "zips": [
+        "91770"
+      ]
+    },
+    {
+      "id": "la-public-007",
+      "name": "Downtown Magnets High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.057,
+      "lng": -118.254,
+      "zips": [
+        "90012"
+      ]
+    },
+    {
+      "id": "la-public-008",
+      "name": "El Camino Real Charter High School",
+      "city": "Woodland Hills",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "charter",
+      "lat": 34.173,
+      "lng": -118.602,
+      "zips": [
+        "91367"
+      ]
+    },
+    {
+      "id": "la-public-009",
+      "name": "Fairfax Senior High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.0823,
+      "lng": -118.3614,
+      "zips": [
+        "90046"
+      ]
+    },
+    {
+      "id": "la-private-017",
+      "name": "Flintridge Preparatory School",
+      "city": "La Cañada Flintridge",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.2046,
+      "lng": -118.2095,
+      "zips": [
+        "91011"
+      ]
+    },
+    {
+      "id": "la-private-018",
+      "name": "Flintridge Sacred Heart Academy",
+      "city": "La Cañada Flintridge",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.208,
+      "lng": -118.211,
+      "zips": [
+        "91011"
+      ]
+    },
+    {
+      "id": "la-public-010",
+      "name": "Francisco Bravo Medical Magnet High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.0521,
+      "lng": -118.208,
+      "zips": [
+        "90033"
+      ]
+    },
+    {
+      "id": "la-public-011",
+      "name": "Granada Hills Charter High School",
+      "city": "Granada Hills",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "charter",
+      "lat": 34.273,
+      "lng": -118.518,
+      "zips": [
+        "91344"
+      ]
+    },
+    {
+      "id": "la-private-019",
+      "name": "Harvard-Westlake School",
+      "city": "Studio City",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1466,
+      "lng": -118.3939,
+      "zips": [
+        "91604"
+      ]
+    },
+    {
+      "id": "la-public-012",
+      "name": "Hollywood High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.098,
+      "lng": -118.337,
+      "zips": [
+        "90028"
+      ]
+    },
+    {
+      "id": "la-private-020",
+      "name": "Immaculate Heart High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.111,
+      "lng": -118.301,
+      "zips": [
+        "90027"
+      ]
+    },
+    {
+      "id": "la-public-013",
+      "name": "John Marshall High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.109,
+      "lng": -118.288,
+      "zips": [
+        "90027"
+      ]
+    },
+    {
+      "id": "la-private-021",
+      "name": "La Salle College Preparatory",
+      "city": "Pasadena",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.169,
+      "lng": -118.111,
+      "zips": [
+        "91107"
+      ]
+    },
+    {
+      "id": "la-private-023",
+      "name": "Louisville High School",
+      "city": "Woodland Hills",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.172,
+      "lng": -118.59,
+      "zips": [
+        "91367"
+      ]
+    },
+    {
+      "id": "la-private-022",
+      "name": "Loyola High School of Los Angeles",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0567,
+      "lng": -118.287,
+      "zips": [
+        "90006"
+      ]
+    },
+    {
+      "id": "la-private-024",
+      "name": "Maranatha High School",
+      "city": "Pasadena",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.153,
+      "lng": -118.132,
+      "zips": [
+        "91107"
+      ]
+    },
+    {
+      "id": "la-private-025",
+      "name": "Marlborough School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0696,
+      "lng": -118.306,
+      "zips": [
+        "90004"
+      ]
+    },
+    {
+      "id": "la-private-026",
+      "name": "Mary Star of the Sea High School",
+      "city": "San Pedro",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.739,
+      "lng": -118.307,
+      "zips": [
+        "90732"
+      ]
+    },
+    {
+      "id": "la-private-027",
+      "name": "Marymount High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0793,
+      "lng": -118.4827,
+      "zips": [
+        "90049"
+      ]
+    },
+    {
+      "id": "la-private-028",
+      "name": "Mayfield Senior School",
+      "city": "Pasadena",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1442,
+      "lng": -118.1577,
+      "zips": [
+        "91105"
+      ]
+    },
+    {
+      "id": "la-public-014",
+      "name": "Mira Costa High School",
+      "city": "Manhattan Beach",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.8869,
+      "lng": -118.396,
+      "zips": [
+        "90266"
+      ]
+    },
+    {
+      "id": "la-private-029",
+      "name": "Ancient Paths School",
+      "city": "Santa Monica",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.0228,
+      "lng": -118.4738,
+      "zips": [
+        "90405"
+      ]
+    },
+    {
+      "id": "la-public-015",
+      "name": "North Hollywood High School",
+      "city": "North Hollywood",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.169,
+      "lng": -118.403,
+      "zips": [
+        "91601"
+      ]
+    },
+    {
+      "id": "la-public-016",
+      "name": "North Torrance High School",
+      "city": "Torrance",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.859,
+      "lng": -118.338,
+      "zips": [
+        "90504"
+      ]
+    },
+    {
+      "id": "la-private-030",
+      "name": "Notre Dame Academy",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.05,
+      "lng": -118.431,
+      "zips": [
+        "90045"
+      ]
+    },
+    {
+      "id": "la-private-031",
+      "name": "Notre Dame High School",
+      "city": "Sherman Oaks",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.153,
+      "lng": -118.447,
+      "zips": [
+        "91423"
+      ]
+    },
+    {
+      "id": "la-private-052",
+      "name": "Notre Dame High School",
+      "city": "San Pedro",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.735,
+      "lng": -118.298,
+      "zips": [
+        "90731"
+      ]
+    },
+    {
+      "id": "la-private-032",
+      "name": "Oakwood School",
+      "city": "North Hollywood",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.169,
+      "lng": -118.388,
+      "zips": [
+        "91602"
+      ]
+    },
+    {
+      "id": "la-private-033",
+      "name": "Pacifica Christian High School",
+      "city": "Santa Monica",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.025,
+      "lng": -118.496,
+      "zips": [
+        "90401"
+      ]
+    },
+    {
+      "id": "la-public-017",
+      "name": "Palisades Charter High School",
+      "city": "Pacific Palisades",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "charter",
+      "lat": 34.0464,
+      "lng": -118.517,
+      "zips": [
+        "90272"
+      ]
+    },
+    {
+      "id": "la-public-018",
+      "name": "Palos Verdes High School",
+      "city": "Palos Verdes Estates",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.798,
+      "lng": -118.396,
+      "zips": [
+        "90274"
+      ]
+    },
+    {
+      "id": "la-public-019",
+      "name": "Palos Verdes Peninsula High School",
+      "city": "Rolling Hills Estates",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.7777,
+      "lng": -118.354,
+      "zips": [
+        "90274"
+      ]
+    },
+    {
+      "id": "la-public-020",
+      "name": "Pasadena High School",
+      "city": "Pasadena",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.148,
+      "lng": -118.089,
+      "zips": [
+        "91107"
+      ]
+    },
+    {
+      "id": "la-private-034",
+      "name": "Polytechnic School",
+      "city": "Pasadena",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1395,
+      "lng": -118.1264,
+      "zips": [
+        "91106"
+      ]
+    },
+    {
+      "id": "la-private-035",
+      "name": "Providence High School",
+      "city": "Burbank",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.17,
+      "lng": -118.334,
+      "zips": [
+        "91505"
+      ]
+    },
+    {
+      "id": "la-public-021",
+      "name": "Redondo Union High School",
+      "city": "Redondo Beach",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.8514,
+      "lng": -118.387,
+      "zips": [
+        "90277"
+      ]
+    },
+    {
+      "id": "la-private-036",
+      "name": "Saint Francis High School",
+      "city": "La Cañada Flintridge",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1986,
+      "lng": -118.201,
+      "zips": [
+        "91011"
+      ]
+    },
+    {
+      "id": "la-private-037",
+      "name": "Saint Genevieve High School",
+      "city": "Panorama City",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.224,
+      "lng": -118.438,
+      "zips": [
+        "91402"
+      ]
+    },
+    {
+      "id": "la-private-038",
+      "name": "Salesian College Preparatory",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.075,
+      "lng": -118.209,
+      "zips": [
+        "90033"
+      ]
+    },
+    {
+      "id": "la-public-022",
+      "name": "San Pedro High School",
+      "city": "San Pedro",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.722,
+      "lng": -118.302,
+      "zips": [
+        "90731"
+      ]
+    },
+    {
+      "id": "la-public-023",
+      "name": "Santa Monica High School",
+      "city": "Santa Monica",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.0152,
+      "lng": -118.488,
+      "zips": [
+        "90405"
+      ]
+    },
+    {
+      "id": "la-private-039",
+      "name": "Sierra Canyon School",
+      "city": "Chatsworth",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.258,
+      "lng": -118.601,
+      "zips": [
+        "91311"
+      ]
+    },
+    {
+      "id": "la-public-024",
+      "name": "South Torrance High School",
+      "city": "Torrance",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.798,
+      "lng": -118.338,
+      "zips": [
+        "90505"
+      ]
+    },
+    {
+      "id": "la-private-040",
+      "name": "St. Bernard High School",
+      "city": "Playa del Rey",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.959,
+      "lng": -118.425,
+      "zips": [
+        "90293"
+      ]
+    },
+    {
+      "id": "la-private-042",
+      "name": "St. Mary's Academy",
+      "city": "Inglewood",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.965,
+      "lng": -118.353,
+      "zips": [
+        "90302"
+      ]
+    },
+    {
+      "id": "la-private-043",
+      "name": "St. Monica Catholic High School",
+      "city": "Santa Monica",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.027,
+      "lng": -118.486,
+      "zips": [
+        "90403"
+      ]
+    },
+    {
+      "id": "la-private-044",
+      "name": "St. Paul High School",
+      "city": "Santa Fe Springs",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.943,
+      "lng": -118.071,
+      "zips": [
+        "90670"
+      ]
+    },
+    {
+      "id": "la-public-025",
+      "name": "Taft Charter High School",
+      "city": "Woodland Hills",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "charter",
+      "lat": 34.169,
+      "lng": -118.564,
+      "zips": [
+        "91367"
+      ]
+    },
+    {
+      "id": "ca-private-058",
+      "name": "The Webb Schools",
+      "city": "Claremont",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1303,
+      "lng": -117.709,
+      "zips": [
+        "91711"
+      ]
+    },
+    {
+      "id": "la-public-026",
+      "name": "Torrance High School",
+      "city": "Torrance",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.833,
+      "lng": -118.33,
+      "zips": [
+        "90501"
+      ]
+    },
+    {
+      "id": "la-public-027",
+      "name": "University High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.051,
+      "lng": -118.452,
+      "zips": [
+        "90025"
+      ]
+    },
+    {
+      "id": "la-public-028",
+      "name": "Van Nuys High School",
+      "city": "Van Nuys",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 34.188,
+      "lng": -118.452,
+      "zips": [
+        "91411"
+      ]
+    },
+    {
+      "id": "la-public-029",
+      "name": "Venice High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.992,
+      "lng": -118.436,
+      "zips": [
+        "90066"
+      ]
+    },
+    {
+      "id": "la-private-045",
+      "name": "Verbum Dei High School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.942,
+      "lng": -118.252,
+      "zips": [
+        "90059"
+      ]
+    },
+    {
+      "id": "la-private-046",
+      "name": "Viewpoint School",
+      "city": "Calabasas",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1497,
+      "lng": -118.675,
+      "zips": [
+        "91302"
+      ]
+    },
+    {
+      "id": "la-private-047",
+      "name": "Village Christian School",
+      "city": "Sun Valley",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.241,
+      "lng": -118.364,
+      "zips": [
+        "91352"
+      ]
+    },
+    {
+      "id": "la-private-048",
+      "name": "Vistamar School",
+      "city": "El Segundo",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.927,
+      "lng": -118.385,
+      "zips": [
+        "90245"
+      ]
+    },
+    {
+      "id": "la-public-030",
+      "name": "West Torrance High School",
+      "city": "Torrance",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.843,
+      "lng": -118.369,
+      "zips": [
+        "90505"
+      ]
+    },
+    {
+      "id": "la-private-049",
+      "name": "Westridge School",
+      "city": "Pasadena",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.1422,
+      "lng": -118.1639,
+      "zips": [
+        "91105"
+      ]
+    },
+    {
+      "id": "la-private-050",
+      "name": "Wildwood School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.049,
+      "lng": -118.449,
+      "zips": [
+        "90064"
+      ]
+    },
+    {
+      "id": "la-private-051",
+      "name": "Windward School",
+      "city": "Los Angeles",
+      "region": "Los Angeles County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.004,
+      "lng": -118.453,
+      "zips": [
+        "90066"
+      ]
+    },
+    {
+      "id": "ca-public-011",
+      "name": "Corona del Mar High School",
+      "city": "Newport Beach",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.609,
+      "lng": -117.873,
+      "zips": [
+        "92625"
+      ]
+    },
+    {
+      "id": "ca-private-020",
+      "name": "Crean Lutheran High School",
+      "city": "Irvine",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.689,
+      "lng": -117.767,
+      "zips": [
+        "92618"
+      ]
+    },
+    {
+      "id": "ca-public-012",
+      "name": "Edison High School",
+      "city": "Huntington Beach",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.71,
+      "lng": -117.989,
+      "zips": [
+        "92646"
+      ]
+    },
+    {
+      "id": "ca-public-013",
+      "name": "Huntington Beach High School",
+      "city": "Huntington Beach",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.676,
+      "lng": -118.001,
+      "zips": [
+        "92648"
+      ]
+    },
+    {
+      "id": "ca-public-014",
+      "name": "Irvine High School",
+      "city": "Irvine",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.685,
+      "lng": -117.8,
+      "zips": [
+        "92604"
+      ]
+    },
+    {
+      "id": "ca-private-021",
+      "name": "JSerra Catholic High School",
+      "city": "San Juan Capistrano",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.494,
+      "lng": -117.658,
+      "zips": [
+        "92675"
+      ]
+    },
+    {
+      "id": "ca-public-015",
+      "name": "Laguna Beach High School",
+      "city": "Laguna Beach",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.547,
+      "lng": -117.786,
+      "zips": [
+        "92651"
+      ]
+    },
+    {
+      "id": "ca-public-016",
+      "name": "Los Alamitos High School",
+      "city": "Los Alamitos",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.792,
+      "lng": -118.067,
+      "zips": [
+        "90720"
+      ]
+    },
+    {
+      "id": "ca-private-022",
+      "name": "Mater Dei High School",
+      "city": "Santa Ana",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.756,
+      "lng": -117.881,
+      "zips": [
+        "92707"
+      ]
+    },
+    {
+      "id": "ca-public-017",
+      "name": "Newport Harbor High School",
+      "city": "Newport Beach",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.623,
+      "lng": -117.93,
+      "zips": [
+        "92663"
+      ]
+    },
+    {
+      "id": "ca-public-018",
+      "name": "Northwood High School",
+      "city": "Irvine",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.717,
+      "lng": -117.777,
+      "zips": [
+        "92620"
+      ]
+    },
+    {
+      "id": "ca-private-023",
+      "name": "Orange Lutheran High School",
+      "city": "Orange",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.796,
+      "lng": -117.87,
+      "zips": [
+        "92869"
+      ]
+    },
+    {
+      "id": "ca-private-024",
+      "name": "Pacifica Christian High School Orange County",
+      "city": "Newport Beach",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.661,
+      "lng": -117.899,
+      "zips": [
+        "92663"
+      ]
+    },
+    {
+      "id": "ca-public-019",
+      "name": "Portola High School",
+      "city": "Irvine",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.7,
+      "lng": -117.737,
+      "zips": [
+        "92618"
+      ]
+    },
+    {
+      "id": "ca-private-025",
+      "name": "Rosary Academy",
+      "city": "Fullerton",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.88,
+      "lng": -117.922,
+      "zips": [
+        "92832"
+      ]
+    },
+    {
+      "id": "ca-private-026",
+      "name": "Sage Hill School",
+      "city": "Newport Coast",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.631,
+      "lng": -117.84,
+      "zips": [
+        "92657"
+      ]
+    },
+    {
+      "id": "ca-public-020",
+      "name": "San Clemente High School",
+      "city": "San Clemente",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.449,
+      "lng": -117.623,
+      "zips": [
+        "92672"
+      ]
+    },
+    {
+      "id": "ca-private-027",
+      "name": "Santa Margarita Catholic High School",
+      "city": "Rancho Santa Margarita",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.63,
+      "lng": -117.601,
+      "zips": [
+        "92688"
+      ]
+    },
+    {
+      "id": "ca-private-028",
+      "name": "Servite High School",
+      "city": "Anaheim",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.84,
+      "lng": -117.946,
+      "zips": [
+        "92801"
+      ]
+    },
+    {
+      "id": "ca-private-029",
+      "name": "St. Margaret's Episcopal School",
+      "city": "San Juan Capistrano",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.504,
+      "lng": -117.661,
+      "zips": [
+        "92675"
+      ]
+    },
+    {
+      "id": "ca-public-021",
+      "name": "Tesoro High School",
+      "city": "Las Flores",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.581,
+      "lng": -117.624,
+      "zips": [
+        "92688"
+      ]
+    },
+    {
+      "id": "ca-public-022",
+      "name": "University High School",
+      "city": "Irvine",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.65,
+      "lng": -117.823,
+      "zips": [
+        "92612"
+      ]
+    },
+    {
+      "id": "ca-public-023",
+      "name": "Woodbridge High School",
+      "city": "Irvine",
+      "region": "Orange County",
+      "state": "CA",
+      "type": "public",
+      "lat": 33.69,
+      "lng": -117.812,
+      "zips": [
+        "92604"
+      ]
+    },
+    {
+      "id": "ca-private-057",
+      "name": "Linfield Christian School",
+      "city": "Temecula",
+      "region": "Riverside County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.518,
+      "lng": -117.143,
+      "zips": [
+        "92592"
+      ]
+    },
+    {
+      "id": "ca-private-055",
+      "name": "Notre Dame High School",
+      "city": "Riverside",
+      "region": "Riverside County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.951,
+      "lng": -117.396,
+      "zips": [
+        "92504"
+      ]
+    },
+    {
+      "id": "ca-private-056",
+      "name": "Woodcrest Christian High School",
+      "city": "Riverside",
+      "region": "Riverside County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.878,
+      "lng": -117.369,
+      "zips": [
+        "92508"
+      ]
+    },
+    {
+      "id": "ca-private-053",
+      "name": "Christian Brothers High School",
+      "city": "Sacramento",
+      "region": "Sacramento County",
+      "state": "CA",
+      "type": "private",
+      "lat": 38.5466,
+      "lng": -121.4538,
+      "zips": [
+        "95818"
+      ]
+    },
+    {
+      "id": "ca-private-051",
+      "name": "Jesuit High School",
+      "city": "Carmichael",
+      "region": "Sacramento County",
+      "state": "CA",
+      "type": "private",
+      "lat": 38.6354,
+      "lng": -121.3413,
+      "zips": [
+        "95608"
+      ]
+    },
+    {
+      "id": "ca-private-052",
+      "name": "Sacramento Country Day School",
+      "city": "Sacramento",
+      "region": "Sacramento County",
+      "state": "CA",
+      "type": "private",
+      "lat": 38.561,
+      "lng": -121.392,
+      "zips": [
+        "95864"
+      ]
+    },
+    {
+      "id": "ca-private-054",
+      "name": "Aquinas High School",
+      "city": "San Bernardino",
+      "region": "San Bernardino County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.139,
+      "lng": -117.288,
+      "zips": [
+        "92404"
+      ]
+    },
+    {
+      "id": "ca-private-046",
+      "name": "Bishop's School",
+      "city": "La Jolla",
+      "region": "San Diego County",
+      "state": "CA",
+      "type": "private",
+      "lat": 32.846,
+      "lng": -117.274,
+      "zips": [
+        "92037"
+      ]
+    },
+    {
+      "id": "ca-public-032",
+      "name": "Canyon Crest Academy",
+      "city": "San Diego",
+      "region": "San Diego County",
+      "state": "CA",
+      "type": "public",
+      "lat": 32.9619,
+      "lng": -117.1948,
+      "zips": [
+        "92130"
+      ]
+    },
+    {
+      "id": "ca-private-047",
+      "name": "Cathedral Catholic High School",
+      "city": "San Diego",
+      "region": "San Diego County",
+      "state": "CA",
+      "type": "private",
+      "lat": 32.9437,
+      "lng": -117.2306,
+      "zips": [
+        "92130"
+      ]
+    },
+    {
+      "id": "ca-private-048",
+      "name": "Francis Parker School",
+      "city": "San Diego",
+      "region": "San Diego County",
+      "state": "CA",
+      "type": "private",
+      "lat": 32.7918,
+      "lng": -117.1503,
+      "zips": [
+        "92103"
+      ]
+    },
+    {
+      "id": "ca-private-049",
+      "name": "La Jolla Country Day School",
+      "city": "La Jolla",
+      "region": "San Diego County",
+      "state": "CA",
+      "type": "private",
+      "lat": 32.8651,
+      "lng": -117.237,
+      "zips": [
+        "92037"
+      ]
+    },
+    {
+      "id": "ca-private-050",
+      "name": "Pacific Ridge School",
+      "city": "Carlsbad",
+      "region": "San Diego County",
+      "state": "CA",
+      "type": "private",
+      "lat": 33.0996,
+      "lng": -117.2542,
+      "zips": [
+        "92009"
+      ]
+    },
+    {
+      "id": "ca-public-031",
+      "name": "Torrey Pines High School",
+      "city": "San Diego",
+      "region": "San Diego County",
+      "state": "CA",
+      "type": "public",
+      "lat": 32.961,
+      "lng": -117.231,
+      "zips": [
+        "92130"
+      ]
+    },
+    {
+      "id": "ca-public-003",
+      "name": "Abraham Lincoln High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.74,
+      "lng": -122.483,
+      "zips": [
+        "94122"
+      ]
+    },
+    {
+      "id": "ca-private-003",
+      "name": "Convent of the Sacred Heart High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.792,
+      "lng": -122.435,
+      "zips": [
+        "94115"
+      ]
+    },
+    {
+      "id": "ca-private-005",
+      "name": "Drew School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.7878,
+      "lng": -122.428,
+      "zips": [
+        "94115"
+      ]
+    },
+    {
+      "id": "ca-public-001",
+      "name": "Galileo Academy of Science and Technology",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.802,
+      "lng": -122.429,
+      "zips": [
+        "94109"
+      ]
+    },
+    {
+      "id": "ca-public-002",
+      "name": "George Washington High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.78,
+      "lng": -122.497,
+      "zips": [
+        "94121"
+      ]
+    },
+    {
+      "id": "ca-private-007",
+      "name": "Lick-Wilmerding High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.722,
+      "lng": -122.438,
+      "zips": [
+        "94112"
+      ]
+    },
+    {
+      "id": "ca-public-006",
+      "name": "Lowell High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.732,
+      "lng": -122.483,
+      "zips": [
+        "94132"
+      ]
+    },
+    {
+      "id": "ca-public-007",
+      "name": "Mission High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.767,
+      "lng": -122.428,
+      "zips": [
+        "94114"
+      ]
+    },
+    {
+      "id": "ca-private-011",
+      "name": "Sacred Heart Cathedral Preparatory",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.78,
+      "lng": -122.422,
+      "zips": [
+        "94109"
+      ]
+    },
+    {
+      "id": "ca-private-014",
+      "name": "San Francisco University High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.787,
+      "lng": -122.44,
+      "zips": [
+        "94115"
+      ]
+    },
+    {
+      "id": "ca-private-015",
+      "name": "Stuart Hall High School",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.786,
+      "lng": -122.431,
+      "zips": [
+        "94115"
+      ]
+    },
+    {
+      "id": "ca-private-016",
+      "name": "The Bay School of San Francisco",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.802,
+      "lng": -122.457,
+      "zips": [
+        "94129"
+      ]
+    },
+    {
+      "id": "ca-private-018",
+      "name": "The Urban School of San Francisco",
+      "city": "San Francisco",
+      "region": "San Francisco County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.771,
+      "lng": -122.44,
+      "zips": [
+        "94117"
+      ]
+    },
+    {
+      "id": "ca-private-004",
+      "name": "Crystal Springs Uplands School",
+      "city": "Hillsborough",
+      "region": "San Mateo County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.566,
+      "lng": -122.368,
+      "zips": [
+        "94010"
+      ]
+    },
+    {
+      "id": "ca-private-008",
+      "name": "Menlo School",
+      "city": "Atherton",
+      "region": "San Mateo County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.454,
+      "lng": -122.19,
+      "zips": [
+        "94027"
+      ]
+    },
+    {
+      "id": "ca-private-009",
+      "name": "Notre Dame High School",
+      "city": "Belmont",
+      "region": "San Mateo County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.52,
+      "lng": -122.289,
+      "zips": [
+        "94002"
+      ]
+    },
+    {
+      "id": "ca-private-010",
+      "name": "Nueva School",
+      "city": "San Mateo",
+      "region": "San Mateo County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.518,
+      "lng": -122.328,
+      "zips": [
+        "94403"
+      ]
+    },
+    {
+      "id": "ca-private-012",
+      "name": "Sacred Heart Preparatory",
+      "city": "Atherton",
+      "region": "San Mateo County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.454,
+      "lng": -122.185,
+      "zips": [
+        "94027"
+      ]
+    },
+    {
+      "id": "ca-public-010",
+      "name": "Woodside High School",
+      "city": "Woodside",
+      "region": "San Mateo County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.454,
+      "lng": -122.271,
+      "zips": [
+        "94062"
+      ]
+    },
+    {
+      "id": "ca-private-019",
+      "name": "Woodside Priory School",
+      "city": "Portola Valley",
+      "region": "San Mateo County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.376,
+      "lng": -122.215,
+      "zips": [
+        "94028"
+      ]
+    },
+    {
+      "id": "ca-private-017",
+      "name": "Archbishop Mitty High School",
+      "city": "San Jose",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.312,
+      "lng": -121.989,
+      "zips": [
+        "95129"
+      ]
+    },
+    {
+      "id": "ca-private-001",
+      "name": "Bellarmine College Preparatory",
+      "city": "San Jose",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.336,
+      "lng": -121.91,
+      "zips": [
+        "95126"
+      ]
+    },
+    {
+      "id": "ca-private-002",
+      "name": "Castilleja School",
+      "city": "Palo Alto",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.4399,
+      "lng": -122.1518,
+      "zips": [
+        "94301"
+      ]
+    },
+    {
+      "id": "ca-private-006",
+      "name": "Harker School",
+      "city": "San Jose",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.317,
+      "lng": -121.987,
+      "zips": [
+        "95129"
+      ]
+    },
+    {
+      "id": "ca-public-004",
+      "name": "Henry M. Gunn High School",
+      "city": "Palo Alto",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.4053,
+      "lng": -122.133,
+      "zips": [
+        "94306"
+      ]
+    },
+    {
+      "id": "ca-public-005",
+      "name": "Los Altos High School",
+      "city": "Los Altos",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.369,
+      "lng": -122.101,
+      "zips": [
+        "94022"
+      ]
+    },
+    {
+      "id": "ca-public-008",
+      "name": "Mountain View High School",
+      "city": "Mountain View",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.39,
+      "lng": -122.086,
+      "zips": [
+        "94040"
+      ]
+    },
+    {
+      "id": "ca-public-009",
+      "name": "Palo Alto High School",
+      "city": "Palo Alto",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "public",
+      "lat": 37.425,
+      "lng": -122.153,
+      "zips": [
+        "94301"
+      ]
+    },
+    {
+      "id": "ca-private-013",
+      "name": "Saint Francis High School",
+      "city": "Mountain View",
+      "region": "Santa Clara County",
+      "state": "CA",
+      "type": "private",
+      "lat": 37.385,
+      "lng": -122.07,
+      "zips": [
+        "94040"
+      ]
+    },
+    {
+      "id": "la-private-041",
+      "name": "St. Bonaventure High School",
+      "city": "Ventura",
+      "region": "Ventura County",
+      "state": "CA",
+      "type": "private",
+      "lat": 34.298,
+      "lng": -119.239,
+      "zips": [
+        "93003"
+      ]
+    },
+    {
+      "id": "us-private-008",
+      "name": "Georgetown Day School",
+      "city": "Washington",
+      "region": "DC Metro",
+      "state": "DC",
+      "type": "private",
+      "lat": 38.943,
+      "lng": -77.083,
+      "zips": [
+        "20016"
+      ]
+    },
+    {
+      "id": "us-private-009",
+      "name": "Maret School",
+      "city": "Washington",
+      "region": "DC Metro",
+      "state": "DC",
+      "type": "private",
+      "lat": 38.941,
+      "lng": -77.053,
+      "zips": [
+        "20008"
+      ]
+    },
+    {
+      "id": "us-private-010",
+      "name": "National Cathedral School",
+      "city": "Washington",
+      "region": "DC Metro",
+      "state": "DC",
+      "type": "private",
+      "lat": 38.931,
+      "lng": -77.071,
+      "zips": [
+        "20016"
+      ]
+    },
+    {
+      "id": "us-private-007",
+      "name": "Sidwell Friends School",
+      "city": "Washington",
+      "region": "DC Metro",
+      "state": "DC",
+      "type": "private",
+      "lat": 38.952,
+      "lng": -77.07,
+      "zips": [
+        "20016"
+      ]
+    },
+    {
+      "id": "us-private-011",
+      "name": "St. Albans School",
+      "city": "Washington",
+      "region": "DC Metro",
+      "state": "DC",
+      "type": "private",
+      "lat": 38.93,
+      "lng": -77.071,
+      "zips": [
+        "20016"
+      ]
+    },
+    {
+      "id": "us-private-030",
+      "name": "Gulliver Preparatory School",
+      "city": "Pinecrest",
+      "region": "Miami Metro",
+      "state": "FL",
+      "type": "private",
+      "lat": 25.67,
+      "lng": -80.305,
+      "zips": [
+        "33156"
+      ]
+    },
+    {
+      "id": "us-private-031",
+      "name": "Ransom Everglades School",
+      "city": "Coconut Grove",
+      "region": "Miami Metro",
+      "state": "FL",
+      "type": "private",
+      "lat": 25.727,
+      "lng": -80.238,
+      "zips": [
+        "33133"
+      ]
+    },
+    {
+      "id": "us-private-051",
+      "name": "Holy Innocents' Episcopal School",
+      "city": "Atlanta",
+      "region": "Atlanta Metro",
+      "state": "GA",
+      "type": "private",
+      "lat": 33.9215,
+      "lng": -84.3805,
+      "zips": [
+        "30327"
+      ]
+    },
+    {
+      "id": "us-private-052",
+      "name": "Lovett School",
+      "city": "Atlanta",
+      "region": "Atlanta Metro",
+      "state": "GA",
+      "type": "private",
+      "lat": 33.8662,
+      "lng": -84.4419,
+      "zips": [
+        "30327"
+      ]
+    },
+    {
+      "id": "us-private-053",
+      "name": "Pace Academy",
+      "city": "Atlanta",
+      "region": "Atlanta Metro",
+      "state": "GA",
+      "type": "private",
+      "lat": 33.8556,
+      "lng": -84.4178,
+      "zips": [
+        "30327"
+      ]
+    },
+    {
+      "id": "us-private-054",
+      "name": "Westminster Schools",
+      "city": "Atlanta",
+      "region": "Atlanta Metro",
+      "state": "GA",
+      "type": "private",
+      "lat": 33.8489,
+      "lng": -84.4271,
+      "zips": [
+        "30327"
+      ]
+    },
+    {
+      "id": "us-private-012",
+      "name": "Francis W. Parker School",
+      "city": "Chicago",
+      "region": "Chicago Metro",
+      "state": "IL",
+      "type": "private",
+      "lat": 41.927,
+      "lng": -87.644,
+      "zips": [
+        "60614"
+      ]
+    },
+    {
+      "id": "us-private-013",
+      "name": "Latin School of Chicago",
+      "city": "Chicago",
+      "region": "Chicago Metro",
+      "state": "IL",
+      "type": "private",
+      "lat": 41.91,
+      "lng": -87.63,
+      "zips": [
+        "60610"
+      ]
+    },
+    {
+      "id": "us-private-014",
+      "name": "North Shore Country Day School",
+      "city": "Winnetka",
+      "region": "Chicago Metro",
+      "state": "IL",
+      "type": "private",
+      "lat": 42.107,
+      "lng": -87.733,
+      "zips": [
+        "60093"
+      ]
+    },
+    {
+      "id": "us-private-015",
+      "name": "University of Chicago Laboratory Schools",
+      "city": "Chicago",
+      "region": "Chicago Metro",
+      "state": "IL",
+      "type": "private",
+      "lat": 41.792,
+      "lng": -87.601,
+      "zips": [
+        "60637"
+      ]
+    },
+    {
+      "id": "us-private-001",
+      "name": "Belmont Hill School",
+      "city": "Belmont",
+      "region": "Boston Metro",
+      "state": "MA",
+      "type": "private",
+      "lat": 42.403,
+      "lng": -71.182,
+      "zips": [
+        "02478"
+      ]
+    },
+    {
+      "id": "us-private-002",
+      "name": "Buckingham Browne & Nichols School",
+      "city": "Cambridge",
+      "region": "Boston Metro",
+      "state": "MA",
+      "type": "private",
+      "lat": 42.387,
+      "lng": -71.132,
+      "zips": [
+        "02138"
+      ]
+    },
+    {
+      "id": "us-private-003",
+      "name": "Milton Academy",
+      "city": "Milton",
+      "region": "Boston Metro",
+      "state": "MA",
+      "type": "private",
+      "lat": 42.251,
+      "lng": -71.07,
+      "zips": [
+        "02186"
+      ]
+    },
+    {
+      "id": "us-private-004",
+      "name": "Noble and Greenough School",
+      "city": "Dedham",
+      "region": "Boston Metro",
+      "state": "MA",
+      "type": "private",
+      "lat": 42.252,
+      "lng": -71.17,
+      "zips": [
+        "02026"
+      ]
+    },
+    {
+      "id": "us-private-005",
+      "name": "Roxbury Latin School",
+      "city": "West Roxbury",
+      "region": "Boston Metro",
+      "state": "MA",
+      "type": "private",
+      "lat": 42.278,
+      "lng": -71.161,
+      "zips": [
+        "02132"
+      ]
+    },
+    {
+      "id": "us-private-006",
+      "name": "Winsor School",
+      "city": "Boston",
+      "region": "Boston Metro",
+      "state": "MA",
+      "type": "private",
+      "lat": 42.338,
+      "lng": -71.105,
+      "zips": [
+        "02215"
+      ]
+    },
+    {
+      "id": "us-private-020",
+      "name": "Brearley School",
+      "city": "New York",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.774,
+      "lng": -73.946,
+      "zips": [
+        "10028"
+      ]
+    },
+    {
+      "id": "us-private-021",
+      "name": "Chapin School",
+      "city": "New York",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.774,
+      "lng": -73.946,
+      "zips": [
+        "10028"
+      ]
+    },
+    {
+      "id": "us-private-022",
+      "name": "Collegiate School",
+      "city": "New York",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.774,
+      "lng": -73.989,
+      "zips": [
+        "10069"
+      ]
+    },
+    {
+      "id": "us-private-023",
+      "name": "Dalton School",
+      "city": "New York",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.779,
+      "lng": -73.956,
+      "zips": [
+        "10128"
+      ]
+    },
+    {
+      "id": "us-private-024",
+      "name": "Ethical Culture Fieldston School",
+      "city": "Bronx",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.902,
+      "lng": -73.905,
+      "zips": [
+        "10471"
+      ]
+    },
+    {
+      "id": "us-private-025",
+      "name": "Horace Mann School",
+      "city": "Bronx",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.902,
+      "lng": -73.91,
+      "zips": [
+        "10471"
+      ]
+    },
+    {
+      "id": "us-private-026",
+      "name": "Nightingale-Bamford School",
+      "city": "New York",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.781,
+      "lng": -73.959,
+      "zips": [
+        "10128"
+      ]
+    },
+    {
+      "id": "us-private-027",
+      "name": "Riverdale Country School",
+      "city": "Bronx",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.902,
+      "lng": -73.913,
+      "zips": [
+        "10471"
+      ]
+    },
+    {
+      "id": "us-private-028",
+      "name": "Spence School",
+      "city": "New York",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.778,
+      "lng": -73.959,
+      "zips": [
+        "10128"
+      ]
+    },
+    {
+      "id": "us-private-029",
+      "name": "Trinity School",
+      "city": "New York",
+      "region": "New York Metro",
+      "state": "NY",
+      "type": "private",
+      "lat": 40.786,
+      "lng": -73.978,
+      "zips": [
+        "10024"
+      ]
+    },
+    {
+      "id": "us-private-016",
+      "name": "Episcopal Academy",
+      "city": "Newtown Square",
+      "region": "Philadelphia Metro",
+      "state": "PA",
+      "type": "private",
+      "lat": 40.008,
+      "lng": -75.415,
+      "zips": [
+        "19073"
+      ]
+    },
+    {
+      "id": "us-private-017",
+      "name": "Friends' Select School",
+      "city": "Philadelphia",
+      "region": "Philadelphia Metro",
+      "state": "PA",
+      "type": "private",
+      "lat": 39.956,
+      "lng": -75.17,
+      "zips": [
+        "19103"
+      ]
+    },
+    {
+      "id": "us-private-018",
+      "name": "Haverford School",
+      "city": "Haverford",
+      "region": "Philadelphia Metro",
+      "state": "PA",
+      "type": "private",
+      "lat": 40.009,
+      "lng": -75.305,
+      "zips": [
+        "19041"
+      ]
+    },
+    {
+      "id": "us-private-019",
+      "name": "Shipley School",
+      "city": "Bryn Mawr",
+      "region": "Philadelphia Metro",
+      "state": "PA",
+      "type": "private",
+      "lat": 40.022,
+      "lng": -75.317,
+      "zips": [
+        "19010"
+      ]
+    },
+    {
+      "id": "us-private-035",
+      "name": "Episcopal School of Dallas",
+      "city": "Dallas",
+      "region": "Dallas Metro",
+      "state": "TX",
+      "type": "private",
+      "lat": 32.88,
+      "lng": -96.79,
+      "zips": [
+        "75229"
+      ]
+    },
+    {
+      "id": "us-private-034",
+      "name": "Greenhill School",
+      "city": "Addison",
+      "region": "Dallas Metro",
+      "state": "TX",
+      "type": "private",
+      "lat": 32.958,
+      "lng": -96.835,
+      "zips": [
+        "75001"
+      ]
+    },
+    {
+      "id": "us-private-032",
+      "name": "Hockaday School",
+      "city": "Dallas",
+      "region": "Dallas Metro",
+      "state": "TX",
+      "type": "private",
+      "lat": 32.907,
+      "lng": -96.823,
+      "zips": [
+        "75229"
+      ]
+    },
+    {
+      "id": "us-private-033",
+      "name": "St. Mark's School of Texas",
+      "city": "Dallas",
+      "region": "Dallas Metro",
+      "state": "TX",
+      "type": "private",
+      "lat": 32.883,
+      "lng": -96.782,
+      "zips": [
+        "75230"
+      ]
+    },
+    {
+      "id": "us-private-036",
+      "name": "Kinkaid School",
+      "city": "Houston",
+      "region": "Houston Metro",
+      "state": "TX",
+      "type": "private",
+      "lat": 29.767,
+      "lng": -95.498,
+      "zips": [
+        "77024"
+      ]
+    },
+    {
+      "id": "us-private-037",
+      "name": "St. John's School",
+      "city": "Houston",
+      "region": "Houston Metro",
+      "state": "TX",
+      "type": "private",
+      "lat": 29.74,
+      "lng": -95.417,
+      "zips": [
+        "77019"
+      ]
+    }
+  ]
+}

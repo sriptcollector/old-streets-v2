@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Members · Paths</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/chrome.css">
+<script src="/chrome.js?v=20260514" defer></script>
+<style>
+  .members-wrap { max-width: 980px; margin: 12px auto; padding: 0 10px; }
+  .members-head { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap: wrap; }
+  .members-head input { flex:1; min-width:200px; padding:8px 10px; font:13px Verdana,Tahoma,Arial,sans-serif; border:1px solid var(--msp-rule); }
+  .members-head .ct { font-size: 11px; color: var(--msp-mute); }
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+  }
+  .mcard {
+    background: #fff;
+    border: 1px solid var(--msp-rule);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+  .mcard:hover { background: var(--msp-tint-2); }
+  .mcard .av {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: var(--msp-blue);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 32px;
+    border: 1px solid var(--msp-rule);
+    overflow: hidden;
+  }
+  .mcard .av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .mcard .nm { font-weight: 700; font-size: 12px; margin-top: 6px; color: var(--msp-blue-d); line-height: 1.2; }
+  .mcard .hd { font-size: 10px; color: var(--msp-mute); margin-top: 1px; }
+  .mcard .dot {
+    position: absolute;
+    top: 10px; left: 10px;
+    width: 10px; height: 10px;
+    background: var(--msp-green); border: 1px solid #1f6624; border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(76,175,80,0.7);
+    animation: m-pulse 1.6s ease-out infinite;
+  }
+  .mcard .admin-pill {
+    position: absolute; top: 6px; right: 6px;
+    background: #cc5500; color: #fff; font-size: 9px;
+    padding: 1px 5px; font-weight: 700; border-radius: 1px;
+  }
+  .mcard .add-btn {
+    margin-top: 6px;
+    background: var(--msp-blue); color: #fff;
+    border: 1px solid var(--msp-blue-d);
+    font-size: 10px; padding: 3px 8px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .mcard .add-btn:disabled { opacity: 0.5; cursor: default; }
+  @keyframes m-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
+    70%  { box-shadow: 0 0 0 8px rgba(76,175,80,0); }
+    100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+  }
+  .mempty { padding: 40px; text-align: center; color: var(--msp-mute); font-style: italic; grid-column: 1/-1; }
+</style>
+</head>
+<body>
+
+<div class="members-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">👥 Members</h1></div>
+  <div class="url-bar">
+    <div class="url-left"><span class="url-mono">everyone on Streets — click any card to view their profile.</span></div>
+  </div>
+
+  <div class="widget" style="padding: 10px;">
+    <div class="members-head">
+      <input id="mq" type="search" placeholder="search by name or @handle…" autocomplete="off"/>
+      <span class="ct" id="mct">loading…</span>
+    </div>
+    <div class="members-grid" id="mgrid">
+      <div class="mempty">loading members…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token') || '';
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = id => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function initials(n){ const p=(n||'').trim().split(/\s+/).slice(0,2); return p.map(x=>x[0]||'').join('').toUpperCase()||'?'; }
+  function timeAgo(ts){ if(!ts) return ''; const s=Math.floor((Date.now()-ts)/1000); if(s<60) return 'just now'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+
+  async function api(path) {
+    const r = await fetch(path, { headers: { 'X-User-Token': TOKEN } });
+    if (!r.ok) throw new Error('http '+r.status);
+    return r.json();
+  }
+  let myEmail = '';
+  let myFriendSet = new Set();
+  let mySentSet = new Set();
+  async function loadMe() {
+    try {
+      const w = await api('/api/whoami');
+      const me = w.user || w;
+      myEmail = (me.email || '').toLowerCase();
+      myFriendSet = new Set((me.friends || []).map(e => (e||'').toLowerCase()));
+    } catch {}
+    try {
+      const sent = await api('/api/friend-requests/sent');
+      const list = Array.isArray(sent) ? sent : (sent.requests || []);
+      mySentSet = new Set(list.map(r => (r.to || '').toLowerCase()));
+    } catch {}
+  }
+
+  async function load(q) {
+    try {
+      const url = '/api/members' + (q ? '?q=' + encodeURIComponent(q) : '');
+      const d = await api(url);
+      const list = d.members || [];
+      $('mct').textContent = (d.total || 0) + ' member' + ((d.total||0)===1?'':'s');
+      if (!list.length) {
+        $('mgrid').innerHTML = '<div class="mempty">no members match.</div>';
+        return;
+      }
+      $('mgrid').innerHTML = list.map(u => {
+        const h = u.handle || (u.email||'').split('@')[0];
+        const isSelf = (u.email || '').toLowerCase() === myEmail;
+        const isFriend = myFriendSet.has((u.email||'').toLowerCase());
+        const isSent = mySentSet.has((u.email||'').toLowerCase());
+        let btnHtml = '';
+        if (!isSelf) {
+          if (isFriend) btnHtml = '<button class="add-btn" disabled>✓ friends</button>';
+          else if (isSent) btnHtml = '<button class="add-btn" disabled>· requested</button>';
+          else btnHtml = `<button class="add-btn" data-email="${esc(u.email||'')}">+ add friend</button>`;
+        }
+        return `<a class="mcard" href="/u/${esc(h)}">
+          ${u.online ? '<span class="dot" title="online now"></span>' : ''}
+          ${u.isAdmin ? '<span class="admin-pill">ADMIN</span>' : ''}
+          <div class="av">${u.avatar ? `<img src="${esc(u.avatar)}" alt=""/>` : esc(initials(u.name))}</div>
+          <div class="nm">${esc(u.name||'unknown')}${(u.rating && u.rating > 0) ? ` <span style="color:#cc7700;font-size:10px;">★${u.rating.toFixed(1)}</span>` : ''}</div>
+          <div class="hd">@${esc(h)}${u.online ? ' · online' : (u.lastSeen ? ' · '+esc(timeAgo(u.lastSeen)) : '')}</div>
+          ${btnHtml}
+        </a>`;
+      }).join('');
+      $('mgrid').querySelectorAll('.add-btn').forEach(b => {
+        b.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const email = b.dataset.email;
+          b.disabled = true; b.textContent = '…';
+          try {
+            const r = await fetch('/api/friend-requests/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'X-User-Token': TOKEN },
+              body: JSON.stringify({ toEmail: email })
+            });
+            if (!r.ok) throw new Error('failed');
+            b.textContent = '· requested';
+            mySentSet.add((email||'').toLowerCase());
+          } catch {
+            b.disabled = false; b.textContent = '+ add friend';
+          }
+        });
+      });
+    } catch (e) {
+      $('mgrid').innerHTML = '<div class="mempty">could not load: '+esc(e.message)+'</div>';
+    }
+  }
+
+  let timer = null;
+  $('mq').addEventListener('input', () => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => load($('mq').value.trim()), 220);
+  });
+
+  loadMe().then(() => load(''));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Leaderboard · Paths</title>
+<link rel="stylesheet" href="/chrome.css?v=20260513y"/>
+<script src="/chrome.js?v=20260513y"></script>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="hello-bar"><h1 class="hello-h1">🏆 Leaderboard</h1></div>
+  <div class="url-bar"><div class="url-left"><span class="url-mono">who's running this place</span></div></div>
+
+  <div class="os-tabs" id="tabs">
+    <a class="os-tab active" data-tab="streaks">Streaks</a>
+    <a class="os-tab" data-tab="posts">Posts</a>
+    <a class="os-tab" data-tab="reactions">Reactions Earned</a>
+    <a class="os-tab" data-tab="invites">Top Inviters</a>
+  </div>
+  <div class="widget"><div class="widget-body none" id="board"><div class="empty">loading…</div></div></div>
+</div>
+
+<script>
+(function(){
+  const TOKEN = localStorage.getItem('oldstreets-token') || sessionStorage.getItem('oldstreets-token');
+  if (!TOKEN) { location.replace('/onboard.html'); return; }
+  const $ = (id) => document.getElementById(id);
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function initials(n){ const p=(n||'').trim().split(/\s+/).slice(0,2); return p.map(x=>x[0]||'').join('').toUpperCase()||'?'; }
+  async function api(path){ const r = await fetch(path, { headers: { 'X-User-Token': TOKEN } }); return r.json().catch(()=>({})); }
+  let MODE = 'streaks';
+  document.querySelectorAll('.os-tab').forEach(t => t.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.os-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    MODE = t.dataset.tab;
+    load();
+  }));
+  async function load(){
+    $('board').innerHTML = '<div class="empty">loading…</div>';
+    try {
+      const data = await api('/api/leaderboard?mode=' + encodeURIComponent(MODE));
+      const list = data.leaderboard || data || [];
+      if (!list.length) { $('board').innerHTML = '<div class="empty">no rankings yet.</div>'; return; }
+      $('board').innerHTML = list.slice(0,50).map((u,i) => {
+        const handle = u.handle || (u.email||'').split('@')[0];
+        const rcolor = i===0?'#d4a300':i===1?'#888':i===2?'#c0860a':'var(--msp-blue-d)';
+        const label = MODE==='streaks' ? (u.streak||0)+' days'
+                    : MODE==='posts' ? (u.posts||0)+' posts'
+                    : MODE==='reactions' ? (u.reactions||0)+' reacts'
+                    : (u.invites||0)+' invites';
+        return `<div class="os-row">
+          <div style="width:24px; font-weight:700; color:${rcolor}; font-size:14px;">${i+1}</div>
+          <div class="avatar" style="width:32px; height:32px; font-size:12px;">${u.avatar ? `<img src="${esc(u.avatar)}"/>` : esc(initials(u.name))}</div>
+          <div class="body"><div class="name"><a href="/u/${esc(handle)}">${esc(u.name||'?')}</a></div><div class="ts">@${esc(handle)}</div></div>
+          <div style="font-weight:700; color:var(--msp-orange);">${esc(label)}</div>
+        </div>`;
+      }).join('');
+    } catch { $('board').innerHTML = '<div class="empty">could not load.</div>'; }
+  }
+  load();
+})();
+</script>
+</body>
+</html>
